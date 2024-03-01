@@ -1,6 +1,7 @@
 {
   "name": "epub-to-image",
   "version": "0.1.0",
+  "proxy": "https://api.openai.com",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",
