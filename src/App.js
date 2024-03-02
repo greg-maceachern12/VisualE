@@ -78,27 +78,30 @@ function App() {
 
         console.log("Chapter texts: ", chapterTexts);
 
-        // Now you can make a call to the DALL-E API with the extracted texts
+        // Now you can make a call to the DALL-E API with the extracted texts (in the correct format.)
+       
+        const chapterPrompt = displayedChapter.contents.innerText.slice(0,900)
 
-        // Example DALL-E API call
-        const response = await axios.post(
-          "https://api.openai.com/v2/images/generations",
-          {
-            prompt: Object.values(chapterTexts).join(". "), // Concatenate all chapter texts into a single string
-            n: 1, // Number of images to generate
-            size: "1024x1024", // Image size
+       // This now needs to be fed to ChatGPT to optimize the prompt.
+
+          //  Call DALL-E with the improved prompt
+        fetch('http://localhost:3001/generateImage', {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           },
-          {
-            headers: {
-              Authorization: `Bearer ${process.env.OPENAI_API_KEY}`, // Accessing the API key from .env
-            },
-          }
-        );
+          body: JSON.stringify({
+            prompt: chapterPrompt,
+          }),
+        })
+          .then((response) => response.json())
+          .then((data) => console.log(data))
+          .catch((error) => console.error("Error:", error));
 
         // Access the generated image URL from the DALL-E API response
-        const imageUrl = response.data.data[0].url; // Assuming the response structure has the URL at this path
-        console.log("Generated Image URL:", imageUrl);
-        console.log("Generated Image URL:", chapterTexts);
+        // const imageUrl = response.data.data[0].url; // Assuming the response structure has the URL at this path
+        // console.log("Generated Image URL:", imageUrl);
+        // console.log("Generated Image URL:", chapterTexts);
       } catch (error) {
         console.error("Error while parsing EPUB:", error);
       }
