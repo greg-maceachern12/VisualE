@@ -34,7 +34,7 @@ VisualE was crafted to enhance readers' comprehension of descriptive language in
 
 
 ### Image
-![Example of GenAI image from Eragon](assets/eragonEx3.jpeg)
+![Example of GenAI image from Eragon](assets/eragonEx3.png)
 
 
 ## Example 3
