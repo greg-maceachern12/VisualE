@@ -1,4 +1,4 @@
-# Visuale *Still under active development*
+# Visuale *(still under active development)*
 
 ## Description
 
