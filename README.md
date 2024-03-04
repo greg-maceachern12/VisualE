@@ -39,6 +39,7 @@ VisualE was crafted to enhance readers' comprehension of descriptive language in
 npm install
 
 npm start
+
 node server.js *(in another window)*
 
 
