@@ -20,6 +20,25 @@ VisualE was crafted to enhance readers' comprehension of descriptive language in
 
 ## Example 2
 ### Text
+> Eragon knelt in a bed of trampled reed grass and scanned the tracks with a practiced eye. 
+> The prints told him that the deer had been in the meadow only a half-hour before. 
+>Soon they would bed down. His target, a small doe with a pronounced limp in her 
+> left forefoot, was still with the herd. He was amazed she had made it so far 
+> without a wolf or bear catching her. 
+ 
+> The sky was clear and dark, and a slight breeze stirred the air. A silvery cloud drifted 
+> over the mountains that surrounded him, its edges glowing with ruddy light cast 
+> from the harvest moon cradled between two peaks. Streams flowed down the 
+> mountains from stolid glaciers and glistening snowpacks. A brooding mist crept 
+> along the valley’s floor, almost thick enough to obscure his feet.”
+
+
+### Image
+![Example of GenAI image from Eragon](assets/eragonEx3.jpeg)
+
+
+## Example 3
+### Text
 > One tree bulged at the base to form a two-story house before sinking its roots into the loam. Both stories
 > were hexagonal, although the upper level was half as small as the first, which gave the house a tiered 
 > appearance. The roofs and walls were made of webbed sheets of wood
