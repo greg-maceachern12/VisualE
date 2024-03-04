@@ -2,8 +2,6 @@
 
 ## Description
 
-
-
 VisualE was crafted to enhance readers' comprehension of descriptive language in books by transforming text into visual representations. It operates with PDF or EPUB files (currently limited to EPUB), scanning each chapter for visually descriptive passages. Utilizing DALLE technology, it generates images corresponding to these descriptions. These images are seamlessly integrated beneath the respective paragraphs, providing readers with a nuanced visual interpretation of the text.
 
 ## Example 1
