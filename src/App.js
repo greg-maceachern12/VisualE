@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import epub from "epubjs";
 import axios from "axios";
+import "./App.css";
 
 function App() {
   const [epubFile, setEpubFile] = useState(null);
@@ -8,6 +9,7 @@ function App() {
   const [chapterNumber, setChapterNumber] = useState(0);
   const [imageUrl, setImageUrl] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0); // Track the current chapter index
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -47,6 +49,10 @@ function App() {
         // Extract the first 900 characters of the chapter's text
         const chapterPrompt = displayedChapter.contents.innerText.slice(0, 900);
         console.log(chapterPrompt);
+
+        // Before the fetch call, indicate loading has started
+        setIsLoading(true);
+
         // Fetch call with the prompt
         fetch("http://localhost:3001/generateImage", {
           method: "POST",
@@ -59,9 +65,13 @@ function App() {
         })
           .then((response) => response.json())
           .then((data) => {
-            setImageUrl(data.imageUrl); // Assuming the API returns an object with an imageUrl property
+            setImageUrl(data.imageUrl); // Update with the new image URL
+            setIsLoading(false); // Loading complete
           })
-          .catch((error) => console.error("Error calling the API:", error));
+          .catch((error) => {
+            console.error("Error calling the API:", error);
+            setIsLoading(false); // Ensure loading is stopped on error
+          });
       } catch (error) {
         console.error("Error while parsing EPUB:", error);
       }
@@ -93,10 +103,16 @@ function App() {
           <h2>
             Chapter {chapterNumber}: {chapterTitle}
           </h2>
-          {imageUrl && <img src={imageUrl} alt="Generated from chapter" />}
+          {isLoading ? (
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <span>Loading AI Generated Image... </span>
+              <div className="spinner"></div>
+            </div>
+          ) : (
+            imageUrl && <img src={imageUrl} alt="Generated from chapter" />
+          )}
         </div>
       )}
-      {/* Hidden div for off-screen content rendering */}
       <div id="hiddenDiv" style={{ display: "none", height: 0 }}></div>
     </div>
   );
