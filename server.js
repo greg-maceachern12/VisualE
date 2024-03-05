@@ -15,16 +15,36 @@ const app = express();
 app.use(express.json());
 app.use(cors()); // Use this if your React app is served from a different port or domain
 
-// Endpoint to handle OpenAI API requests
+// Endpoint to handle OpenAI ChatGPT API requests
+app.post('/api/chatgpt', async (req, res) => {
+    try {
+        const chatResponse = await openai.chat.completions.create({
+            model: "gpt-3.5-turbo",
+            messages: [
+              {"role": "system", "content": "Analyze the inputted book chapter for themes, characters, settings, events, and emotional tone. Generate a prompt highlighting these elements for DALL-E 3 image generation. Use visually descriptive elements as much as possible. Output just the prompt that can immediately be used by DALL-E 3"},
+              {"role": "user", "content": req.body.prompt}
+            ]
+        });
+        console.log(chatResponse.choices[0].message.content)
+        res.json({ response: chatResponse.choices[0].message.content });
+    } catch (error) {
+        console.error('Error with ChatGPT API:', error);
+        res.status(500).json({ error: 'An error occurred with the ChatGPT API.' });
+    }
+});
+
+
+
+// Endpoint to handle OpenAI DALL-E 3 API requests
 app.post('/generateImage', async(req, res) => {
     try {
         
     /*Code to generate image */
-        const image = await openai.images.generate({ model: "dall-e-3", prompt: req.body.prompt });
-        const imageUrl = image.data[0].url;
+        // const image = await openai.images.generate({ model: "dall-e-3", prompt: req.body.prompt });
+        // const imageUrl = image.data[0].url;
 
     /* Safe way to test without using DALEE Credits */
-        // const imageUrl = "https://images.penguinrandomhouse.com/cover/9780593704462";
+        const imageUrl = "https://images.penguinrandomhouse.com/cover/9780593704462";
         console.log(imageUrl)
         res.json({ imageUrl });
     } catch (error) {
@@ -32,29 +52,6 @@ app.post('/generateImage', async(req, res) => {
         res.status(500).json({ error: 'An error occurred while generating the image.' });
     }
 });
-
-
-// app.post('/api/openai', async (req, res) => {
-//     const { prompt } = req.body;
-//     try {
-//         const response = await axios.post(
-//             "https://api.openai.com/v2/images/generations",
-//             {
-//               prompt: prompt,
-//               n: 1, // Number of images to generate
-//               size: "1024x1024", // Image size
-//             },
-//             {
-//               headers: {
-//                 Authorization: `Bearer ${process.env.OPENAI_API_KEY}`, // Accessing the API key from .env
-//               },
-//             }
-//           );
-//         res.json(response.data);
-//     } catch (error) {
-//         res.status(500).send(error.toString());
-//     }
-// });
 
 
 // Start the server

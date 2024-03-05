@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import epub from "epubjs";
-import { Zenitho } from "uvcanvas";
-import axios from "axios";
+// import { Zenitho } from "uvcanvas";
+// import axios from "axios";
+
 import "./App.css";
 
 function App() {
   const [epubFile, setEpubFile] = useState(null);
   const [chapterTitle, setChapterTitle] = useState("");
-  const [chapterPrompt, setChapterPrompt] = useState("");
+  const [displayPrompt, setDisplayPrompt] = useState("");
   const [chapterNumber, setChapterNumber] = useState(0);
   const [imageUrl, setImageUrl] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0); // Track the current chapter index
@@ -49,23 +50,39 @@ function App() {
           .display(currentChapter.href);
 
         // Extract the first 900 characters of the chapter's text
-        const chapterPrompt = displayedChapter.contents.innerText.slice(0, 900);
-        console.log(chapterPrompt);
-        setChapterPrompt(chapterPrompt);
-
+        const chapterPrompt = displayedChapter.contents.innerText.slice(0,16000);
         // Before the fetch call, indicate loading has started
         setIsLoading(true);
 
-        // Fetch call with the prompt
-        fetch("http://localhost:3001/generateImage", {
+        console.log("Chapter Prompt: "+ chapterPrompt);
+
+
+        // Assume this is part of your function where you want to use the ChatGPT API before image generation
+        const processedPrompt = await fetch("/api/chatgpt", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            prompt: chapterPrompt,
-          }),
+          body: JSON.stringify({ prompt: chapterPrompt }),
         })
+          .then((response) => response.json())
+          .then((data) => data.response)
+          .catch((error) => console.error("Error with ChatGPT API:", error));
+        console.log("Processed Prompt: "+ processedPrompt);
+
+
+        setDisplayPrompt(processedPrompt);
+        
+        // Use `processedPrompt` for your image generation API call
+        fetch("/generateImage", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ prompt: processedPrompt }),
+        })
+          // Follow with the existing logic to handle the image generation response
+
           .then((response) => response.json())
           .then((data) => {
             setImageUrl(data.imageUrl); // Update with the new image URL
@@ -95,7 +112,7 @@ function App() {
 
   return (
     <div className="App">
-      <h1>EPUB to Image</h1>
+      <h1>Visuale - Epub to Image</h1>
       <input type="file" accept=".epub" onChange={handleFileChange} />
       <button onClick={handleParseAndGenerateImage}>
         Parse and Generate Image
@@ -106,7 +123,7 @@ function App() {
           <h2>
             Chapter {chapterNumber}: {chapterTitle}
           </h2>
-          <div className="chapterPrompt">{chapterPrompt}</div>
+          <div className="chapterPrompt">Image Prompt: {isLoading ? "Loading..." : displayPrompt}</div>
           {isLoading ? (
             <div className="loadingContainer">
               <span>Loading AI Generated Image... </span>
