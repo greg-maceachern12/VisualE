@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import epub from "epubjs";
+import { Zenitho } from "uvcanvas";
 import axios from "axios";
 import "./App.css";
 
 function App() {
   const [epubFile, setEpubFile] = useState(null);
   const [chapterTitle, setChapterTitle] = useState("");
+  const [chapterPrompt, setChapterPrompt] = useState("");
   const [chapterNumber, setChapterNumber] = useState(0);
   const [imageUrl, setImageUrl] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0); // Track the current chapter index
@@ -49,6 +51,7 @@ function App() {
         // Extract the first 900 characters of the chapter's text
         const chapterPrompt = displayedChapter.contents.innerText.slice(0, 900);
         console.log(chapterPrompt);
+        setChapterPrompt(chapterPrompt);
 
         // Before the fetch call, indicate loading has started
         setIsLoading(true);
@@ -91,7 +94,7 @@ function App() {
   };
 
   return (
-    <div>
+    <div className="App">
       <h1>EPUB to Image</h1>
       <input type="file" accept=".epub" onChange={handleFileChange} />
       <button onClick={handleParseAndGenerateImage}>
@@ -99,21 +102,28 @@ function App() {
       </button>
       <button onClick={handleNextChapter}>Next Chapter</button>
       {chapterTitle && (
-        <div>
+        <div className="chapterContainer">
           <h2>
             Chapter {chapterNumber}: {chapterTitle}
           </h2>
+          <div className="chapterPrompt">{chapterPrompt}</div>
           {isLoading ? (
-            <div style={{ display: "flex", alignItems: "center" }}>
+            <div className="loadingContainer">
               <span>Loading AI Generated Image... </span>
               <div className="spinner"></div>
             </div>
           ) : (
-            imageUrl && <img src={imageUrl} alt="Generated from chapter" />
+            imageUrl && (
+              <img
+                src={imageUrl}
+                alt="Generated from chapter"
+                className="generatedImage"
+              />
+            )
           )}
         </div>
       )}
-      <div id="hiddenDiv" style={{ display: "none", height: 0 }}></div>
+      <div id="hiddenDiv"></div>
     </div>
   );
 }

@@ -1,40 +1,32 @@
 .App {
-  text-align: center;
+  /* Your existing styles for App */
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.chapterContainer {
+  /* Styles previously applied inline for chapter title and prompt container */
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.chapterPrompt {
+  max-height: 100px;
+  overflow-y: auto;
+  margin-top: 10px;
+  border: 1px solid #ccc;
+  padding: 5px;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.loadingContainer {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
 }
 
-.App-link {
-  color: #61dafb;
+
+.generatedImage {
+  /* Any specific styles for your images */
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+#hiddenDiv {
+  display: none;
+  height: 0;
 }
 .spinner {
   border: 4px solid rgba(0, 0, 0, 0.1);
