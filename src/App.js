@@ -5,6 +5,7 @@ import epub from "epubjs";
 
 import "./App.css";
 
+
 function App() {
   const [epubFile, setEpubFile] = useState(null);
   const [chapterTitle, setChapterTitle] = useState("");
@@ -12,7 +13,8 @@ function App() {
   const [chapterNumber, setChapterNumber] = useState(0);
   const [imageUrl, setImageUrl] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0); // Track the current chapter index
-  const [isLoading, setIsLoading] = useState(false);
+  const [isImageLoading, setIsImageLoading] = useState(false);
+  const [isTextLoading, setIsTextLoading] = useState(false);
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -52,7 +54,8 @@ function App() {
         // Extract the first 900 characters of the chapter's text
         const chapterPrompt = displayedChapter.contents.innerText.slice(0,16000);
         // Before the fetch call, indicate loading has started
-        setIsLoading(true);
+        setIsImageLoading(true);
+        setIsTextLoading(true)
 
         console.log("Chapter Prompt: "+ chapterPrompt);
 
@@ -66,7 +69,10 @@ function App() {
           body: JSON.stringify({ prompt: chapterPrompt }),
         })
           .then((response) => response.json())
-          .then((data) => data.response)
+          .then((data) => {
+            setIsTextLoading(false); // Turn off loading indicator on successful data retrieval
+            return data.response;
+          })
           .catch((error) => console.error("Error with ChatGPT API:", error));
         console.log("Processed Prompt: "+ processedPrompt);
 
@@ -86,11 +92,11 @@ function App() {
           .then((response) => response.json())
           .then((data) => {
             setImageUrl(data.imageUrl); // Update with the new image URL
-            setIsLoading(false); // Loading complete
+            setIsImageLoading(false); // Loading complete
           })
           .catch((error) => {
             console.error("Error calling the API:", error);
-            setIsLoading(false); // Ensure loading is stopped on error
+            setIsImageLoading(false); // Ensure loading is stopped on error
           });
       } catch (error) {
         console.error("Error while parsing EPUB:", error);
@@ -123,8 +129,8 @@ function App() {
           <h2>
             Chapter {chapterNumber}: {chapterTitle}
           </h2>
-          <div className="chapterPrompt">Image Prompt: {isLoading ? "Loading..." : displayPrompt}</div>
-          {isLoading ? (
+          <div className="chapterPrompt">Image Prompt: {isTextLoading ? "Loading..." : displayPrompt}</div>
+          {isImageLoading ? (
             <div className="loadingContainer">
               <span>Loading AI Generated Image... </span>
               <div className="spinner"></div>
