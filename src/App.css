@@ -1,7 +1,8 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap");
+
 body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  background-color: #f7f8fa;
+  font-family: "Roboto", sans-serif;
+  background: linear-gradient(to right, #d1ecfb, #ddbde5);
   color: #333;
   line-height: 1.5;
 }
@@ -17,28 +18,58 @@ h1 {
 }
 
 button {
-  background-color: #007aff;
-  color: #ffffff;
+  background: linear-gradient(to bottom, #007aff, #0051a8);
+  color: white;
+  margin-left: 15px;
   border: none;
   padding: 10px 20px;
-  margin: 0 8px;
-  border-radius: 13px;
-  font-weight: bold;
-  text-transform: uppercase;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  outline: none;
+  cursor: pointer;
+  transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
 }
+
+#parse {
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+  background-size: 200% 200%;
+  background-image: linear-gradient(
+    to left,
+    #2b6cb0,  /* Darker blue */
+    #38a169,  /* Darker green */
+    #dd6b20,  /* Darker orange */
+    #d53f8c,  /* Darker pink */
+    #2b6cb0   /* Darker blue */
+  );
+  transition: transform 0.1s;
+  animation: gradientBackground 5s ease infinite;
+}
+
+
 
 button:hover {
-  background-color: #005ecb;
+  transform: scale(1.05);
 }
 
+button:active {
+  transform: scale(0.95);
+}
 
 img {
   max-width: 100%;
-  height: auto;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  height: 450px;
+  width: auto; /* Maintain aspect ratio */
 }
 
 .spinner {
@@ -51,29 +82,57 @@ img {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .chapterPrompt {
-  max-height: 100px;
+  max-height: 450px;
   overflow-y: auto;
   margin-top: 10px;
   border: 1px solid #ccc;
   padding: 5px;
+  margin-left: 20px;
 }
 
 .loadingContainer {
   display: flex;
   align-items: center;
+  margin: auto;
+}
+.container {
+  display: flex;
+  align-items: flex-start; /* Align items at the start of the container */
+  width: 75%;
+  /* margin: auto; */
+  align-items: center;
+
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px;
 }
 
-
 .generatedImage {
-  margin-top: 20px;
+  /* margin-top: 20px; */
 }
 
 #hiddenDiv {
   display: none;
   height: 0;
+}
+
+@keyframes gradientBackground {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }

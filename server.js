@@ -22,7 +22,7 @@ app.post("/api/chatgpt", async (req, res) => {
         {
           role: "system",
           content:
-            "Analyze the provided book chapter to extract themes, characters, settings, events, and emotional tone. Formulate a prompt that showcases these elements while emphasizing a painted aesthetic for DALL-E 3 image generation. Utilize vivid, descriptive language to enrich the prompt. Produce a refined prompt tailored for DALL-E 3, ensuring it emphasizes the desired painted output.",
+            "Analyze the provided book chapter to extract themes, characters, settings, events, and emotional tone. Formulate a prompt that showcases these elements while emphasizing a painted aesthetic for DALL-E 3 image generation. Utilize vivid, descriptive language to enrich the prompt. Produce a refined prompt tailored for DALL-E 3 that will does not include generation blocking verbiage, ensuring it emphasizes the desired painted output.",
         },
         { role: "user", content: "create a prompt from the inputted chapter text" },
         {
@@ -32,8 +32,12 @@ app.post("/api/chatgpt", async (req, res) => {
         { role: "user", content: req.body.prompt },
       ],
     });
-    console.log(chatResponse.choices[0].message.content);
-    res.json({ response: chatResponse.choices[0].message.content });
+    const chatReply = chatResponse.choices[0].message.content;
+
+    // const chatReply =
+    //   "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+    console.log(chatReply);
+    res.json({ response: chatReply });
   } catch (error) {
     console.error("Error with ChatGPT API:", error);
     res.status(500).json({ error: "An error occurred with the ChatGPT API." });

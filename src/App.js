@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import epub from "epubjs";
 // import { Zenitho } from "uvcanvas";
-// import axios from "axios";
+import { RingLoader } from "react-spinners";
 
 import "./App.css";
-
 
 function App() {
   const [epubFile, setEpubFile] = useState(null);
@@ -52,13 +51,15 @@ function App() {
           .display(currentChapter.href);
 
         // Extract the first 900 characters of the chapter's text
-        const chapterPrompt = displayedChapter.contents.innerText.slice(0,16000);
+        const chapterPrompt = displayedChapter.contents.innerText.slice(
+          0,
+          16000
+        );
         // Before the fetch call, indicate loading has started
         setIsImageLoading(true);
-        setIsTextLoading(true)
+        setIsTextLoading(true);
 
-        console.log("Chapter Prompt: "+ chapterPrompt);
-
+        console.log("Chapter Prompt: " + chapterPrompt);
 
         // Assume this is part of your function where you want to use the ChatGPT API before image generation
         const processedPrompt = await fetch("/api/chatgpt", {
@@ -74,11 +75,10 @@ function App() {
             return data.response;
           })
           .catch((error) => console.error("Error with ChatGPT API:", error));
-        console.log("Processed Prompt: "+ processedPrompt);
-
+        console.log("Processed Prompt: " + processedPrompt);
 
         setDisplayPrompt(processedPrompt);
-        
+
         // Use `processedPrompt` for your image generation API call
         fetch("/generateImage", {
           method: "POST",
@@ -118,9 +118,9 @@ function App() {
 
   return (
     <div className="App">
-      <h1>Visuale - Epub to Image</h1>
+      <h1>Visuale - ePub to Image</h1>
       <input type="file" accept=".epub" onChange={handleFileChange} />
-      <button onClick={handleParseAndGenerateImage}>
+      <button id="parse" onClick={handleParseAndGenerateImage}>
         Parse and Generate Image
       </button>
       <button onClick={handleNextChapter}>Next Chapter</button>
@@ -129,21 +129,29 @@ function App() {
           <h2>
             Chapter {chapterNumber}: {chapterTitle}
           </h2>
-          <div className="chapterPrompt">Image Prompt: {isTextLoading ? "Loading..." : displayPrompt}</div>
-          {isImageLoading ? (
-            <div className="loadingContainer">
-              <span>Loading AI Generated Image... </span>
-              <div className="spinner"></div>
-            </div>
-          ) : (
-            imageUrl && (
-              <img
-                src={imageUrl}
-                alt="Generated from chapter"
-                className="generatedImage"
-              />
-            )
-          )}
+          <div className="container">
+            {!isTextLoading && !isImageLoading ? (
+              <>
+                {imageUrl && (
+                  <img
+                    src={imageUrl}
+                    alt="Generated from chapter"
+                    className="generatedImage"
+                  />
+                )}
+                <div className="chapterPrompt">
+                  <b>
+                    <i>Optimized</i> Image Prompt:
+                  </b>{" "}
+                  {displayPrompt}
+                </div>
+              </>
+            ) : (
+              <div className="loadingContainer">
+                <RingLoader size={150} color={"#123abc"} loading={true} />
+              </div>
+            )}
+          </div>
         </div>
       )}
       <div id="hiddenDiv"></div>
