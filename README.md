@@ -6,6 +6,20 @@ VisualE was crafted to enhance readers' comprehension of descriptive language in
 
 ## Example 1
 ### Text
+> Across the courtesy bay the white palaces of fashionable East Egg glittered along
+> the water. Their house was even more elaborate than I expected, a cheerful
+> red-and-white Georgian Colonial mansion, overlooking the bay. The lawn started at
+> the beach and ran toward the front door for a quarter of a mile, jumping over
+> sun-dials and brick walks and burning gardens—finally when it reached the house
+> drifting up the side in bright vines as though from the momentum of its run. The
+> front was broken by a line of French windows, glowing now with reflected gold and
+> wide open to the warm windy afternoon
+
+### Image
+![Example of GenAI image from The Great Gatsby](assets/gatsby.jpeg)
+
+## Example 2
+### Text
 > They neared the city-mountain, and Eragon saw that the white marble of Tronjheim was highly 
 > polished and shaped into flowing contours, as if it had been poured into place. 
 > It was dotted with countless round windows framed by elaborate carvings. A 
@@ -18,7 +32,7 @@ VisualE was crafted to enhance readers' comprehension of descriptive language in
 ### Image
 ![Example of GenAI image from Eragon](assets/eragonExample.jpeg)
 
-## Example 2
+## Example 3
 ### Text
 > Eragon knelt in a bed of trampled reed grass and scanned the tracks with a practiced eye. 
 > The prints told him that the deer had been in the meadow only a half-hour before. 
@@ -36,21 +50,6 @@ VisualE was crafted to enhance readers' comprehension of descriptive language in
 ### Image
 ![Example of GenAI image from Eragon](assets/eragonEx3.png)
 
-
-## Example 3
-### Text
-> One tree bulged at the base to form a two-story house before sinking its roots into the loam. Both stories
-> were hexagonal, although the upper level was half as small as the first, which gave the house a tiered 
-> appearance. The roofs and walls were made of webbed sheets of wood
-> draped over six thick ridges. Moss and yellow lichen bearded the eaves and hung over jeweled windows set
-> into each side. The front door was a mysterious black silhouette recessed under an archway wrought with
-> symbols.
-> Another house was nestled between three pines, which were joined to it through a series of curved branches.
-> Reinforced by those flying buttresses, the house rose five levels, light and airy. Beside it sat a bower
-> woven out of willow and dogwood and hung with flameless lanterns disguised as galls.
-
-### Image
-![Example of GenAI image from Eragon](assets/eldestExample.jpeg)
 
 ## Usage
 npm install
