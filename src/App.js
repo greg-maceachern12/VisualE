@@ -74,9 +74,18 @@ function App() {
             setIsTextLoading(false); // Turn off loading indicator on successful data retrieval
             return data.response;
           })
-          .catch((error) => console.error("Error with ChatGPT API:", error));
-        console.log("Processed Prompt: " + processedPrompt);
+          .catch((error) => {
+            console.error("Error with ChatGPT API:", error);
+            setIsTextLoading(false);
+          })
 
+          if (processedPrompt == "False") {
+            setDisplayPrompt("Chapter text invalid - try next chapter");
+            setIsTextLoading(false);
+            setIsImageLoading(false);
+            return
+          } 
+        
         setDisplayPrompt(processedPrompt);
 
         // Use `processedPrompt` for your image generation API call

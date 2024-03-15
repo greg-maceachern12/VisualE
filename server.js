@@ -22,14 +22,19 @@ app.post("/api/chatgpt", async (req, res) => {
         {
           role: "system",
           content:
-            "Analyze the provided book chapter to extract themes, characters, settings, events, and emotional tone. Formulate a prompt that showcases these elements while emphasizing a painted aesthetic for DALL-E 3 image generation. Utilize vivid, descriptive language to enrich the prompt. Produce a refined prompt tailored for DALL-E 3 that will does not include generation blocking verbiage, ensuring it emphasizes the desired painted output.",
+            "Analyze the provided chapter text to capture the overarching mood and significant visual elements. Formulate a prompt for DALL-E 3 that requests the generation of an image with a painterly quality, emulating the textured brushwork, vibrant color palette, and dynamic lighting seen in classic adventure fantasy art. The language of the prompt should be rich and descriptive, highlighting the emotional tone and setting found within the chapter while directing the AI to produce an artwork that resonates with the depth and movement characteristic of traditional oil painting. If the chapter text does not lend itself to creating such an image, due to lack of descriptive content or because it is non-narrative in nature (like a table of contents or acknowledgments), return 'False'. This instruction is intended to yield a prompt that will result in an image capturing the spirit and aesthetic of a fantasy saga through a painterly lens.",
         },
-        { role: "user", content: "create a prompt from the inputted chapter text" },
-        {
-          role: "assistant",
-          content: "A young fantasy warrior with an intricate blue tunic and brown leather pants is riding on the back of a magnificent blue dragon soaring through a cloudy sky. The dragon has large, powerful wings and glittering scales that catch the light of the sun. The warrior holds a medieval spear in hand and has a look of determination, with long brown hair flowing in the wind. Both are high above a sprawling fantasy landscape below, dotted with mountains and forests. The image is painted in a vibrant, realistic style that emphasizes the dynamic movement of the dragon and the bold colors of the scene",
-        },
-        { role: "user", content: req.body.prompt },
+        // {
+        //   role: "user",
+        //   content:
+        //     "create a DALL-E 3 image generation prompt from the inputted chapter text",
+        // },
+        // {
+        //   role: "assistant",
+        //   content:
+        //     "A young fantasy warrior with an intricate blue tunic and brown leather pants is riding on the back of a magnificent blue dragon soaring through a cloudy sky. The dragon has large, powerful wings and glittering scales that catch the light of the sun. The warrior holds a medieval spear in hand and has a look of determination, with long brown hair flowing in the wind. Both are high above a sprawling fantasy landscape below, dotted with mountains and forests. The image is painted in a vibrant, realistic style that emphasizes the dynamic movement of the dragon and the bold colors of the scene",
+        // },
+        { role: "user", content: "Here is the chapter text: " + req.body.prompt },
       ],
     });
     const chatReply = chatResponse.choices[0].message.content;
