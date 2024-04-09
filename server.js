@@ -22,7 +22,7 @@ app.post("/api/chatgpt", async (req, res) => {
         {
           role: "system",
           content:
-            "Analyze the provided chapter text to capture the overarching mood and significant visual elements. Formulate a prompt for DALL-E 3 that requests the generation of an image with a painterly quality, emulating the textured brushwork, vibrant color palette, and dynamic lighting seen in classic adventure fantasy art. The language of the prompt should be rich and descriptive, highlighting the emotional tone and setting found within the chapter while directing the AI to produce an artwork that resonates with the depth and movement characteristic of traditional oil painting. If the chapter text does not lend itself to creating such an image, due to lack of descriptive content or because it is non-narrative in nature (like a table of contents or acknowledgments), return 'False'. This instruction is intended to yield a prompt that will result in an image capturing the spirit and aesthetic of a fantasy saga through a painterly lens.",
+            "Analyze the provided chapter text to capture a signficant visual scene from the text. Formulate a prompt for DALL-E 3 that requests the generation of an image with an oil painting quality. The language of the prompt should be rich and descriptive, highlighting the visual tone and physical and environnmental setting found within the chapter while directing the AI to produce an artwork that resonates with the depth and movement characteristic of traditional oil painting.",
         },
         // {
         //   role: "user",
