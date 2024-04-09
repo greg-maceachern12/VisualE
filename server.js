@@ -16,7 +16,7 @@ app.use(cors()); // Use this if your React app is served from a different port o
 // Endpoint to handle OpenAI ChatGPT API requests
 app.post("/api/chatgpt", async (req, res) => {
   try {
-    const chatResponse = await openai.chat.completions.create({
+   const chatResponse = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
       messages: [
         {
@@ -37,7 +37,7 @@ app.post("/api/chatgpt", async (req, res) => {
         { role: "user", content: "Here is the chapter text: " + req.body.prompt },
       ],
     });
-    const chatReply = chatResponse.choices[0].message.content;
+    const chatReply = chatResponse.choices[0].message.content; 
 
     // const chatReply =
     //   "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
@@ -53,13 +53,14 @@ app.post("/api/chatgpt", async (req, res) => {
 app.post("/generateImage", async (req, res) => {
   try {
     /*Code to generate image */
+    console.log(req.body)
     const image = await openai.images.generate({
       model: "dall-e-3",
       prompt: req.body.prompt,
     });
     const imageUrl = image.data[0].url;
 
-    /* Safe way to test without using DALEE Credits */
+    /* Safe way to test without using DALL-E Credits */
     // const imageUrl = "https://images.penguinrandomhouse.com/cover/9780593704462";
     console.log(imageUrl);
     res.json({ imageUrl });

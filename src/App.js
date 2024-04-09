@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import epub from "epubjs";
-// import { Zenitho } from "uvcanvas";
 import { RingLoader } from "react-spinners";
-
+import { disableButton } from "./utils";
 import "./App.css";
 
 function App() {
@@ -11,13 +10,58 @@ function App() {
   const [displayPrompt, setDisplayPrompt] = useState("");
   const [chapterNumber, setChapterNumber] = useState(0);
   const [imageUrl, setImageUrl] = useState("");
-  const [currentIndex, setCurrentIndex] = useState(0); // Track the current chapter index
+  const [currentChapterIndex, setCurrentChapterIndex] = useState(0);
+  const [currentSubitemIndex, setCurrentSubitemIndex] = useState(0);
   const [isImageLoading, setIsImageLoading] = useState(false);
   const [isTextLoading, setIsTextLoading] = useState(false);
+  const [epubReader, setEpubReader] = useState(null);
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     setEpubFile(file);
+  };
+
+  const handleParseAndGenerateImage = () => {
+    setCurrentChapterIndex(0);
+    setCurrentSubitemIndex(0);
+    loadChapter(0);
+  };
+
+  const handleNextChapter = async () => {
+    if (epubReader) {
+      const nav = await epubReader.loaded.navigation;
+      const toc = nav.toc;
+  
+      const currentChapter = toc[currentChapterIndex];
+      if (currentChapter.subitems && currentChapter.subitems.length > 0) {
+        const nextSubitemIndex = currentSubitemIndex + 1;
+        if (nextSubitemIndex < currentChapter.subitems.length) {
+          const nextSubitem = currentChapter.subitems[nextSubitemIndex];
+          await processChapter(nextSubitem, `${currentChapterIndex + 1}.${nextSubitemIndex + 1}`, epubReader);
+          setCurrentSubitemIndex(nextSubitemIndex);
+        } else {
+          const nextChapterIndex = currentChapterIndex + 1;
+          if (nextChapterIndex < toc.length) {
+            const nextChapter = toc[nextChapterIndex];
+            await processChapter(nextChapter, String(nextChapterIndex + 1), epubReader);
+            setCurrentChapterIndex(nextChapterIndex);
+            setCurrentSubitemIndex(0);
+          } else {
+            console.error("Reached the end of the book.");
+          }
+        }
+      } else {
+        const nextChapterIndex = currentChapterIndex + 1;
+        if (nextChapterIndex < toc.length) {
+          const nextChapter = toc[nextChapterIndex];
+          await processChapter(nextChapter, String(nextChapterIndex + 1), epubReader);
+          setCurrentChapterIndex(nextChapterIndex);
+          setCurrentSubitemIndex(0);
+        } else {
+          console.error("Reached the end of the book.");
+        }
+      }
+    }
   };
 
   const loadChapter = async (chapterIndex) => {
@@ -31,82 +75,31 @@ function App() {
       const epubBlob = new Blob([event.target.result], {
         type: "application/epub+zip",
       });
-      const epubReader = epub(epubBlob);
+      const reader = epub(epubBlob);
+      setEpubReader(reader);
 
       try {
-        const nav = await epubReader.loaded.navigation;
+        const nav = await reader.loaded.navigation;
         const toc = nav.toc;
+
         if (chapterIndex >= toc.length) {
           console.error("Reached the end of the book.");
           return;
         }
 
+        await processChapter(toc[chapterIndex], String(chapterIndex + 1), reader);
         const currentChapter = toc[chapterIndex];
         setChapterTitle(currentChapter.label);
         setChapterNumber(chapterIndex + 1);
 
-        // Assuming we use rendition to display and access the text
-        const displayedChapter = await epubReader
-          .renderTo("hiddenDiv")
-          .display(currentChapter.href);
+        // const chapterPrompt = await getChapterPrompt(currentChapter, reader);
+        // console.log(chapterPrompt);
 
-        // Extract the first 900 characters of the chapter's text
-        const chapterPrompt = displayedChapter.contents.innerText.slice(
-          0,
-          16000
-        );
-        // Before the fetch call, indicate loading has started
-        setIsImageLoading(true);
-        setIsTextLoading(true);
+        // setIsImageLoading(true);
+        // setIsTextLoading(true);
 
-        console.log("Chapter Prompt: " + chapterPrompt);
-
-        // Assume this is part of your function where you want to use the ChatGPT API before image generation
-        const processedPrompt = await fetch("/api/chatgpt", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ prompt: chapterPrompt }),
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            setIsTextLoading(false); // Turn off loading indicator on successful data retrieval
-            return data.response;
-          })
-          .catch((error) => {
-            console.error("Error with ChatGPT API:", error);
-            setIsTextLoading(false);
-          })
-
-          if (processedPrompt == "False") {
-            setDisplayPrompt("Chapter text invalid - try next chapter");
-            setIsTextLoading(false);
-            setIsImageLoading(false);
-            return
-          } 
-        
-        setDisplayPrompt(processedPrompt);
-
-        // Use `processedPrompt` for your image generation API call
-        fetch("/generateImage", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ prompt: processedPrompt }),
-        })
-          // Follow with the existing logic to handle the image generation response
-
-          .then((response) => response.json())
-          .then((data) => {
-            setImageUrl(data.imageUrl); // Update with the new image URL
-            setIsImageLoading(false); // Loading complete
-          })
-          .catch((error) => {
-            console.error("Error calling the API:", error);
-            setIsImageLoading(false); // Ensure loading is stopped on error
-          });
+        // const processedPrompt = generateTextFromPrompt(chapterPrompt);
+        // generateImageFromPrompt(processedPrompt);
       } catch (error) {
         console.error("Error while parsing EPUB:", error);
       }
@@ -114,15 +107,75 @@ function App() {
     reader.readAsArrayBuffer(epubFile);
   };
 
-  const handleParseAndGenerateImage = () => {
-    setCurrentIndex(0); // Start from the first chapter
-    loadChapter(0);
+  const generateTextFromPrompt = async (prompt) => {
+    const processedPrompt = await fetch("/api/chatgpt", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ prompt: prompt }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setIsTextLoading(false);
+        return data.response;
+      })
+      .catch((error) => {
+        console.error("Error with ChatGPT API:", error);
+        setIsTextLoading(false);
+      });
+
+    if (processedPrompt === "False") {
+      setDisplayPrompt("Chapter text invalid - try next chapter");
+      setIsTextLoading(false);
+      setIsImageLoading(false);
+      return;
+    }
+    
+    setDisplayPrompt(processedPrompt);
+    return processedPrompt;
   };
 
-  const handleNextChapter = () => {
-    const nextIndex = currentIndex + 1;
-    setCurrentIndex(nextIndex);
-    loadChapter(nextIndex);
+  const generateImageFromPrompt = async (prompt) => {
+    fetch("/generateImage", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ prompt: prompt }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setImageUrl(data.imageUrl);
+        setIsImageLoading(false);
+        return data.imageUrl;
+      })
+      .catch((error) => {
+        console.error("Error calling the API:", error);
+        setIsImageLoading(false);
+      });
+  };
+
+  const processChapter = async (chapter, currentLevel, epubReader) => {
+        setIsImageLoading(true);
+        setIsTextLoading(true);
+    setChapterTitle(`${currentLevel}: ${chapter.label}`);
+  
+    const chapterPrompt = await getChapterPrompt(chapter, epubReader);
+  
+    setIsImageLoading(true);
+    setIsTextLoading(true);
+  
+    const processedPrompt = await generateTextFromPrompt(chapterPrompt);
+    const imageUrl = await generateImageFromPrompt(processedPrompt);
+  
+    // setDisplayPrompt(processedPrompt);
+    setImageUrl(imageUrl);
+  };
+
+  const getChapterPrompt = async (chapter, epubReader) => {
+    const displayedChapter = await epubReader.renderTo("hiddenDiv").display(chapter.href);
+    return displayedChapter.contents.innerText.slice(0, 16000);
   };
 
   return (
