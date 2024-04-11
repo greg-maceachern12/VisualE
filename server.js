@@ -24,16 +24,6 @@ app.post("/api/chatgpt", async (req, res) => {
           content:
             "Analyze the provided chapter text to capture a signficant visual scene from the text. Formulate a prompt for DALL-E 3 that requests the generation of an image with an oil painting quality. The language of the prompt should be rich and descriptive, highlighting the visual tone and physical and environnmental setting found within the chapter while directing the AI to produce an artwork that resonates with the depth and movement characteristic of traditional oil painting.",
         },
-        // {
-        //   role: "user",
-        //   content:
-        //     "create a DALL-E 3 image generation prompt from the inputted chapter text",
-        // },
-        // {
-        //   role: "assistant",
-        //   content:
-        //     "A young fantasy warrior with an intricate blue tunic and brown leather pants is riding on the back of a magnificent blue dragon soaring through a cloudy sky. The dragon has large, powerful wings and glittering scales that catch the light of the sun. The warrior holds a medieval spear in hand and has a look of determination, with long brown hair flowing in the wind. Both are high above a sprawling fantasy landscape below, dotted with mountains and forests. The image is painted in a vibrant, realistic style that emphasizes the dynamic movement of the dragon and the bold colors of the scene",
-        // },
         { role: "user", content: "Here is the chapter text: " + req.body.prompt },
       ],
     });
@@ -53,7 +43,7 @@ app.post("/api/chatgpt", async (req, res) => {
 app.post("/generateImage", async (req, res) => {
   try {
     /*Code to generate image */
-    console.log(req.body)
+    // console.log(req.body)
     const image = await openai.images.generate({
       model: "dall-e-3",
       prompt: req.body.prompt,

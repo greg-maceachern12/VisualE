@@ -1,15 +1,23 @@
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&family=Outfit:wght@100..900&display=swap');
 
 body {
-  font-family: "Roboto", sans-serif;
-  background: linear-gradient(to right, #d1ecfb, #ddbde5);
+  font-family: "Inter", "Roboto", sans-serif;
+  /* background: linear-gradient(to right, #d1ecfb, #ddbde5); */
   color: #333;
   line-height: 1.5;
+  margin: 0;
+  padding: 0;
 }
 
 .App {
   text-align: center;
   padding: 2rem;
+  min-height: 100vh;
+  background-image: linear-gradient(45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab),
+                    linear-gradient(45deg, #23d5ab, #ee7752, #e73c7e, #23a6d5);
+  background-size: 400% 400%;
+  animation: gradientAnimation 30s ease infinite;
 }
 
 h1 {
@@ -134,5 +142,22 @@ img {
   }
   100% {
     background-position: 0% 50%;
+  }
+}
+@keyframes gradientAnimation {
+  0% {
+    background-position: 0% 50%, 100% 50%;
+  }
+  25% {
+    background-position: 100% 50%, 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%, 0% 50%;
+  }
+  75% {
+    background-position: 0% 50%, 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%, 100% 50%;
   }
 }

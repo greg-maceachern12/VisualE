@@ -8,7 +8,6 @@ function App() {
   const [epubFile, setEpubFile] = useState(null);
   const [chapterTitle, setChapterTitle] = useState("");
   const [displayPrompt, setDisplayPrompt] = useState("");
-  const [chapterNumber, setChapterNumber] = useState(0);
   const [imageUrl, setImageUrl] = useState("");
   const [currentChapterIndex, setCurrentChapterIndex] = useState(0);
   const [currentSubitemIndex, setCurrentSubitemIndex] = useState(0);
@@ -29,47 +28,21 @@ function App() {
 
   const handleNextChapter = async () => {
     if (epubReader) {
-      const nav = await epubReader.loaded.navigation;
-      const toc = nav.toc;
-  
-      const currentChapter = toc[currentChapterIndex];
-      if (currentChapter.subitems && currentChapter.subitems.length > 0) {
-        const nextSubitemIndex = currentSubitemIndex + 1;
-        if (nextSubitemIndex < currentChapter.subitems.length) {
-          const nextSubitem = currentChapter.subitems[nextSubitemIndex];
-          await processChapter(nextSubitem, `${currentChapterIndex + 1}.${nextSubitemIndex + 1}`, epubReader);
-          setCurrentSubitemIndex(nextSubitemIndex);
-        } else {
-          const nextChapterIndex = currentChapterIndex + 1;
-          if (nextChapterIndex < toc.length) {
-            const nextChapter = toc[nextChapterIndex];
-            await processChapter(nextChapter, String(nextChapterIndex + 1), epubReader);
-            setCurrentChapterIndex(nextChapterIndex);
-            setCurrentSubitemIndex(0);
-          } else {
-            console.error("Reached the end of the book.");
-          }
-        }
-      } else {
-        const nextChapterIndex = currentChapterIndex + 1;
-        if (nextChapterIndex < toc.length) {
-          const nextChapter = toc[nextChapterIndex];
-          await processChapter(nextChapter, String(nextChapterIndex + 1), epubReader);
-          setCurrentChapterIndex(nextChapterIndex);
-          setCurrentSubitemIndex(0);
-        } else {
-          console.error("Reached the end of the book.");
-        }
-      }
+      await loadChapter(currentChapterIndex, currentSubitemIndex + 1);
     }
   };
+  
+  const isNonStoryChapter = (chapterLabel) => {
+    const nonStoryLabels = ["Title Page", "Cover", "Dedication", "Contents", "Copyright"];
+    return nonStoryLabels.some((label) => chapterLabel.toLowerCase().includes(label.toLowerCase()));
+  };
 
-  const loadChapter = async (chapterIndex) => {
+  const loadChapter = async (chapterIndex, subitemIndex = 0) => {
     if (!epubFile) {
       console.error("No EPUB file selected.");
       return;
     }
-
+  
     const reader = new FileReader();
     reader.onload = async (event) => {
       const epubBlob = new Blob([event.target.result], {
@@ -77,29 +50,33 @@ function App() {
       });
       const reader = epub(epubBlob);
       setEpubReader(reader);
-
+  
       try {
         const nav = await reader.loaded.navigation;
         const toc = nav.toc;
-
+  
         if (chapterIndex >= toc.length) {
           console.error("Reached the end of the book.");
           return;
         }
-
-        await processChapter(toc[chapterIndex], String(chapterIndex + 1), reader);
+  
         const currentChapter = toc[chapterIndex];
-        setChapterTitle(currentChapter.label);
-        setChapterNumber(chapterIndex + 1);
-
-        // const chapterPrompt = await getChapterPrompt(currentChapter, reader);
-        // console.log(chapterPrompt);
-
-        // setIsImageLoading(true);
-        // setIsTextLoading(true);
-
-        // const processedPrompt = generateTextFromPrompt(chapterPrompt);
-        // generateImageFromPrompt(processedPrompt);
+        if (isNonStoryChapter(currentChapter.label)) {
+          await loadChapter(chapterIndex + 1);
+        } else if (currentChapter.subitems && currentChapter.subitems.length > 0) {
+          if (subitemIndex < currentChapter.subitems.length) {
+            const currentSubitem = currentChapter.subitems[subitemIndex];
+            await processChapter(currentSubitem, reader);
+            setCurrentChapterIndex(chapterIndex);
+            setCurrentSubitemIndex(subitemIndex);
+          } else {
+            await loadChapter(chapterIndex + 1);
+          }
+        } else {
+          await processChapter(currentChapter, reader);
+          setCurrentChapterIndex(chapterIndex);
+          setCurrentSubitemIndex(0);
+        }
       } catch (error) {
         console.error("Error while parsing EPUB:", error);
       }
@@ -156,10 +133,11 @@ function App() {
       });
   };
 
-  const processChapter = async (chapter, currentLevel, epubReader) => {
+  const processChapter = async (chapter, epubReader) => {
         setIsImageLoading(true);
         setIsTextLoading(true);
-    setChapterTitle(`${currentLevel}: ${chapter.label}`);
+        console.log(chapter)
+    setChapterTitle(`${chapter.label}`);
   
     const chapterPrompt = await getChapterPrompt(chapter, epubReader);
   
@@ -189,7 +167,7 @@ function App() {
       {chapterTitle && (
         <div className="chapterContainer">
           <h2>
-            Chapter {chapterNumber}: {chapterTitle}
+            {chapterTitle}
           </h2>
           <div className="container">
             {!isTextLoading && !isImageLoading ? (
