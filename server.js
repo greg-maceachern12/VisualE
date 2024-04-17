@@ -44,14 +44,14 @@ app.post("/generateImage", async (req, res) => {
   try {
     /*Code to generate image */
     // console.log(req.body)
-    const image = await openai.images.generate({
-      model: "dall-e-3",
-      prompt: req.body.prompt,
-    });
-    const imageUrl = image.data[0].url;
+    // const image = await openai.images.generate({
+    //   model: "dall-e-3",
+    //   prompt: req.body.prompt,
+    // });
+    // const imageUrl = image.data[0].url;
 
     /* Safe way to test without using DALL-E Credits */
-    // const imageUrl = "https://images.penguinrandomhouse.com/cover/9780593704462";
+    const imageUrl = "https://images.penguinrandomhouse.com/cover/9780593704462";
     console.log(imageUrl);
     res.json({ imageUrl });
   } catch (error) {
