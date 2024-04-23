@@ -7,13 +7,8 @@ import { initGradientBackground } from "./gradBG/gradBG.js";
 
 function App() {
   const [epubFile, setEpubFile] = useState(null);
-  const [chapterTitle, setChapterTitle] = useState("");
-  const [displayPrompt, setDisplayPrompt] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
-  const [currentChapterIndex, setCurrentChapterIndex] = useState(0);
-  const [currentSubitemIndex, setCurrentSubitemIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
-  const [epubReader, setEpubReader] = useState(null);
+  const [downloadLink, setDownloadLink] = useState("");
 
   useEffect(() => {
     const cleanupGradientBackground = initGradientBackground();
@@ -21,41 +16,77 @@ function App() {
   }, []);
 
   const handleFileChange = (event) => {
-    setEpubFile(event.target.files[0]);
+    const selectedFile = event.target.files[0];
+    setEpubFile(selectedFile);
+    console.log("EPUB file selected:", selectedFile);
   };
 
-  const handleParseAndGenerateImage = () => {
-    setCurrentChapterIndex(0);
-    setCurrentSubitemIndex(0);
-    loadChapter(0);
-  };
+  const processChapter = async (chapter, epubReader, generatedImages) => {
+    console.log("Processing chapter:", chapter);
 
-  const handleNextChapter = async () => {
-    if (!epubReader) return;
+    if (!isNonStoryChapter(chapter.label)) {
+      const chapterPrompt = await getChapterPrompt(chapter, epubReader);
+      const processedPrompt = await generateTextFromPrompt(chapterPrompt);
+      const imageUrl = await generateImageFromPrompt(processedPrompt);
 
-    const nav = await epubReader.loaded.navigation;
-    const toc = nav.toc;
-
-    let nextChapterIndex = currentChapterIndex;
-    let nextSubitemIndex = currentSubitemIndex + 1;
-
-    const currentChapter = toc[currentChapterIndex];
-    if (currentChapter.subitems && currentChapter.subitems.length > 0) {
-      if (nextSubitemIndex >= currentChapter.subitems.length) {
-        nextChapterIndex++;
-        nextSubitemIndex = 0;
-      }
+      generatedImages.push({ chapter, imageUrl });
     } else {
-      nextChapterIndex++;
-      nextSubitemIndex = 0;
+      console.log("Skipping non-story chapter:", chapter.label);
     }
 
-    if (nextChapterIndex >= toc.length) {
-      console.error("Reached the end of the book.");
+    if (chapter.subitems && chapter.subitems.length > 0) {
+      for (const subchapter of chapter.subitems) {
+        await processChapter(subchapter, epubReader, generatedImages);
+      }
+    }
+  };
+
+  const handleStartProcessing = async () => {
+    if (!epubFile) {
+      console.error("No EPUB file selected.");
       return;
     }
 
-    await loadChapter(nextChapterIndex, nextSubitemIndex);
+    setIsLoading(true);
+    console.log("Start processing EPUB file:", epubFile);
+
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      const epubBlob = new Blob([event.target.result], {
+        type: "application/epub+zip",
+      });
+      const epubReader = epub(epubBlob);
+      console.log("EPUB reader created:", epubReader);
+
+      try {
+        const nav = await epubReader.loaded.navigation;
+        const toc = nav.toc;
+        const generatedImages = [];
+
+        console.log("Table of Contents:", toc);
+
+        for (const chapter of toc) {
+          await processChapter(chapter, epubReader, generatedImages);
+        }
+
+        console.log("Generated images:", generatedImages);
+
+        console.log("Reconstructing book...");
+        const updatedBook = await reconstructBook(epubReader, generatedImages);
+        console.log("Updated book:", updatedBook);
+
+        console.log("Creating download link...");
+        const downloadLink = await createDownloadLink(updatedBook);
+        console.log("Download link:", downloadLink);
+
+        setDownloadLink(downloadLink);
+      } catch (error) {
+        console.error("Error while processing EPUB:", error);
+      }
+
+      setIsLoading(false);
+    };
+    reader.readAsArrayBuffer(epubFile);
   };
 
   const isNonStoryChapter = (chapterLabel) => {
@@ -72,68 +103,6 @@ function App() {
     return nonStoryLabels.some((label) =>
       chapterLabel.toLowerCase().includes(label.toLowerCase())
     );
-  };
-
-  const loadChapter = async (chapterIndex, subitemIndex = 0) => {
-    if (!epubFile) {
-      console.error("No EPUB file selected.");
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = async (event) => {
-      const epubBlob = new Blob([event.target.result], {
-        type: "application/epub+zip",
-      });
-      const reader = epub(epubBlob);
-      setEpubReader(reader);
-
-      try {
-        const nav = await reader.loaded.navigation;
-        const toc = nav.toc;
-
-        if (chapterIndex >= toc.length) {
-          console.error("Reached the end of the book.");
-          return;
-        }
-
-        const currentChapter = toc[chapterIndex];
-        if (isNonStoryChapter(currentChapter.label)) {
-          await loadChapter(chapterIndex + 1);
-        } else if (
-          currentChapter.subitems &&
-          currentChapter.subitems.length > 0
-        ) {
-          if (subitemIndex < currentChapter.subitems.length) {
-            await processChapter(currentChapter.subitems[subitemIndex], reader);
-            setCurrentChapterIndex(chapterIndex);
-            setCurrentSubitemIndex(subitemIndex);
-          } else {
-            await loadChapter(chapterIndex + 1);
-          }
-        } else {
-          await processChapter(currentChapter, reader);
-          setCurrentChapterIndex(chapterIndex);
-          setCurrentSubitemIndex(0);
-        }
-      } catch (error) {
-        console.error("Error while parsing EPUB:", error);
-      }
-    };
-    reader.readAsArrayBuffer(epubFile);
-  };
-
-  const processChapter = async (chapter, epubReader) => {
-    setIsLoading(true);
-    setChapterTitle(chapter.label);
-
-    const chapterPrompt = await getChapterPrompt(chapter, epubReader);
-    const processedPrompt = await generateTextFromPrompt(chapterPrompt);
-    const imageUrl = await generateImageFromPrompt(processedPrompt);
-
-    setDisplayPrompt(processedPrompt);
-    setImageUrl(imageUrl);
-    setIsLoading(false);
   };
 
   const getChapterPrompt = async (chapter, epubReader) => {
@@ -177,6 +146,20 @@ function App() {
     }
   };
 
+  const reconstructBook = async (epubReader, generatedImages) => {
+    // Implement the logic to insert the generated images above the first paragraph of each chapter
+    // You can use the epubReader to modify the EPUB content
+    // Return the updated EPUB file
+  };
+
+  const createDownloadLink = async (updatedBook) => {
+    // Create a Blob from the updated EPUB file
+    const blob = new Blob([updatedBook], { type: "application/epub+zip" });
+    // Create a download link
+    const url = URL.createObjectURL(blob);
+    return url;
+  };
+
   return (
     <div className="App">
       <div className="gradient-bg">
@@ -214,37 +197,19 @@ function App() {
           etc.)
         </h3>
         <input type="file" accept=".epub" onChange={handleFileChange} />
-        <button id="parse" onClick={handleParseAndGenerateImage}>
-          Parse and Generate Image
+        <button id="start" onClick={handleStartProcessing}>
+          Start
         </button>
-        <button onClick={handleNextChapter}>Next Chapter</button>
-        {chapterTitle && (
-          <div className="chapterContainer">
-            <h2>{chapterTitle}</h2>
-            <div className="container">
-              {!isLoading ? (
-                <>
-                  {imageUrl && (
-                    <img
-                      src={imageUrl}
-                      alt="Generated from chapter"
-                      className="generatedImage"
-                    />
-                  )}
-                  <div className="chapterPrompt">
-                    <b>
-                      <i>Optimized</i> Image Prompt:
-                    </b>{" "}
-                    {displayPrompt}
-                  </div>
-                </>
-              ) : (
-                <div className="loadingContainer">
-                  <GridLoader size={25} color={"#adbcf3"} loading={true} />
-                </div>
-              )}
-            </div>
+        {isLoading ? (
+          <div className="loadingContainer">
+            <GridLoader size={25} color={"#adbcf3"} loading={true} />
           </div>
+        ) : (
+          downloadLink && (
+            <a href={downloadLink} download="updated_book.epub">
+              Download Updated Book
+            </a>
+          )
         )}
         <div id="hiddenDiv"></div>
       </div>
