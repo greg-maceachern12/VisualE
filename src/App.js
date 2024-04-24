@@ -172,7 +172,7 @@ function App() {
 
   const generatePromptFromText = async (prompt) => {
     try {
-      const response = await fetch("/.netlify/functions/api/chatgpt", {
+      const response = await fetch("/.netlify/functions/server/api/chatgpt", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
