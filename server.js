@@ -2,7 +2,7 @@
 const express = require("express");
 const axios = require("axios"); // For making HTTP requests
 const cors = require("cors"); // To enable CORS for your server, if needed
-require('dotenv').config({ path: '../../.env' })
+require('dotenv').config()
 const OpenAIApi = require("openai");
 
 const openai = new OpenAIApi.OpenAI({
@@ -82,7 +82,7 @@ app.post("/generateImage", async (req, res) => {
 });
 
 // Start the server
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

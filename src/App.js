@@ -294,7 +294,7 @@ function App() {
                     </select>
                   </div>
                   <div className="dropdown-item">
-                    <label>Size</label>
+                    <label>Size (Beta)</label>
                     <select
                       value={selectedSize}
                       onChange={(e) => setSelectedSize(e.target.value)}
