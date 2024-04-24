@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from "react";
 import epub from "epubjs";
-import { GridLoader } from "react-spinners";
+
 import "./App.scss";
 import "./gradBG/gradBG.scss";
+import AccessCode from "./AccessCode";
+
 import { initGradientBackground } from "./gradBG/gradBG.js";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFlask } from "@fortawesome/free-solid-svg-icons";
+import { GridLoader } from "react-spinners";
 
 function App() {
   const [epubFile, setEpubFile] = useState(null);
@@ -15,6 +20,18 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [epubReader, setEpubReader] = useState(null);
 
+  const [showOptions, setShowOptions] = useState(false);
+  const [selectedStyle, setSelectedStyle] = useState("");
+  const [selectedColorScheme, setSelectedColorScheme] = useState("");
+  const [selectedComposition, setSelectedComposition] = useState("");
+  const [selectedSize, setSelectedSize] = useState("");
+
+  const [isAccessGranted, setIsAccessGranted] = useState(false);
+
+  const handleAccessGranted = () => {
+    setIsAccessGranted(true);
+  };
+
   useEffect(() => {
     const cleanupGradientBackground = initGradientBackground();
     return () => cleanupGradientBackground();
@@ -22,6 +39,10 @@ function App() {
 
   const handleFileChange = (event) => {
     setEpubFile(event.target.files[0]);
+  };
+
+  const toggleOptions = () => {
+    setShowOptions(!showOptions);
   };
 
   const handleParseAndGenerateImage = () => {
@@ -128,7 +149,13 @@ function App() {
     setChapterTitle(chapter.label);
 
     const chapterPrompt = await getChapterPrompt(chapter, epubReader);
-    const processedPrompt = await generateTextFromPrompt(chapterPrompt);
+    const processedPrompt = await generatePromptFromText(
+      chapterPrompt,
+      selectedStyle,
+      selectedColorScheme,
+      selectedComposition,
+      selectedSize
+    );
     const imageUrl = await generateImageFromPrompt(processedPrompt);
 
     setDisplayPrompt(processedPrompt);
@@ -143,14 +170,20 @@ function App() {
     return displayedChapter.contents.innerText.slice(0, 16000);
   };
 
-  const generateTextFromPrompt = async (prompt) => {
+  const generatePromptFromText = async (prompt) => {
     try {
       const response = await fetch("/api/chatgpt", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ prompt }),
+        body: JSON.stringify({
+          prompt,
+          style: selectedStyle,
+          colorScheme: selectedColorScheme,
+          composition: selectedComposition,
+          size: selectedSize,
+        }),
       });
       const data = await response.json();
       return data.response;
@@ -209,44 +242,112 @@ function App() {
       </div>
       <div className="content-container">
         <h1>Visuale - ePub to Image</h1>
-        <h3>
-          We automatically skip the intro chapters of the book (TOC, Dedications
-          etc.)
-        </h3>
-        <input type="file" accept=".epub" onChange={handleFileChange} />
-        <button id="parse" onClick={handleParseAndGenerateImage}>
-          Parse and Generate Image
-        </button>
-        <button onClick={handleNextChapter}>Next Chapter</button>
-        {chapterTitle && (
-          <div className="chapterContainer">
-            <h2>{chapterTitle}</h2>
-            <div className="container">
-              {!isLoading ? (
-                <>
-                  {imageUrl && (
-                    <img
-                      src={imageUrl}
-                      alt="Generated from chapter"
-                      className="generatedImage"
-                    />
-                  )}
-                  <div className="chapterPrompt">
-                    <b>
-                      <i>Optimized</i> Image Prompt:
-                    </b>{" "}
-                    {displayPrompt}
+        {isAccessGranted ? (
+          <div>
+            <h3>
+              We automatically skip the intro chapters of the book (TOC,
+              Dedications etc.)
+            </h3>
+            <div class="control-container">
+              <div className="input-container">
+                <button className="options-button" onClick={toggleOptions}>
+                  <FontAwesomeIcon icon={faFlask} />
+                </button>
+                <input type="file" accept=".epub" onChange={handleFileChange} />
+              </div>
+              {showOptions && (
+                <div className="options-dropdown">
+                  <div className="dropdown-item">
+                    <label>Style</label>
+                    <select
+                      value={selectedStyle}
+                      onChange={(e) => setSelectedStyle(e.target.value)}
+                    >
+                      <option value="Oilpainting">Oilpainting</option>
+                      <option value="Hyper-realism">Hyper-realism</option>
+                      <option value="Animated">Animated</option>
+                      <option value="Watercolor">Watercolor</option>
+                      <option value="Sketch">Sketch</option>
+                      <option value="Digital art">Digital art</option>
+                    </select>
                   </div>
-                </>
-              ) : (
-                <div className="loadingContainer">
-                  <GridLoader size={25} color={"#adbcf3"} loading={true} />
+                  <div className="dropdown-item">
+                    <label>Coloring</label>
+                    <select
+                      value={selectedColorScheme}
+                      onChange={(e) => setSelectedColorScheme(e.target.value)}
+                    >
+                      <option value="Pastel">Pastel</option>
+                      <option value="Vibrant">Vibrant</option>
+                      <option value="Black and White">Black and White</option>
+                    </select>
+                  </div>
+                  <div className="dropdown-item">
+                    <label>Composition</label>
+                    <select
+                      value={selectedComposition}
+                      onChange={(e) => setSelectedComposition(e.target.value)}
+                    >
+                      <option value="Wide-angle">Wide-angle</option>
+                      <option value="Close-up">Close-up</option>
+                      <option value="Bird's eye view">Bird's eye view</option>
+                    </select>
+                  </div>
+                  <div className="dropdown-item">
+                    <label>Size</label>
+                    <select
+                      value={selectedSize}
+                      onChange={(e) => setSelectedSize(e.target.value)}
+                    >
+                      <option value="16:9">Landscape</option>
+                      <option value="1:1">Square</option>
+                      <option value="4:7">Portrait</option>
+                    </select>
+                  </div>
+                </div>
+              )}
+              {epubFile && (
+                <div className="button-container">
+                  <button id="parse" onClick={handleParseAndGenerateImage}>
+                    Parse and Generate Image
+                  </button>
+                  <button onClick={handleNextChapter}>Next Chapter</button>
                 </div>
               )}
             </div>
+            {chapterTitle && (
+              <div className="chapterContainer">
+                <h2>{chapterTitle}</h2>
+                <div className="container">
+                  {!isLoading ? (
+                    <>
+                      {imageUrl && (
+                        <img
+                          src={imageUrl}
+                          alt="Generated from chapter"
+                          className="generatedImage"
+                        />
+                      )}
+                      <div className="chapterPrompt">
+                        <b>
+                          <i>Optimized</i> Image Prompt:
+                        </b>{" "}
+                        {displayPrompt}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="loadingContainer">
+                      <GridLoader size={25} color={"#adbcf3"} loading={true} />
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+            <div id="hiddenDiv"></div>
           </div>
+        ) : (
+          <AccessCode onAccessGranted={handleAccessGranted} />
         )}
-        <div id="hiddenDiv"></div>
       </div>
     </div>
   );
