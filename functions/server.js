@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(cors()); // Use this if your React app is served from a different port or domain
 
 // Endpoint to handle OpenAI ChatGPT API requests
-app.post("/.netlify/functions/server/api/chatgpt", async (req, res) => {
+app.post("/api/chatgpt", async (req, res) => {
   try {
     const { prompt, style, colorScheme, composition, size } = req.body;
 
@@ -58,7 +58,7 @@ Consider the interplay of light, shadow, texture, and perspective to create a vi
 });
 
 // Endpoint to handle OpenAI DALL-E 3 API requests
-app.post("/.netlify/functions/server/generateImage", async (req, res) => {
+app.post("/generateImage", async (req, res) => {
   try {
     /*Code to generate image */
     // console.log(req.body)
