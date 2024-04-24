@@ -3,7 +3,7 @@ import epub from "epubjs";
 
 import "./App.scss";
 import "./gradBG/gradBG.scss";
-import AccessCode from "./AccessCode";
+import AccessCode from "./AccessCode.js";
 
 import { initGradientBackground } from "./gradBG/gradBG.js";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
