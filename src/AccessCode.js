@@ -23,7 +23,6 @@ function AccessCode({ onAccessGranted }) {
       <h3>These API call's ain't free :(</h3>
       <form onSubmit={handleSubmit}>
         <input
-          type="password"
           value={accessCode}
           onChange={handleAccessCodeChange}
           placeholder="Access Code"
