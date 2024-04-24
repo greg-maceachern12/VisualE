@@ -4,6 +4,7 @@ const axios = require("axios"); // For making HTTP requests
 const cors = require("cors"); // To enable CORS for your server, if needed
 require('dotenv').config({ path: '../.env' })
 const OpenAIApi = require("openai");
+const serverless = require('serverless-http');
 
 const openai = new OpenAIApi.OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -86,3 +87,4 @@ const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+module.exports.handler = serverless(app);
