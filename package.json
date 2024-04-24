@@ -18,7 +18,6 @@
     "dotenv": "^16.4.5",
     "epubjs": "^0.3.93",
     "express": "^4.18.3",
-    "netlify-cli": "^17.22.1",
     "openai": "^4.28.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
