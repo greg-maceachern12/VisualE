@@ -17,6 +17,8 @@ app.use(cors()); // Use this if your React app is served from a different port o
 
 // Endpoint to handle OpenAI ChatGPT API requests
 app.post("/api/chatgpt", async (req, res) => {
+  console.log(openai);
+  console.log(req.body);
   try {
     const { prompt, style, colorScheme, composition, size } = req.body;
 
