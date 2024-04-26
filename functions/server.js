@@ -9,6 +9,7 @@ const serverless = require('serverless-http');
 const openai = new OpenAIApi.OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
+console.log(openai);
 
 const app = express();
 app.use(express.json());
