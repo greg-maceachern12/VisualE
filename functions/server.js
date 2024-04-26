@@ -10,6 +10,7 @@ const openai = new OpenAIApi.OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 console.log(openai);
+console.log('rendering functions!')
 
 const app = express();
 app.use(express.json());
