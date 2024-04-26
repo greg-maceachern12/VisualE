@@ -10,7 +10,7 @@ const openai = new OpenAIApi.OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-app.post("/.netlify/functions/generateImage", async (req, res) => {
+app.post("/.netlify/functions/generateImage/generateImage", async (req, res) => {
   try {
     const image = await openai.images.generate({
       model: "dall-e-3",

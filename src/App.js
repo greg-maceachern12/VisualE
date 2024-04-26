@@ -172,7 +172,7 @@ function App() {
 
   const generatePromptFromText = async (prompt) => {
     try {
-      const response = await fetch("/.netlify/functions/server/api/chatgpt", {
+      const response = await fetch("/.netlify/functions/chatgpt/api/chatgpt", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -195,7 +195,7 @@ function App() {
 
   const generateImageFromPrompt = async (prompt) => {
     try {
-      const response = await fetch("/.netlify/functions/server/generateImage", {
+      const response = await fetch("/.netlify/functions/generateImage/generateImage", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

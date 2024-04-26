@@ -10,7 +10,7 @@ const openai = new OpenAIApi.OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-app.post("/.netlify/functions/api/chatgpt", async (req, res) => {
+app.post("/.netlify/functions/chatgpt/api/chatgpt", async (req, res) => {
   console.log(req.body);
   try {
     const { prompt, style, colorScheme, composition, size } = req.body;
