@@ -241,7 +241,7 @@ function App() {
         </div>
       </div>
       <div className="content-container">
-        <h1>Visuale - ePub to Image</h1>
+        <h1>Visuai - ePub to Image</h1>
         {isAccessGranted ? (
           <div>
             <h3>
