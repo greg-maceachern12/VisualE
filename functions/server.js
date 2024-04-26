@@ -2,7 +2,7 @@
 const express = require("express");
 const axios = require("axios"); // For making HTTP requests
 const cors = require("cors"); // To enable CORS for your server, if needed
-require('dotenv').config({ path: '../.env' })
+// require('dotenv').config({ path: '../.env' })
 const OpenAIApi = require("openai");
 const serverless = require('serverless-http');
 
