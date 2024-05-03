@@ -9,6 +9,7 @@ import { initGradientBackground } from "./gradBG/gradBG.js";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFlask } from "@fortawesome/free-solid-svg-icons";
 import { GridLoader } from "react-spinners";
+import { Skeleton } from "@mui/material";
 
 function App() {
   const [epubFile, setEpubFile] = useState(null);
@@ -164,7 +165,7 @@ function App() {
 
     setDisplayPrompt(processedPrompt);
     setImageUrl(imageUrl);
-    setIsLoading(false);
+    // setIsLoading(false);
   };
 
   const getChapterPrompt = async (chapter, epubReader) => {
@@ -176,18 +177,19 @@ function App() {
 
   const generatePromptFromText = async (prompt) => {
     try {
-      const response = await fetch(chatAPI, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          prompt,
-          style: selectedStyle,
-          colorScheme: selectedColorScheme,
-          composition: selectedComposition,
-        }),
-      });
+      // const response = await fetch(chatAPI, {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify({
+      //     prompt,
+      //     style: selectedStyle,
+      //     colorScheme: selectedColorScheme,
+      //     composition: selectedComposition,
+      //   }),
+      // });
+      const response = 'test'
       const data = await response.json();
       console.log(data.response);
       return data.response;
@@ -199,13 +201,15 @@ function App() {
 
   const generateImageFromPrompt = async (prompt) => {
     try {
-      const response = await fetch(imageAPI, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ prompt }),
-      });
+      // const response = await fetch(imageAPI, {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify({ prompt }),
+      // });
+      const response = 'test'
+
       const data = await response.json();
       return data.imageUrl;
     } catch (error) {
@@ -330,7 +334,37 @@ function App() {
                     </>
                   ) : (
                     <div className="loadingContainer">
-                      <GridLoader size={25} color={"#adbcf3"} loading={true} />
+                      <div className="skeletonWrapper">
+                        <Skeleton
+                          variant="rounded"
+                          width={400}
+                          height={300}
+                          animation="wave"
+                        />
+                        <div className="textSkeletons">
+                          <Skeleton variant="text" sx={{ fontSize: "1rem"}} />
+                          <Skeleton
+                            variant="text"
+                            sx={{ fontSize: "1rem"}}
+                            animation="wave"
+                          />
+                          <Skeleton
+                            variant="text"
+                            sx={{ fontSize: "1rem"}}
+                            animation="wave"
+                          />
+                          <Skeleton
+                            variant="text"
+                            sx={{ fontSize: "1rem"}}
+                            animation="wave"
+                          />
+                          <Skeleton
+                            variant="text"
+                            sx={{ fontSize: "1rem"}}
+                            animation={false}
+                          />
+                        </div>
+                      </div>
                     </div>
                   )}
                 </div>

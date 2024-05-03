@@ -1,6 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&family=Outfit:wght@100..900&display=swap");
-@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap");
 
 body {
   font-family: "Lora", "Roboto", sans-serif;
@@ -74,7 +74,6 @@ input[type="file"] {
   background-color: #f5f5f5;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
 }
 select {
   margin-right: 5px;
@@ -157,7 +156,6 @@ select {
   margin-right: 0;
 }
 
-
 #parse {
   background: white;
   color: #333;
@@ -214,9 +212,37 @@ img {
 .loadingContainer {
   display: flex;
   align-items: center;
-  margin: auto;
-}
+  justify-content: center;
+  margin-top: 20px;
 
+  .skeletonWrapper {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+
+    .MuiSkeleton-rounded {
+      width: 300px;
+      height: 400px;
+      margin-right: 20px;
+    }
+
+    .textSkeletons {
+      display: flex;
+      flex-direction: column;
+      width: 300px;
+
+      .MuiSkeleton-text {
+        width: 100%;
+        max-width: 400px;
+        margin-bottom: 10px;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+}Ï
 .container {
   display: flex;
   flex-direction: row;
