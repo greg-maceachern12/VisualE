@@ -10,7 +10,7 @@ function AccessCode({ onAccessGranted }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (accessCode === "epub") {
+    if (accessCode === "eragon") {
       onAccessGranted();
     } else {
       alert("Invalid access code. Please try again.");
