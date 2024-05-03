@@ -2,15 +2,15 @@
 const express = require("express");
 const axios = require("axios"); // For making HTTP requests
 const cors = require("cors"); // To enable CORS for your server, if needed
-require('dotenv').config({ path: '../.env' })
+require("dotenv").config({ path: "../.env" });
 const OpenAIApi = require("openai");
-const serverless = require('serverless-http');
+const serverless = require("serverless-http");
 
 const openai = new OpenAIApi.OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 // console.log(openai);
-console.log('rendering functions!')
+console.log("rendering functions!");
 
 const app = express();
 app.use(express.json());
@@ -19,7 +19,7 @@ app.use(cors()); // Use this if your React app is served from a different port o
 // Endpoint to handle OpenAI ChatGPT API requests
 app.post("/.netlify/functions/server/api/chatgpt", async (req, res) => {
   console.log(req.body);
-  
+
   try {
     const { prompt, style, colorScheme, composition } = req.body;
 
@@ -28,19 +28,15 @@ app.post("/.netlify/functions/server/api/chatgpt", async (req, res) => {
       messages: [
         {
           role: "system",
-          content: `Analyze the provided chapter text to capture a segment from the text that is most visually descriptive. Formulate a prompt for DALL-E 3 that requests the generation of an image with the following characteristics:
+          content: `Identify a visually descriptive segment from the provided chapter text that is suitable for image generation and does not contain explicit violence, gore, or overtly sexual content.
+Create a prompt for DALL-E 3 that includes the following:
 
-1. Image Style: ${style}
-   - Incorporate the techniques, brushstrokes, and visual qualities associated with ${style} to create a visually stunning and immersive image.
+Image Style: ${style} - Incorporate the style's techniques and visual qualities while avoiding depictions of graphic violence or sexually explicit content.
+Color Scheme: ${colorScheme} - Use the color scheme to evoke the desired mood without relying on excessively dark or disturbing tones.
+Composition: ${composition} - Employ the composition to guide the viewer's eye and emphasize key elements, avoiding inappropriate or explicit focus.
 
-2. Color Scheme: ${colorScheme}
-   - Use a ${colorScheme} color palette to evoke the desired mood and atmosphere, ensuring that the colors harmonize and enhance the overall visual impact of the image.
-
-3. Composition: ${composition}
-   - Employ a ${composition} composition to guide the viewer's eye, create visual interest, and emphasize the key elements of the scene.
-The language of the prompt should be rich and descriptive, highlighting the visual tone, physical setting, environmental details, and emotional undertones found within the chapter. Direct the AI to produce an artwork that resonates with the depth, movement, and artistic style characteristic of ${style}, while capturing the essence and significance of the selected scene.
-
-Consider the interplay of light, shadow, texture, and perspective to create a visually compelling and immersive image that transports the viewer into the world of the story.`,
+Use descriptive language to highlight the visual tone, setting, and emotional undertones, ensuring the prompt does not promote violence, hate speech, or explicit content.
+Direct the AI to create a visually compelling artwork that captures the essence of the scene, adhering to OpenAI's content guidelines. Consider the interplay of light, shadow, texture, and perspective to create a striking image suitable for a broad audience, without relying on shock value or inappropriate content.`,
         },
         {
           role: "user",
