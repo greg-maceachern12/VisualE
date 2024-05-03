@@ -165,7 +165,7 @@ function App() {
 
     setDisplayPrompt(processedPrompt);
     setImageUrl(imageUrl);
-    // setIsLoading(false);
+    setIsLoading(false);
   };
 
   const getChapterPrompt = async (chapter, epubReader) => {
@@ -200,6 +200,7 @@ function App() {
 
   const generateImageFromPrompt = async (prompt) => {
     try {
+      console.log("generating image.. this can take up to 15s")
       const response = await fetch(imageAPI, {
         method: "POST",
         headers: {
@@ -209,10 +210,11 @@ function App() {
       });
 
       const data = await response.json();
+      console.log(data.imageUrl)
       return data.imageUrl;
     } catch (error) {
       console.error("Error calling the API:", error);
-      return "";
+      return "Cannot generate image";
     }
   };
 

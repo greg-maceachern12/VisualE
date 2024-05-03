@@ -174,7 +174,7 @@ select {
 }
 
 img {
-  max-width: 60%;
+  max-width: 50%;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   height: auto;
@@ -207,6 +207,9 @@ img {
   margin-top: 10px;
   border: 1px solid #ccc;
   padding: 5px;
+}
+.generatedImage {
+  margin-right: 40px;
 }
 
 .loadingContainer {
@@ -242,7 +245,7 @@ img {
       }
     }
   }
-}Ï
+}
 .container {
   display: flex;
   flex-direction: row;
@@ -250,6 +253,8 @@ img {
   margin: 0 auto;
   padding: 40px;
   width: 100%;
+  background-color: whitesmoke;
+  color: black;
 }
 
 #hiddenDiv {
