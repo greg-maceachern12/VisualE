@@ -8,7 +8,7 @@ import AccessCode from "./AccessCode.js";
 import { initGradientBackground } from "./gradBG/gradBG.js";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFlask } from "@fortawesome/free-solid-svg-icons";
-import { GridLoader } from "react-spinners";
+// import { GridLoader } from "react-spinners";
 import { Skeleton } from "@mui/material";
 
 function App() {
