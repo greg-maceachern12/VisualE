@@ -177,19 +177,18 @@ function App() {
 
   const generatePromptFromText = async (prompt) => {
     try {
-      // const response = await fetch(chatAPI, {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify({
-      //     prompt,
-      //     style: selectedStyle,
-      //     colorScheme: selectedColorScheme,
-      //     composition: selectedComposition,
-      //   }),
-      // });
-      const response = 'test'
+      const response = await fetch(chatAPI, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          prompt,
+          style: selectedStyle,
+          colorScheme: selectedColorScheme,
+          composition: selectedComposition,
+        }),
+      });
       const data = await response.json();
       console.log(data.response);
       return data.response;
@@ -201,14 +200,13 @@ function App() {
 
   const generateImageFromPrompt = async (prompt) => {
     try {
-      // const response = await fetch(imageAPI, {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify({ prompt }),
-      // });
-      const response = 'test'
+      const response = await fetch(imageAPI, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ prompt }),
+      });
 
       const data = await response.json();
       return data.imageUrl;
