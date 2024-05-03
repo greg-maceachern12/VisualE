@@ -24,9 +24,14 @@ function App() {
   const [selectedStyle, setSelectedStyle] = useState("");
   const [selectedColorScheme, setSelectedColorScheme] = useState("");
   const [selectedComposition, setSelectedComposition] = useState("");
-  const [selectedSize, setSelectedSize] = useState("");
 
   const [isAccessGranted, setIsAccessGranted] = useState(false);
+
+  // const path = '/.netlify/functions/server';
+  const chatAPI =
+    "https://visuaicalls.azurewebsites.net/api/chatgpt?code=QDubsyOhk_c8jC1RAGPBHNydCCNgpgfcSscjsSqVRdw_AzFuxUgufQ%3D%3D";
+  const imageAPI =
+    "https://visuaicalls.azurewebsites.net/api/generateImage?code=sbKw5c6I6xFV6f9AWYKAbR5IGBIj-td2aUly5oNP4QZMAzFuSvLDYw%3D%3D";
 
   const handleAccessGranted = () => {
     setIsAccessGranted(true);
@@ -153,8 +158,7 @@ function App() {
       chapterPrompt,
       selectedStyle,
       selectedColorScheme,
-      selectedComposition,
-      selectedSize
+      selectedComposition
     );
     const imageUrl = await generateImageFromPrompt(processedPrompt);
 
@@ -172,7 +176,7 @@ function App() {
 
   const generatePromptFromText = async (prompt) => {
     try {
-      const response = await fetch("/.netlify/functions/chatgpt/api/chatgpt", {
+      const response = await fetch(chatAPI, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -182,10 +186,10 @@ function App() {
           style: selectedStyle,
           colorScheme: selectedColorScheme,
           composition: selectedComposition,
-          size: selectedSize,
         }),
       });
       const data = await response.json();
+      console.log(data.response);
       return data.response;
     } catch (error) {
       console.error("Error with ChatGPT API:", error);
@@ -195,7 +199,7 @@ function App() {
 
   const generateImageFromPrompt = async (prompt) => {
     try {
-      const response = await fetch("/.netlify/functions/generateImage/generateImage", {
+      const response = await fetch(imageAPI, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -291,17 +295,6 @@ function App() {
                       <option value="Wide-angle">Wide-angle</option>
                       <option value="Close-up">Close-up</option>
                       <option value="Bird's eye view">Bird's eye view</option>
-                    </select>
-                  </div>
-                  <div className="dropdown-item">
-                    <label>Size (Beta)</label>
-                    <select
-                      value={selectedSize}
-                      onChange={(e) => setSelectedSize(e.target.value)}
-                    >
-                      <option value="16:9">Landscape</option>
-                      <option value="1:1">Square</option>
-                      <option value="4:7">Portrait</option>
                     </select>
                   </div>
                 </div>
