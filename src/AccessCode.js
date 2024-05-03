@@ -20,7 +20,6 @@ function AccessCode({ onAccessGranted }) {
   return (
     <div className="access-code-container">
       <h1>Enter Access Code</h1>
-      <h3>These API call's ain't free :(</h3>
       <form onSubmit={handleSubmit}>
         <input
           value={accessCode}
