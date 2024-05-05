@@ -45,8 +45,21 @@ body {
 
 .input-container {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 10px;
+}
+
+.file-input-wrapper {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.error-message {
+  color: red;
+  font-size: 0.8em;
+  margin-top: 4px;
+  font-style: italic;
 }
 
 input[type="file"] {
@@ -80,6 +93,7 @@ select {
 }
 
 .options-button {
+  margin-right: 10px;
   background-color: #007bff;
   color: #fff;
   border: none;

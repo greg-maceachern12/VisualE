@@ -25,6 +25,7 @@ function App() {
   const [selectedStyle, setSelectedStyle] = useState("");
   const [selectedColorScheme, setSelectedColorScheme] = useState("");
   const [selectedComposition, setSelectedComposition] = useState("");
+  const [fileError, setFileError] = useState("");
 
   const [isAccessGranted, setIsAccessGranted] = useState(false);
 
@@ -44,7 +45,19 @@ function App() {
   }, []);
 
   const handleFileChange = (event) => {
-    setEpubFile(event.target.files[0]);
+    const file = event.target.files[0];
+    if (file) {
+      if (file.type === "application/epub+zip") {
+        setEpubFile(file);
+        setFileError("");
+      } else {
+        setEpubFile(null);
+        setFileError("Please select a valid EPUB file.");
+      }
+    } else {
+      setEpubFile(null);
+      setFileError("No file selected.");
+    }
   };
 
   const toggleOptions = () => {
@@ -200,7 +213,7 @@ function App() {
 
   const generateImageFromPrompt = async (prompt) => {
     try {
-      console.log("generating image.. this can take up to 15s")
+      console.log("generating image.. this can take up to 15s");
       const response = await fetch(imageAPI, {
         method: "POST",
         headers: {
@@ -210,7 +223,7 @@ function App() {
       });
 
       const data = await response.json();
-      console.log(data.imageUrl)
+      console.log(data.imageUrl);
       return data.imageUrl;
     } catch (error) {
       console.error("Error calling the API:", error);
@@ -249,7 +262,7 @@ function App() {
         </div>
       </div>
       <div className="content-container">
-        <h1>Visuai - ePub to Image (beta)</h1>
+        <h1>Visuai - ePub to Image (alpha)</h1>
         {isAccessGranted ? (
           <div>
             <h3>
@@ -258,10 +271,17 @@ function App() {
             </h3>
             <div class="control-container">
               <div className="input-container">
-                <button className="options-button" onClick={toggleOptions}>
-                  <FontAwesomeIcon icon={faFlask} />
-                </button>
-                <input type="file" accept=".epub" onChange={handleFileChange} />
+                <div className="file-input-wrapper">
+                  <button className="options-button" onClick={toggleOptions}>
+                    <FontAwesomeIcon icon={faFlask} />
+                  </button>
+                  <input
+                    type="file"
+                    accept=".epub"
+                    onChange={handleFileChange}
+                  />
+                </div>
+                {fileError && <p className="error-message">{fileError}</p>}
               </div>
               {showOptions && (
                 <div className="options-dropdown">
@@ -342,25 +362,25 @@ function App() {
                           animation="wave"
                         />
                         <div className="textSkeletons">
-                          <Skeleton variant="text" sx={{ fontSize: "1rem"}} />
+                          <Skeleton variant="text" sx={{ fontSize: "1rem" }} />
                           <Skeleton
                             variant="text"
-                            sx={{ fontSize: "1rem"}}
+                            sx={{ fontSize: "1rem" }}
                             animation="wave"
                           />
                           <Skeleton
                             variant="text"
-                            sx={{ fontSize: "1rem"}}
+                            sx={{ fontSize: "1rem" }}
                             animation="wave"
                           />
                           <Skeleton
                             variant="text"
-                            sx={{ fontSize: "1rem"}}
+                            sx={{ fontSize: "1rem" }}
                             animation="wave"
                           />
                           <Skeleton
                             variant="text"
-                            sx={{ fontSize: "1rem"}}
+                            sx={{ fontSize: "1rem" }}
                             animation={false}
                           />
                         </div>
