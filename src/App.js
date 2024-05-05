@@ -253,7 +253,7 @@ function App() {
         {isAccessGranted ? (
           <div>
             <h3>
-              We automatically skip the intro chapters of the book (TOC,
+              Visuai automatically skips the intro chapters of the book (TOC,
               Dedications etc.)
             </h3>
             <div class="control-container">
