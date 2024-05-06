@@ -1,7 +1,9 @@
 // About.js
 import React from "react";
 import { Link } from "react-router-dom";
-
+import { faGithub } from "@fortawesome/free-brands-svg-icons";
+import { faExternalLinkAlt } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 function About() {
   return (
     <div className="about-container">
@@ -14,10 +16,11 @@ function About() {
         <i>
           I discovered that authors invest significant effort in crafting rich
           visual details for many scenes, and my mind struggled to fully
-          visualize them. See the landing page for examples.
-        </i>{" "}
-        I often found myself searching online for fan renditions of the
-        characters to aid my imagination.
+          visualize them.
+        </i>
+        See the <a href="https://landvisuai.netlify.app/">landing page</a> for
+        examples. I often found myself searching online for fan renditions of
+        the characters to aid my imagination.
         <br></br>
         It became apparent that the authors were essentially providing
         well-written prompts to generate this content, encompassing scenes,
@@ -28,9 +31,9 @@ function About() {
         Thus, Visuai was born!
         <br></br>
         <br></br>
-        IMO, the ideal user experience would be a Kindle extension
-        directly integrated into the product, automatically generating visuals for
-        the user or based on highlighted content. Until Amazon opens up Kindle
+        IMO, the ideal user experience would be a Kindle extension directly
+        integrated into the product, automatically generating visuals for the
+        user or based on highlighted content. Until Amazon opens up Kindle
         extensions, Visuai will operate as a self-serve platform.
         <br></br>
         The longer-term vision for this app is to enable users to:
@@ -51,16 +54,29 @@ function About() {
           <li>Move to Groq for faster inference on parts of the generation.</li>
         </ol>
         Until then, please enjoy!<br></br>
-        If you're reading this <b>please don't go crazy on the generations.. this eats up my OpenAI credit :(</b>
+        If you're reading this{" "}
+        <b>
+          please don't go crazy on the generations.. this eats up my OpenAI
+          credit :(
+        </b>
+        <br></br>
+        <br></br>
+        <Link to="/" className="link-button">
+          Back to App
+        </Link>
       </p>
-      <Link to="/" className="back-button">
-        Back to App
-      </Link>
       <br></br>
       <br></br>
-      <a href="https://github.com/greg-maceachern12/VisualE">Github</a>
-      <br></br>
-      <a href="https://landvisuai.netlify.app/">Landing Page</a>
+      <a
+        href="https://github.com/greg-maceachern12/VisualE"
+        className="link-button"
+      >
+        <FontAwesomeIcon icon={faGithub} />Github
+      </a>
+      <br />
+      <a href="https://landvisuai.netlify.app/" className="link-button">
+        <FontAwesomeIcon icon={faExternalLinkAlt} />Landing Page
+      </a>
     </div>
   );
 }
