@@ -6,19 +6,61 @@ function About() {
   return (
     <div className="about-container">
       <h2>About Visuai</h2>
-      <p>
-        Visuai is an innovative project that combines the power of AI and ePub reading to generate captivating images based on the content of chapters in ePub books. By leveraging advanced natural language processing and image generation techniques, Visuai brings the stories to life, creating visual representations that enhance the reading experience.
+      <p className="aboutText">
+        Welcome to Visuai - a project inspired by the captivating visual
+        descriptions found in recent fiction books I've been immersed in, from
+        the likes of Dune, the Way of Kings and Eragon (again).
+        <br></br>
+        <i>
+          I discovered that authors invest significant effort in crafting rich
+          visual details for many scenes, and my mind struggled to fully
+          visualize them. See the landing page for examples.
+        </i>{" "}
+        I often found myself searching online for fan renditions of the
+        characters to aid my imagination.
+        <br></br>
+        It became apparent that the authors were essentially providing
+        well-written prompts to generate this content, encompassing scenes,
+        characters, environments, and more, for the reader. What was missing was
+        an interface to seamlessly connect these elements together.
+        <br></br>
+        <br></br>
+        Thus, Visuai was born!
+        <br></br>
+        <br></br>
+        IMO, the ideal user experience would be a Kindle extension
+        directly integrated into the product, automatically generating visuals for
+        the user or based on highlighted content. Until Amazon opens up Kindle
+        extensions, Visuai will operate as a self-serve platform.
+        <br></br>
+        The longer-term vision for this app is to enable users to:
+        <ol>
+          <li>Upload their epub files</li>
+          <li>Have the app generate and cache images for each chapter</li>
+          <li>Integrate the images inline with the text</li>
+        </ol>
+        For now, users can browse chapter by chapter and/or select a specific
+        chapter <i>(coming soon)</i> to explore a visual representation of that
+        portion of the book.
+        <br></br>
+        There are numerous improvements planned for Visuai, including:
+        <ol>
+          <li>Utilization of control nets for enhanced image generation</li>
+          <li>Caching of AI-generated images for future use</li>
+          <li>Implementation of a subscription model and/or payment schema</li>
+          <li>Move to Groq for faster inference on parts of the generation.</li>
+        </ol>
+        Until then, please enjoy!<br></br>
+        If you're reading this <b>please don't go crazy on the generations.. this eats up my OpenAI credit :(</b>
       </p>
-      <p>
-        With Visuai, users can easily upload their ePub files and watch as the application intelligently analyzes the text, skipping over non-story chapters such as the table of contents and dedications. The AI-powered system then processes the relevant chapters, extracting key information and generating unique image prompts that capture the essence of the story.
-      </p>
-      <p>
-        Users have the flexibility to customize the generated images by selecting from a range of styles, color schemes, and compositions. Whether you prefer oil paintings, hyper-realistic renderings, or watercolor illustrations, Visuai offers a diverse array of options to suit your preferences.
-      </p>
-      <p>
-        Visuai aims to revolutionize the way we engage with ePub books, providing a immersive and visually stimulating experience. By bridging the gap between text and imagery, Visuai opens up new possibilities for readers, writers, and artists alike.
-      </p>
-      <Link to="/" className="back-button">Back to Home</Link>
+      <Link to="/" className="back-button">
+        Back to App
+      </Link>
+      <br></br>
+      <br></br>
+      <a href="https://github.com/greg-maceachern12/VisualE">Github</a>
+      <br></br>
+      <a href="https://landvisuai.netlify.app/">Landing Page</a>
     </div>
   );
 }

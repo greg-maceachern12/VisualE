@@ -280,6 +280,12 @@ img {
   height: 0;
 }
 
+.aboutText {
+  background-color: #00000080;
+  border-radius: 10px;
+  padding: 40px;
+}
+
 @keyframes gradientBackground {
   0% {
     background-position: 0% 50%;
