@@ -19,12 +19,12 @@ function AccessCode({ onAccessGranted }) {
 
   return (
     <div className="access-code-container">
-      <h1>Enter Access Code</h1>
+      <h1>Enter Password</h1>
       <form onSubmit={handleSubmit}>
         <input
           value={accessCode}
           onChange={handleAccessCodeChange}
-          placeholder="Access Code"
+          placeholder="password"
         />
         <button type="submit">Submit</button>
       </form>
