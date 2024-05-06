@@ -263,13 +263,23 @@ img {
     }
   }
 }
+.header-container {
+  background-color: #0000005c;
+  padding: 40px;
+  border-radius: 10px;
+}
 .container {
   display: flex;
   flex-direction: row;
   align-items: center;
   margin: 0 auto;
+
+  h2 {
+    margin-top: 0;
+  }
+}
+.chapterContainer {
   padding: 40px;
-  width: 100%;
   background-color: #f5f5f57d;
   color: black;
   border-radius: 10px;

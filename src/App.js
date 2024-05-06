@@ -270,168 +270,175 @@ function App() {
               path="/"
               element={
                 <>
-                  <h1>Visuai - ePub to Image (alpha)</h1>
-                  <Link to="/about" className="about-button">
-                    About
-                  </Link>
-                  {isAccessGranted ? (
-                    <div>
-                      <h3>
-                        Visuai automatically skips the intro chapters of the
-                        book (TOC, Dedications etc.)
-                      </h3>
-                      
-                      <div class="control-container">
-                        <div className="input-container">
-                          <div className="file-input-wrapper">
-                            <button
-                              className="options-button"
-                              onClick={toggleOptions}
-                            >
-                              <FontAwesomeIcon icon={faFlask} />
-                            </button>
-                            <input
-                              type="file"
-                              accept=".epub"
-                              onChange={handleFileChange}
-                            />
+                  <div className="header-container">
+                    <div className="title-container">
+                      <h1>Visuai - ePub to Image (alpha)</h1>
+                      <Link to="/about" className="about-button">
+                        About
+                      </Link>
+                    </div>
+                    {isAccessGranted ? (
+                      <div>
+                        <h3>
+                          Visuai automatically skips the intro chapters of the
+                          book (TOC, Dedications etc.)
+                        </h3>
+                        <div class="control-container">
+                          <div className="input-container">
+                            <div className="file-input-wrapper">
+                              <button
+                                className="options-button"
+                                onClick={toggleOptions}
+                              >
+                                <FontAwesomeIcon icon={faFlask} />
+                              </button>
+                              <input
+                                type="file"
+                                accept=".epub"
+                                onChange={handleFileChange}
+                              />
+                            </div>
+                            {fileError && (
+                              <p className="error-message">{fileError}</p>
+                            )}
                           </div>
-                          {fileError && (
-                            <p className="error-message">{fileError}</p>
+                          {showOptions && (
+                            <div className="options-dropdown">
+                              <div className="dropdown-item">
+                                <label>Style</label>
+                                <select
+                                  value={selectedStyle}
+                                  onChange={(e) =>
+                                    setSelectedStyle(e.target.value)
+                                  }
+                                >
+                                  <option value="Oilpainting">
+                                    Oilpainting
+                                  </option>
+                                  <option value="Hyper-realism">
+                                    Hyper-realism
+                                  </option>
+                                  <option value="Animated">Animated</option>
+                                  <option value="Watercolor">Watercolor</option>
+                                  <option value="Sketch">Sketch</option>
+                                  <option value="Digital art">
+                                    Digital art
+                                  </option>
+                                </select>
+                              </div>
+                              <div className="dropdown-item">
+                                <label>Coloring</label>
+                                <select
+                                  value={selectedColorScheme}
+                                  onChange={(e) =>
+                                    setSelectedColorScheme(e.target.value)
+                                  }
+                                >
+                                  <option value="Pastel">Pastel</option>
+                                  <option value="Vibrant">Vibrant</option>
+                                  <option value="Black and White">
+                                    Black and White
+                                  </option>
+                                </select>
+                              </div>
+                              <div className="dropdown-item">
+                                <label>Composition</label>
+                                <select
+                                  value={selectedComposition}
+                                  onChange={(e) =>
+                                    setSelectedComposition(e.target.value)
+                                  }
+                                >
+                                  <option value="Wide-angle">Wide-angle</option>
+                                  <option value="Close-up">Close-up</option>
+                                  <option value="Bird's eye view">
+                                    Bird's eye view
+                                  </option>
+                                </select>
+                              </div>
+                            </div>
+                          )}
+                          {epubFile && (
+                            <div className="button-container">
+                              <button
+                                id="parse"
+                                onClick={handleParseAndGenerateImage}
+                              >
+                                Parse and Generate Image
+                              </button>
+                              <button onClick={handleNextChapter}>
+                                Next Chapter
+                              </button>
+                            </div>
                           )}
                         </div>
-                        {showOptions && (
-                          <div className="options-dropdown">
-                            <div className="dropdown-item">
-                              <label>Style</label>
-                              <select
-                                value={selectedStyle}
-                                onChange={(e) =>
-                                  setSelectedStyle(e.target.value)
-                                }
-                              >
-                                <option value="Oilpainting">Oilpainting</option>
-                                <option value="Hyper-realism">
-                                  Hyper-realism
-                                </option>
-                                <option value="Animated">Animated</option>
-                                <option value="Watercolor">Watercolor</option>
-                                <option value="Sketch">Sketch</option>
-                                <option value="Digital art">Digital art</option>
-                              </select>
+                      </div>
+                    ) : (
+                      <AccessCode onAccessGranted={handleAccessGranted} />
+                    )}
+                  </div>
+                  {chapterTitle && (
+                    <div className="chapterContainer">
+                      <h2>{chapterTitle}</h2>
+                      <div className="container">
+                        {!isLoading ? (
+                          <>
+                            {imageUrl && (
+                              <img
+                                src={imageUrl}
+                                alt="Generated from chapter"
+                                className="generatedImage"
+                              />
+                            )}
+                            <div className="chapterPrompt">
+                              <b>
+                                <i>Optimized</i> Image Prompt:
+                              </b>{" "}
+                              {displayPrompt}
                             </div>
-                            <div className="dropdown-item">
-                              <label>Coloring</label>
-                              <select
-                                value={selectedColorScheme}
-                                onChange={(e) =>
-                                  setSelectedColorScheme(e.target.value)
-                                }
-                              >
-                                <option value="Pastel">Pastel</option>
-                                <option value="Vibrant">Vibrant</option>
-                                <option value="Black and White">
-                                  Black and White
-                                </option>
-                              </select>
+                          </>
+                        ) : (
+                          <div className="loadingContainer">
+                            <div className="skeletonWrapper">
+                              <Skeleton
+                                variant="rounded"
+                                width={400}
+                                height={300}
+                                animation="wave"
+                              />
+                              <div className="textSkeletons">
+                                <Skeleton
+                                  variant="text"
+                                  sx={{ fontSize: "1rem" }}
+                                />
+                                <Skeleton
+                                  variant="text"
+                                  sx={{ fontSize: "1rem" }}
+                                  animation="wave"
+                                />
+                                <Skeleton
+                                  variant="text"
+                                  sx={{ fontSize: "1rem" }}
+                                  animation="wave"
+                                />
+                                <Skeleton
+                                  variant="text"
+                                  sx={{ fontSize: "1rem" }}
+                                  animation="wave"
+                                />
+                                <Skeleton
+                                  variant="text"
+                                  sx={{ fontSize: "1rem" }}
+                                  animation={false}
+                                />
+                              </div>
                             </div>
-                            <div className="dropdown-item">
-                              <label>Composition</label>
-                              <select
-                                value={selectedComposition}
-                                onChange={(e) =>
-                                  setSelectedComposition(e.target.value)
-                                }
-                              >
-                                <option value="Wide-angle">Wide-angle</option>
-                                <option value="Close-up">Close-up</option>
-                                <option value="Bird's eye view">
-                                  Bird's eye view
-                                </option>
-                              </select>
-                            </div>
-                          </div>
-                        )}
-                        {epubFile && (
-                          <div className="button-container">
-                            <button
-                              id="parse"
-                              onClick={handleParseAndGenerateImage}
-                            >
-                              Parse and Generate Image
-                            </button>
-                            <button onClick={handleNextChapter}>
-                              Next Chapter
-                            </button>
                           </div>
                         )}
                       </div>
-                      {chapterTitle && (
-                        <div className="chapterContainer">
-                          <h2>{chapterTitle}</h2>
-                          <div className="container">
-                            {!isLoading ? (
-                              <>
-                                {imageUrl && (
-                                  <img
-                                    src={imageUrl}
-                                    alt="Generated from chapter"
-                                    className="generatedImage"
-                                  />
-                                )}
-                                <div className="chapterPrompt">
-                                  <b>
-                                    <i>Optimized</i> Image Prompt:
-                                  </b>{" "}
-                                  {displayPrompt}
-                                </div>
-                              </>
-                            ) : (
-                              <div className="loadingContainer">
-                                <div className="skeletonWrapper">
-                                  <Skeleton
-                                    variant="rounded"
-                                    width={400}
-                                    height={300}
-                                    animation="wave"
-                                  />
-                                  <div className="textSkeletons">
-                                    <Skeleton
-                                      variant="text"
-                                      sx={{ fontSize: "1rem" }}
-                                    />
-                                    <Skeleton
-                                      variant="text"
-                                      sx={{ fontSize: "1rem" }}
-                                      animation="wave"
-                                    />
-                                    <Skeleton
-                                      variant="text"
-                                      sx={{ fontSize: "1rem" }}
-                                      animation="wave"
-                                    />
-                                    <Skeleton
-                                      variant="text"
-                                      sx={{ fontSize: "1rem" }}
-                                      animation="wave"
-                                    />
-                                    <Skeleton
-                                      variant="text"
-                                      sx={{ fontSize: "1rem" }}
-                                      animation={false}
-                                    />
-                                  </div>
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      )}
-                      <div id="hiddenDiv"></div>
                     </div>
-                  ) : (
-                    <AccessCode onAccessGranted={handleAccessGranted} />
                   )}
+                  <div id="hiddenDiv"></div>
                 </>
               }
             />
