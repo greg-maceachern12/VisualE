@@ -36,7 +36,7 @@ function About() {
         user or based on highlighted content. Until Amazon opens up Kindle
         extensions, Visuai will operate as a self-serve platform.
         <br></br>
-        The longer-term vision for this app is to enable users to:
+        <b>The longer-term vision for this app is to enable users to:</b>
         <ol>
           <li>Upload their epub files</li>
           <li>Have the app generate and cache images for each chapter</li>
