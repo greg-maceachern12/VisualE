@@ -48,10 +48,11 @@ function About() {
         <br></br>
         There are numerous improvements planned for Visuai, including:
         <ol>
+        <li>Move to Groq for faster inference on parts of the generation.</li>
+        <li>Migrate to Midjourney for consistent characters in the generation (massively important!)</li>
           <li>Utilization of control nets for enhanced image generation</li>
-          <li>Caching of AI-generated images for future use</li>
+          <li>Caching of AI-generated images for future use on the same book</li>
           <li>Implementation of a subscription model and/or payment schema</li>
-          <li>Move to Groq for faster inference on parts of the generation.</li>
         </ol>
         Until then, please enjoy!<br></br>
         If you're reading this{" "}
