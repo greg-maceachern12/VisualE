@@ -173,8 +173,25 @@ select {
   margin-right: 0;
 }
 
+#nextbtn {
+  color: #333;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+  background-color: lightseagreen;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: rgb(12, 134, 128);
+  }
+}
+
 #parse {
-  background: white;
+  background: #ffa4e8;
   color: #333;
   border: none;
   padding: 10px 20px;
@@ -186,7 +203,7 @@ select {
   transition: background-color 0.3s ease;
 
   &:hover {
-    background-color: #f0f0f0;
+    background-color: #ff8be2;
   }
 }
 
@@ -219,11 +236,17 @@ img {
 
 .chapterPrompt {
   width: 100%;
-  max-height: 450px;
-  overflow-y: auto;
-  margin-top: 10px;
-  border: 1px solid #ccc;
+  // max-height: 450px;
+  // overflow-y: auto;
+  // margin-top: 10px;
+  // border: 1px solid #ccc;
   padding: 5px;
+
+  p {
+    overflow-y: auto;
+    max-height: 430px;
+    margin-top: 0;
+  }
 }
 .generatedImage {
   margin-right: 40px;
@@ -268,6 +291,7 @@ img {
   padding: 40px;
   border-radius: 10px;
 }
+
 .container {
   display: flex;
   flex-direction: row;
@@ -297,7 +321,7 @@ img {
   text-align: left;
 }
 .link-button {
-  color:white
+  color: white;
 }
 
 @keyframes gradientBackground {

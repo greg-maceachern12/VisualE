@@ -36,6 +36,8 @@ function App() {
   const imageAPI =
     "https://visuaicalls.azurewebsites.net/api/generateImage?code=sbKw5c6I6xFV6f9AWYKAbR5IGBIj-td2aUly5oNP4QZMAzFuSvLDYw%3D%3D";
 
+  const segmentAPI = "https://visuaicalls.azurewebsites.net/api/segmentFinder?code=pNDxb_DAPifFYYNOr59_RjNuryY-49m3n9iscpdA3MewAzFu0bfNxg%3D%3D";
+
   const handleAccessGranted = () => {
     setIsAccessGranted(true);
   };
@@ -169,15 +171,17 @@ function App() {
     setChapterTitle(chapter.label);
 
     const chapterPrompt = await getChapterPrompt(chapter, epubReader);
+    const chapterSegment = await findChapterPrompt (chapterPrompt);
     const processedPrompt = await generatePromptFromText(
-      chapterPrompt,
+      chapterSegment,
       selectedStyle,
       selectedColorScheme,
       selectedComposition
     );
     const imageUrl = await generateImageFromPrompt(processedPrompt);
 
-    setDisplayPrompt(processedPrompt);
+    setDisplayPrompt(chapterSegment);
+    console.log(chapterSegment);
     setImageUrl(imageUrl);
     setIsLoading(false);
   };
@@ -189,6 +193,25 @@ function App() {
     return displayedChapter.contents.innerText.slice(0, 16000);
   };
 
+  const findChapterPrompt = async (prompt) => {
+    try {
+      const response = await fetch(segmentAPI, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          prompt,
+        }),
+      });
+      const data = await response.json();
+      console.log("Segment of text: " + data.response);
+      return data.response;
+    } catch (error) {
+      console.error("Error with ChatGPT API:", error);
+      return "Chapter text invalid - try next chapter";
+    }
+  }
   const generatePromptFromText = async (prompt) => {
     try {
       const response = await fetch(chatAPI, {
@@ -204,7 +227,7 @@ function App() {
         }),
       });
       const data = await response.json();
-      console.log(data.response);
+      console.log("DALL-E Prompt: " + data.response);
       return data.response;
     } catch (error) {
       console.error("Error with ChatGPT API:", error);
@@ -283,7 +306,7 @@ function App() {
                           Visuai automatically skips the intro chapters of the
                           book (TOC, Dedications etc.)
                         </h3>
-                        <div class="control-container">
+                        <div className="control-container">
                           <div className="input-container">
                             <div className="file-input-wrapper">
                               <button
@@ -366,9 +389,6 @@ function App() {
                               >
                                 Parse and Generate Image
                               </button>
-                              <button onClick={handleNextChapter}>
-                                Next Chapter
-                              </button>
                             </div>
                           )}
                         </div>
@@ -391,10 +411,10 @@ function App() {
                               />
                             )}
                             <div className="chapterPrompt">
-                              <b>
-                                <i>Optimized</i> Image Prompt:
-                              </b>{" "}
-                              {displayPrompt}
+                              <p><i>{displayPrompt}</i></p>
+                              <button id='nextbtn' onClick={handleNextChapter}>
+                                Next Chapter
+                              </button>
                             </div>
                           </>
                         ) : (
