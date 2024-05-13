@@ -36,7 +36,8 @@ function App() {
   const imageAPI =
     "https://visuaicalls.azurewebsites.net/api/generateImage?code=sbKw5c6I6xFV6f9AWYKAbR5IGBIj-td2aUly5oNP4QZMAzFuSvLDYw%3D%3D";
 
-  const segmentAPI = "https://visuaicalls.azurewebsites.net/api/segmentFinder?code=pNDxb_DAPifFYYNOr59_RjNuryY-49m3n9iscpdA3MewAzFu0bfNxg%3D%3D";
+  const segmentAPI =
+    "https://visuaicalls.azurewebsites.net/api/segmentFinder?code=pNDxb_DAPifFYYNOr59_RjNuryY-49m3n9iscpdA3MewAzFu0bfNxg%3D%3D";
 
   const handleAccessGranted = () => {
     setIsAccessGranted(true);
@@ -171,19 +172,24 @@ function App() {
     setChapterTitle(chapter.label);
 
     const chapterPrompt = await getChapterPrompt(chapter, epubReader);
-    const chapterSegment = await findChapterPrompt (chapterPrompt);
-    const processedPrompt = await generatePromptFromText(
-      chapterSegment,
-      selectedStyle,
-      selectedColorScheme,
-      selectedComposition
-    );
-    const imageUrl = await generateImageFromPrompt(processedPrompt);
-
-    setDisplayPrompt(chapterSegment);
-    console.log(chapterSegment);
-    setImageUrl(imageUrl);
-    setIsLoading(false);
+    const chapterSegment = await findChapterPrompt(chapterPrompt);
+    if (chapterSegment != "False") {
+      const processedPrompt = await generatePromptFromText(
+        chapterSegment,
+        selectedStyle,
+        selectedColorScheme,
+        selectedComposition
+      );
+      const imageUrl = await generateImageFromPrompt(processedPrompt);
+      setDisplayPrompt(chapterSegment);
+      setImageUrl(imageUrl);
+      setIsLoading(false);
+    } else {
+      const imageUrl = 'https://cdn2.iconfinder.com/data/icons/picons-basic-2/57/basic2-085_warning_attention-512.png'
+      setDisplayPrompt("This chapter is not part of the plot, please click next chapter.");
+      setImageUrl(imageUrl);
+      setIsLoading(false);
+    }
   };
 
   const getChapterPrompt = async (chapter, epubReader) => {
@@ -211,7 +217,7 @@ function App() {
       console.error("Error with ChatGPT API:", error);
       return "Chapter text invalid - try next chapter";
     }
-  }
+  };
   const generatePromptFromText = async (prompt) => {
     try {
       const response = await fetch(chatAPI, {
@@ -411,8 +417,10 @@ function App() {
                               />
                             )}
                             <div className="chapterPrompt">
-                              <p><i>{displayPrompt}</i></p>
-                              <button id='nextbtn' onClick={handleNextChapter}>
+                              <p>
+                                <i>{displayPrompt}</i>
+                              </p>
+                              <button id="nextbtn" onClick={handleNextChapter}>
                                 Next Chapter
                               </button>
                             </div>
