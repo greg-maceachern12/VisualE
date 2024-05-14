@@ -184,7 +184,7 @@ function App() {
 
     const chapterPrompt = await getChapterPrompt(chapter, epubReader);
     const chapterSegment = await findChapterPrompt(chapterPrompt);
-    if (chapterSegment != "False") {
+    if (chapterSegment !== "False") {
       const processedPrompt = await generatePromptFromText(
         chapterSegment,
         selectedStyle,
