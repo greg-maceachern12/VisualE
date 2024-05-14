@@ -1,10 +1,16 @@
 // About.js
-import React from "react";
+import React, { useEffect } from "react";
+import ReactGA from "react-ga";
 import { Link } from "react-router-dom";
 import { faGithub } from "@fortawesome/free-brands-svg-icons";
 import { faExternalLinkAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 function About() {
+  useEffect(() => {
+    // Track page views
+    ReactGA.pageview(window.location.pathname + window.location.search);
+  }, []);
+
   return (
     <div className="about-container">
       <h2>About Visuai</h2>
@@ -48,10 +54,15 @@ function About() {
         <br></br>
         There are numerous improvements planned for Visuai, including:
         <ol>
-        <li>Move to Groq for faster inference on parts of the generation.</li>
-        <li>Migrate to Midjourney for consistent characters in the generation (massively important!)</li>
+          <li>Move to Groq for faster inference on parts of the generation.</li>
+          <li>
+            Migrate to Midjourney for consistent characters in the generation
+            (massively important!)
+          </li>
           <li>Utilization of control nets for enhanced image generation</li>
-          <li>Caching of AI-generated images for future use on the same book</li>
+          <li>
+            Caching of AI-generated images for future use on the same book
+          </li>
           <li>Implementation of a subscription model and/or payment schema</li>
         </ol>
         Until then, please enjoy!<br></br>
@@ -72,11 +83,13 @@ function About() {
         href="https://github.com/greg-maceachern12/VisualE"
         className="link-button"
       >
-        <FontAwesomeIcon icon={faGithub} />Github
+        <FontAwesomeIcon icon={faGithub} />
+        Github
       </a>
       <br />
       <a href="https://landvisuai.netlify.app/" className="link-button">
-        <FontAwesomeIcon icon={faExternalLinkAlt} />Landing Page
+        <FontAwesomeIcon icon={faExternalLinkAlt} />
+        Landing Page
       </a>
     </div>
   );

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import epub from "epubjs";
+import ReactGA from "react-ga";
 
 import "./App.scss";
 import "./gradBG/gradBG.scss";
@@ -49,6 +50,9 @@ function App() {
   };
 
   useEffect(() => {
+    ReactGA.initialize("G-74BZMF8F67");
+    ReactGA.pageview(window.location.pathname + window.location.search);
+
     const cleanupGradientBackground = initGradientBackground();
     return () => cleanupGradientBackground();
   }, []);
@@ -70,6 +74,12 @@ function App() {
   };
 
   const handleDownloadSampleBook = () => {
+    ReactGA.event({
+      category: "User",
+      action: "Button Click",
+      label: "Download Sample Book",
+    });
+
     const sampleBookUrl = `${process.env.PUBLIC_URL}/The_Crystal_Throne.epub`;
     const link = document.createElement("a");
     link.href = sampleBookUrl;
@@ -84,6 +94,12 @@ function App() {
   };
 
   const handleParseAndGenerateImage = () => {
+    ReactGA.event({
+      category: "User",
+      action: "Button Click",
+      label: "Start Generation",
+    });
+
     setCurrentChapterIndex(0);
     setCurrentSubitemIndex(0);
     loadChapter(0);
@@ -272,6 +288,12 @@ function App() {
 
       const data = await response.json();
       console.log(data.imageUrl);
+      ReactGA.event({
+        category: "User",
+        action: "Action Complete",
+        label: "Image successfully generated",
+      });
+  
       return data.imageUrl;
     } catch (error) {
       console.error("Error calling the API:", error);
