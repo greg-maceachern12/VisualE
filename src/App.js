@@ -8,7 +8,7 @@ import About from "./About";
 
 import { initGradientBackground } from "./gradBG/gradBG.js";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFlask } from "@fortawesome/free-solid-svg-icons";
+import { faFlask, faBook, faWandMagicSparkles } from "@fortawesome/free-solid-svg-icons";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { Skeleton } from "@mui/material";
 
@@ -26,6 +26,7 @@ function App() {
   const [selectedStyle, setSelectedStyle] = useState("");
   const [selectedColorScheme, setSelectedColorScheme] = useState("");
   const [selectedComposition, setSelectedComposition] = useState("");
+
   const [fileError, setFileError] = useState("");
 
   const [isAccessGranted, setIsAccessGranted] = useState(false);
@@ -62,6 +63,16 @@ function App() {
       setEpubFile(null);
       setFileError("No file selected.");
     }
+  };
+
+  const handleDownloadSampleBook = () => {
+    const sampleBookUrl = `${process.env.PUBLIC_URL}/The_Crystal_Throne.epub`;
+    const link = document.createElement("a");
+    link.href = sampleBookUrl;
+    link.download = "The_Crystal_Throne.epub";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const toggleOptions = () => {
@@ -185,8 +196,11 @@ function App() {
       setImageUrl(imageUrl);
       setIsLoading(false);
     } else {
-      const imageUrl = 'https://cdn2.iconfinder.com/data/icons/picons-basic-2/57/basic2-085_warning_attention-512.png'
-      setDisplayPrompt("This chapter is not part of the plot, please click next chapter.");
+      const imageUrl =
+        "https://cdn2.iconfinder.com/data/icons/picons-basic-2/57/basic2-085_warning_attention-512.png";
+      setDisplayPrompt(
+        "This chapter is not part of the plot, please click next chapter."
+      );
       setImageUrl(imageUrl);
       setIsLoading(false);
     }
@@ -302,16 +316,20 @@ function App() {
                   <div className="header-container">
                     <div className="title-container">
                       <h1>Visuai - ePub to Image (alpha)</h1>
-                      <Link to="/about" className="about-button">
-                        About
-                      </Link>
                     </div>
                     {isAccessGranted ? (
-                      <div>
+                      <div id='headings'>
                         <h3>
                           Visuai automatically skips the intro chapters of the
                           book (TOC, Dedications etc.)
                         </h3>
+                        <h4>
+                          <FontAwesomeIcon icon={faBook} /> No ePub? Click{" "}
+                          <a href="#" onClick={handleDownloadSampleBook}>
+                            here
+                          </a>{" "}
+                          to download an AI generated one.
+                        </h4>
                         <div className="control-container">
                           <div className="input-container">
                             <div className="file-input-wrapper">
@@ -393,6 +411,7 @@ function App() {
                                 id="parse"
                                 onClick={handleParseAndGenerateImage}
                               >
+                                <FontAwesomeIcon icon={faWandMagicSparkles} />
                                 Parse and Generate Image
                               </button>
                             </div>
@@ -402,6 +421,9 @@ function App() {
                     ) : (
                       <AccessCode onAccessGranted={handleAccessGranted} />
                     )}
+                    <Link to="/about" className="about-button">
+                      About
+                    </Link>
                   </div>
                   {chapterTitle && (
                     <div className="chapterContainer">
