@@ -355,6 +355,15 @@ img {
 .link-button {
   color: white;
 }
+.download-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+}
 
 @keyframes gradientBackground {
   0% {

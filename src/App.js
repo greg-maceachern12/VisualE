@@ -8,7 +8,11 @@ import About from "./About";
 
 import { initGradientBackground } from "./gradBG/gradBG.js";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFlask, faBook, faWandMagicSparkles } from "@fortawesome/free-solid-svg-icons";
+import {
+  faFlask,
+  faBook,
+  faWandMagicSparkles,
+} from "@fortawesome/free-solid-svg-icons";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { Skeleton } from "@mui/material";
 
@@ -318,16 +322,19 @@ function App() {
                       <h1>Visuai - ePub to Image (alpha)</h1>
                     </div>
                     {isAccessGranted ? (
-                      <div id='headings'>
+                      <div id="headings">
                         <h3>
                           Visuai automatically skips the intro chapters of the
                           book (TOC, Dedications etc.)
                         </h3>
                         <h4>
                           <FontAwesomeIcon icon={faBook} /> No ePub? Click{" "}
-                          <a href="#" onClick={handleDownloadSampleBook}>
+                          <button
+                            onClick={handleDownloadSampleBook}
+                            className="download-link"
+                          >
                             here
-                          </a>{" "}
+                          </button>{" "}
                           to download an AI generated one.
                         </h4>
                         <div className="control-container">
