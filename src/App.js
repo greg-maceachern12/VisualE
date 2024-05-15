@@ -141,6 +141,8 @@ function App() {
       "Contents",
       "Copyright",
       "Endorsements",
+      "Introduction",
+      "Author",
       "About",
       "Map",
     ];
@@ -212,7 +214,7 @@ function App() {
         selectedStyle,
         selectedColorScheme,
         selectedComposition
-      );
+      )
       setRightBorderColor("lightblue"); // When generatePromptFromText is completed
       const imageUrl = await generateImageFromPrompt(processedPrompt);
       setBottomBorderColor("lightblue"); // When generateImageFromPrompt is completed
