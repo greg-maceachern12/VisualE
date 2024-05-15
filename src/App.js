@@ -20,8 +20,7 @@ function App() {
   const [chapterTitle, setChapterTitle] = useState("");
   const [displayPrompt, setDisplayPrompt] = useState("");
   const [imageUrl, setImageUrl] = useState("");
-  const [currentChapterIndex, setCurrentChapterIndex] = useState(0);
-  const [currentSubitemIndex, setCurrentSubitemIndex] = useState(0);
+
   const [isLoading, setIsLoading] = useState(false);
   const [epubReader, setEpubReader] = useState(null);
   const [showOptions, setShowOptions] = useState(false);
@@ -30,10 +29,6 @@ function App() {
   const [selectedComposition, setSelectedComposition] = useState("");
   const [fileError, setFileError] = useState("");
   const [isAccessGranted, setIsAccessGranted] = useState(false);
-  const [leftBorderColor, setLeftBorderColor] = useState("");
-  const [topBorderColor, setTopBorderColor] = useState("");
-  const [rightBorderColor, setRightBorderColor] = useState("");
-  const [bottomBorderColor, setBottomBorderColor] = useState("");
 
   const chatAPI =
     "https://visuaicalls.azurewebsites.net/api/chatgpt?code=QDubsyOhk_c8jC1RAGPBHNydCCNgpgfcSscjsSqVRdw_AzFuxUgufQ%3D%3D";
@@ -52,15 +47,6 @@ function App() {
     const cleanupGradientBackground = initGradientBackground();
     return () => cleanupGradientBackground();
   }, []);
-
-  useEffect(() => {
-    if (!isLoading) {
-      setLeftBorderColor("");
-      setTopBorderColor("");
-      setRightBorderColor("");
-      setBottomBorderColor("");
-    }
-  }, [isLoading]);
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -98,39 +84,48 @@ function App() {
     setShowOptions(!showOptions);
   };
 
-  const handleParseAndGenerateImage = () => {
+  const handleParseAndGenerateImage = async () => {
     ReactGA.event({
       category: "User",
       action: "Button Click",
       label: "Start Generation",
     });
 
-    setCurrentChapterIndex(0);
-    setCurrentSubitemIndex(0);
-    loadChapter(0);
-  };
-
-  const handleNextChapter = async () => {
-    if (!epubReader) return;
-    const nav = await epubReader.loaded.navigation;
-    const toc = nav.toc;
-    let nextChapterIndex = currentChapterIndex;
-    let nextSubitemIndex = currentSubitemIndex + 1;
-    const currentChapter = toc[currentChapterIndex];
-    if (currentChapter.subitems && currentChapter.subitems.length > 0) {
-      if (nextSubitemIndex >= currentChapter.subitems.length) {
-        nextChapterIndex++;
-        nextSubitemIndex = 0;
-      }
-    } else {
-      nextChapterIndex++;
-      nextSubitemIndex = 0;
-    }
-    if (nextChapterIndex >= toc.length) {
-      console.error("Reached the end of the book.");
+    if (!epubFile) {
+      console.error("No EPUB file selected.");
       return;
     }
-    await loadChapter(nextChapterIndex, nextSubitemIndex);
+
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      const epubBlob = new Blob([event.target.result], {
+        type: "application/epub+zip",
+      });
+      const epubReader = epub(epubBlob);
+      setEpubReader(epubReader);
+
+      try {
+        const nav = await epubReader.loaded.navigation;
+        const toc = nav.toc;
+
+        // Loop through each chapter in the toc
+        for (let i = 0; i < toc.length; i++) {
+          console.log("Working on Chapter: " + i);
+          const chapter = toc[i];
+
+          // Skip non-story chapters
+          if (isNonStoryChapter(chapter.label)) continue;
+
+          // Process the chapter and generate an image
+          await processChapter(chapter, epubReader);
+        }
+      } catch (error) {
+        console.error("Error while parsing EPUB:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    reader.readAsArrayBuffer(epubFile);
   };
 
   const isNonStoryChapter = (chapterLabel) => {
@@ -149,63 +144,13 @@ function App() {
     );
   };
 
-  const loadChapter = async (chapterIndex, subitemIndex = 0) => {
-    if (!epubFile) {
-      console.error("No EPUB file selected.");
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = async (event) => {
-      const epubBlob = new Blob([event.target.result], {
-        type: "application/epub+zip",
-      });
-      const reader = epub(epubBlob);
-      setEpubReader(reader);
-
-      try {
-        const nav = await reader.loaded.navigation;
-        const toc = nav.toc;
-
-        if (chapterIndex >= toc.length) {
-          console.error("Reached the end of the book.");
-          return;
-        }
-
-        const currentChapter = toc[chapterIndex];
-        if (isNonStoryChapter(currentChapter.label)) {
-          await loadChapter(chapterIndex + 1);
-        } else if (
-          currentChapter.subitems &&
-          currentChapter.subitems.length > 0
-        ) {
-          if (subitemIndex < currentChapter.subitems.length) {
-            await processChapter(currentChapter.subitems[subitemIndex], reader);
-            setCurrentChapterIndex(chapterIndex);
-            setCurrentSubitemIndex(subitemIndex);
-          } else {
-            await loadChapter(chapterIndex + 1);
-          }
-        } else {
-          await processChapter(currentChapter, reader);
-          setCurrentChapterIndex(chapterIndex);
-          setCurrentSubitemIndex(0);
-        }
-      } catch (error) {
-        console.error("Error while parsing EPUB:", error);
-      }
-    };
-    reader.readAsArrayBuffer(epubFile);
-  };
-
   const processChapter = async (chapter, epubReader) => {
     setIsLoading(true);
     setChapterTitle(chapter.label);
 
     const chapterPrompt = await getChapterPrompt(chapter, epubReader);
-    setLeftBorderColor("lightblue"); // When getChapterPrompt is completed
     const chapterSegment = await findChapterPrompt(chapterPrompt);
-    setTopBorderColor("lightblue"); // When findChapterPrompt is completed
+    console.log(chapterSegment);
     if (chapterSegment !== "False") {
       const processedPrompt = await generatePromptFromText(
         chapterSegment,
@@ -213,9 +158,8 @@ function App() {
         selectedColorScheme,
         selectedComposition
       );
-      setRightBorderColor("lightblue"); // When generatePromptFromText is completed
+
       const imageUrl = await generateImageFromPrompt(processedPrompt);
-      setBottomBorderColor("lightblue"); // When generateImageFromPrompt is completed
       setDisplayPrompt(chapterSegment);
       setImageUrl(imageUrl);
       setIsLoading(false);
@@ -226,7 +170,6 @@ function App() {
         "This chapter is not part of the plot, please click next chapter."
       );
       setImageUrl(imageUrl);
-      setIsLoading(false);
     }
   };
 
@@ -255,19 +198,22 @@ function App() {
 
   const generatePromptFromText = async (prompt) => {
     try {
-      const response = await fetch(chatAPI, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          prompt,
-          style: selectedStyle,
-          colorScheme: selectedColorScheme,
-          composition: selectedComposition,
-        }),
-      });
-      const data = await response.json();
-      console.log("DALL-E Prompt: " + data.response);
-      return data.response;
+      // const response = await fetch(chatAPI, {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify({
+      //     prompt,
+      //     style: selectedStyle,
+      //     colorScheme: selectedColorScheme,
+      //     composition: selectedComposition,
+      //   }),
+      // });
+      // const data = await response.json();
+      // console.log("DALL-E Prompt: " + data.response);
+      // return data.response;
+
+      const resp = "ttttt";
+      return resp;
     } catch (error) {
       console.error("Error with ChatGPT API:", error);
       return "Chapter text invalid - try next chapter";
@@ -277,19 +223,22 @@ function App() {
   const generateImageFromPrompt = async (prompt) => {
     try {
       console.log("generating image.. this can take up to 15s");
-      const response = await fetch(imageAPI, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt }),
-      });
-      const data = await response.json();
-      console.log(data.imageUrl);
-      ReactGA.event({
-        category: "User",
-        action: "Action Complete",
-        label: "Image successfully generated",
-      });
-      return data.imageUrl;
+      // const response = await fetch(imageAPI, {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify({ prompt }),
+      // });
+      // const data = await response.json();
+      // console.log(data.imageUrl);
+      // ReactGA.event({
+      //   category: "User",
+      //   action: "Action Complete",
+      //   label: "Image successfully generated",
+      // });
+      // return data.imageUrl;
+
+      const url = "https://images.penguinrandomhouse.com/cover/9780593704462";
+      return url;
     } catch (error) {
       console.error("Error calling the API:", error);
       return "Cannot generate image";
@@ -450,15 +399,7 @@ function App() {
                     </Link>
                   </div>
                   {chapterTitle && (
-                    <div
-                      className="chapterContainer"
-                      style={{
-                        "--left-border-color": leftBorderColor,
-                        "--top-border-color": topBorderColor,
-                        "--right-border-color": rightBorderColor,
-                        "--bottom-border-color": bottomBorderColor,
-                      }}
-                    >
+                    <div className="chapterContainer">
                       <h2>{chapterTitle}</h2>
                       <div className="container">
                         {!isLoading ? (
@@ -474,9 +415,6 @@ function App() {
                               <p>
                                 <i>{displayPrompt}</i>
                               </p>
-                              <button id="nextbtn" onClick={handleNextChapter}>
-                                Next Chapter
-                              </button>
                             </div>
                           </>
                         ) : (
