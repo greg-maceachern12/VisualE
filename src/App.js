@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from "react";
 import epub from "epubjs";
 import ReactGA from "react-ga";
-
 import "./App.scss";
 import "./gradBG/gradBG.scss";
 import AccessCode from "./AccessCode.js";
 import About from "./About";
-
 import { initGradientBackground } from "./gradBG/gradBG.js";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -26,22 +24,21 @@ function App() {
   const [currentSubitemIndex, setCurrentSubitemIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [epubReader, setEpubReader] = useState(null);
-
   const [showOptions, setShowOptions] = useState(false);
   const [selectedStyle, setSelectedStyle] = useState("");
   const [selectedColorScheme, setSelectedColorScheme] = useState("");
   const [selectedComposition, setSelectedComposition] = useState("");
-
   const [fileError, setFileError] = useState("");
-
   const [isAccessGranted, setIsAccessGranted] = useState(false);
+  const [leftBorderColor, setLeftBorderColor] = useState("");
+  const [topBorderColor, setTopBorderColor] = useState("");
+  const [rightBorderColor, setRightBorderColor] = useState("");
+  const [bottomBorderColor, setBottomBorderColor] = useState("");
 
-  // const path = '/.netlify/functions/server';
   const chatAPI =
     "https://visuaicalls.azurewebsites.net/api/chatgpt?code=QDubsyOhk_c8jC1RAGPBHNydCCNgpgfcSscjsSqVRdw_AzFuxUgufQ%3D%3D";
   const imageAPI =
     "https://visuaicalls.azurewebsites.net/api/generateImage?code=sbKw5c6I6xFV6f9AWYKAbR5IGBIj-td2aUly5oNP4QZMAzFuSvLDYw%3D%3D";
-
   const segmentAPI =
     "https://visuaicalls.azurewebsites.net/api/segmentFinder?code=pNDxb_DAPifFYYNOr59_RjNuryY-49m3n9iscpdA3MewAzFu0bfNxg%3D%3D";
 
@@ -52,10 +49,18 @@ function App() {
   useEffect(() => {
     ReactGA.initialize("G-74BZMF8F67");
     ReactGA.pageview(window.location.pathname + window.location.search);
-
     const cleanupGradientBackground = initGradientBackground();
     return () => cleanupGradientBackground();
   }, []);
+
+  useEffect(() => {
+    if (!isLoading) {
+      setLeftBorderColor("");
+      setTopBorderColor("");
+      setRightBorderColor("");
+      setBottomBorderColor("");
+    }
+  }, [isLoading]);
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -107,13 +112,10 @@ function App() {
 
   const handleNextChapter = async () => {
     if (!epubReader) return;
-
     const nav = await epubReader.loaded.navigation;
     const toc = nav.toc;
-
     let nextChapterIndex = currentChapterIndex;
     let nextSubitemIndex = currentSubitemIndex + 1;
-
     const currentChapter = toc[currentChapterIndex];
     if (currentChapter.subitems && currentChapter.subitems.length > 0) {
       if (nextSubitemIndex >= currentChapter.subitems.length) {
@@ -124,12 +126,10 @@ function App() {
       nextChapterIndex++;
       nextSubitemIndex = 0;
     }
-
     if (nextChapterIndex >= toc.length) {
       console.error("Reached the end of the book.");
       return;
     }
-
     await loadChapter(nextChapterIndex, nextSubitemIndex);
   };
 
@@ -203,7 +203,9 @@ function App() {
     setChapterTitle(chapter.label);
 
     const chapterPrompt = await getChapterPrompt(chapter, epubReader);
+    setLeftBorderColor("lightblue"); // When getChapterPrompt is completed
     const chapterSegment = await findChapterPrompt(chapterPrompt);
+    setTopBorderColor("lightblue"); // When findChapterPrompt is completed
     if (chapterSegment !== "False") {
       const processedPrompt = await generatePromptFromText(
         chapterSegment,
@@ -211,7 +213,9 @@ function App() {
         selectedColorScheme,
         selectedComposition
       );
+      setRightBorderColor("lightblue"); // When generatePromptFromText is completed
       const imageUrl = await generateImageFromPrompt(processedPrompt);
+      setBottomBorderColor("lightblue"); // When generateImageFromPrompt is completed
       setDisplayPrompt(chapterSegment);
       setImageUrl(imageUrl);
       setIsLoading(false);
@@ -237,12 +241,8 @@ function App() {
     try {
       const response = await fetch(segmentAPI, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          prompt,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt }),
       });
       const data = await response.json();
       console.log("Segment of text: " + data.response);
@@ -252,13 +252,12 @@ function App() {
       return "Chapter text invalid - try next chapter";
     }
   };
+
   const generatePromptFromText = async (prompt) => {
     try {
       const response = await fetch(chatAPI, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           prompt,
           style: selectedStyle,
@@ -280,12 +279,9 @@ function App() {
       console.log("generating image.. this can take up to 15s");
       const response = await fetch(imageAPI, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt }),
       });
-
       const data = await response.json();
       console.log(data.imageUrl);
       ReactGA.event({
@@ -293,7 +289,6 @@ function App() {
         action: "Action Complete",
         label: "Image successfully generated",
       });
-  
       return data.imageUrl;
     } catch (error) {
       console.error("Error calling the API:", error);
@@ -455,7 +450,15 @@ function App() {
                     </Link>
                   </div>
                   {chapterTitle && (
-                    <div className="chapterContainer">
+                    <div
+                      className="chapterContainer"
+                      style={{
+                        "--left-border-color": leftBorderColor,
+                        "--top-border-color": topBorderColor,
+                        "--right-border-color": rightBorderColor,
+                        "--bottom-border-color": bottomBorderColor,
+                      }}
+                    >
                       <h2>{chapterTitle}</h2>
                       <div className="container">
                         {!isLoading ? (
