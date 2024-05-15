@@ -80,6 +80,32 @@ function App() {
     document.body.removeChild(link);
   };
 
+  const handleDownloadBook = async () => {
+    try {
+      console.log("Downloading book...");
+      const response = await fetch("http://localhost:3001/download-book");
+      console.log("Response status:", response.status);
+
+      if (!response.ok) {
+        console.error("Error downloading book:", response.statusText);
+        return;
+      }
+
+      const blob = await response.blob();
+      console.log("Blob size:", blob.size, "bytes");
+
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `Visuai_Generated_Book.epub`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error("Error downloading the book:", error);
+    }
+  };
+
   const toggleOptions = () => {
     setShowOptions(!showOptions);
   };
@@ -122,6 +148,7 @@ function App() {
       } catch (error) {
         console.error("Error while parsing EPUB:", error);
       } finally {
+        handleDownloadBook();
         setIsLoading(false);
       }
     };
@@ -136,6 +163,8 @@ function App() {
       "Contents",
       "Copyright",
       "Endorsements",
+      "Introduction",
+      "Author",
       "About",
       "Map",
     ];
@@ -150,7 +179,7 @@ function App() {
 
     const chapterPrompt = await getChapterPrompt(chapter, epubReader);
     const chapterSegment = await findChapterPrompt(chapterPrompt);
-    console.log(chapterSegment);
+
     if (chapterSegment !== "False") {
       const processedPrompt = await generatePromptFromText(
         chapterSegment,
@@ -162,6 +191,24 @@ function App() {
       const imageUrl = await generateImageFromPrompt(processedPrompt);
       setDisplayPrompt(chapterSegment);
       setImageUrl(imageUrl);
+
+      // Send chapter data to the server
+      try {
+        await fetch("http://localhost:3001/add-chapter", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            chapterTitle: chapter.label,
+            chapterText: chapterSegment,
+            imageUrl,
+          }),
+        });
+      } catch (error) {
+        console.error("Error sending chapter data to server:", error);
+      }
+
       setIsLoading(false);
     } else {
       const imageUrl =
@@ -177,19 +224,22 @@ function App() {
     const displayedChapter = await epubReader
       .renderTo("hiddenDiv")
       .display(chapter.href);
+    console.log(displayedChapter.contents.innerHTML);
     return displayedChapter.contents.innerText.slice(0, 16000);
   };
 
   const findChapterPrompt = async (prompt) => {
     try {
-      const response = await fetch(segmentAPI, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt }),
-      });
-      const data = await response.json();
-      console.log("Segment of text: " + data.response);
-      return data.response;
+      // const response = await fetch(segmentAPI, {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify({ prompt }),
+      // });
+      // const data = await response.json();
+      // console.log("Segment of text: " + data.response);
+      // return data.response;
+      const resp = "ttttt";
+      return resp;
     } catch (error) {
       console.error("Error with ChatGPT API:", error);
       return "Chapter text invalid - try next chapter";
@@ -237,7 +287,7 @@ function App() {
       // });
       // return data.imageUrl;
 
-      const url = "https://images.penguinrandomhouse.com/cover/9780593704462";
+      const url = "https://www.outdoorpainter.com/wp-content/uploads/2015/04/f8b84457f79954b52239c255e44b3bb1.jpg";
       return url;
     } catch (error) {
       console.error("Error calling the API:", error);
