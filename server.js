@@ -20,8 +20,11 @@ app.post("/add-chapter", (req, res) => {
   const { chapterTitle, chapterText, imageUrl } = req.body;
   generatedBook.content.push({
     title: chapterTitle,
-    data: `<img src='${imageUrl}' />`
-    +`<p>${chapterText}</p>`,
+    data:
+      `<body id='master-body'> \n` +
+      `<img src='${imageUrl}' /> \n` +
+      `<p>${chapterText}</p> \n` +
+      `</body>`,
   });
   res.sendStatus(200);
 });

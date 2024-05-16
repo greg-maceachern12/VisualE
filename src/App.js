@@ -37,6 +37,8 @@ function App() {
   const segmentAPI =
     "https://visuaicalls.azurewebsites.net/api/segmentFinder?code=pNDxb_DAPifFYYNOr59_RjNuryY-49m3n9iscpdA3MewAzFu0bfNxg%3D%3D";
 
+  const testMode = true;
+
   const handleAccessGranted = () => {
     setIsAccessGranted(true);
   };
@@ -106,10 +108,12 @@ function App() {
     }
   };
 
+  //option toggle
   const toggleOptions = () => {
     setShowOptions(!showOptions);
   };
 
+  //When user clicks "Parse and Generate".. aka starts the flow and iterates through all chapters
   const handleParseAndGenerateImage = async () => {
     ReactGA.event({
       category: "User",
@@ -155,6 +159,7 @@ function App() {
     reader.readAsArrayBuffer(epubFile);
   };
 
+  // checks if the chapter is non-plot
   const isNonStoryChapter = (chapterLabel) => {
     const nonStoryLabels = [
       "Title Page",
@@ -173,15 +178,16 @@ function App() {
     );
   };
 
+  //main function: calls all of the generation pieces and constructs the books
   const processChapter = async (chapter, epubReader) => {
     setIsLoading(true);
     setChapterTitle(chapter.label);
 
-    const chapterPrompt = await getChapterPrompt(chapter, epubReader);
-    const chapterSegment = await findChapterPrompt(chapterPrompt);
-
+    const chapterPrompt = await getChapterText(chapter, epubReader);
+    const chapterSegment = await findChapterSegment(chapterPrompt.text);
+    
     if (chapterSegment !== "False") {
-      const processedPrompt = await generatePromptFromText(
+      const processedPrompt = await generatePromptFromSegment(
         chapterSegment,
         selectedStyle,
         selectedColorScheme,
@@ -194,6 +200,7 @@ function App() {
 
       // Send chapter data to the server
       try {
+        console.log(chapter.label);
         await fetch("http://localhost:3001/add-chapter", {
           method: "POST",
           headers: {
@@ -201,7 +208,7 @@ function App() {
           },
           body: JSON.stringify({
             chapterTitle: chapter.label,
-            chapterText: chapterSegment,
+            chapterText: chapterPrompt.html,
             imageUrl,
           }),
         });
@@ -220,75 +227,94 @@ function App() {
     }
   };
 
-  const getChapterPrompt = async (chapter, epubReader) => {
+  // Step1: Gets the text from the chapter
+  const getChapterText = async (chapter, epubReader) => {
     const displayedChapter = await epubReader
       .renderTo("hiddenDiv")
       .display(chapter.href);
-    console.log(displayedChapter.contents.innerHTML);
-    return displayedChapter.contents.innerText.slice(0, 16000);
+
+      console.log(displayedChapter.document.body.innerHTML)
+    const chapterPrompt = {
+      html: displayedChapter.document.body.innerHTML,
+      text: displayedChapter.contents.innerText.slice(0, 16000),
+    };
+
+    // console.log(chapterPrompt.html);
+    return chapterPrompt;
   };
 
-  const findChapterPrompt = async (prompt) => {
+  // Step2: Takes the entire chapter as input and finds the best segment of text.
+  const findChapterSegment = async (prompt) => {
     try {
-      // const response = await fetch(segmentAPI, {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify({ prompt }),
-      // });
-      // const data = await response.json();
-      // console.log("Segment of text: " + data.response);
-      // return data.response;
+      if (testMode === false) {
+      const response = await fetch(segmentAPI, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt }),
+      });
+      const data = await response.json();
+      console.log("Segment of text: " + data.response);
+      return data.response;
+    } else {
       const resp = "ttttt";
       return resp;
+    }
     } catch (error) {
       console.error("Error with ChatGPT API:", error);
       return "Chapter text invalid - try next chapter";
     }
   };
 
-  const generatePromptFromText = async (prompt) => {
+  // Step3: takes the segment of text and generates a DALL-E optimized prompt
+  const generatePromptFromSegment = async (prompt) => {
     try {
-      // const response = await fetch(chatAPI, {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify({
-      //     prompt,
-      //     style: selectedStyle,
-      //     colorScheme: selectedColorScheme,
-      //     composition: selectedComposition,
-      //   }),
-      // });
-      // const data = await response.json();
-      // console.log("DALL-E Prompt: " + data.response);
-      // return data.response;
-
-      const resp = "ttttt";
-      return resp;
+      if (testMode === false) {
+        const response = await fetch(chatAPI, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            prompt,
+            style: selectedStyle,
+            colorScheme: selectedColorScheme,
+            composition: selectedComposition,
+          }),
+        });
+        const data = await response.json();
+        console.log("DALL-E Prompt: " + data.response);
+        return data.response;
+      } else {
+        const resp = "ttttt";
+        return resp;
+      }
     } catch (error) {
       console.error("Error with ChatGPT API:", error);
       return "Chapter text invalid - try next chapter";
     }
   };
 
+  // Step4: takes the prompt from OAI and calls DALL-E
   const generateImageFromPrompt = async (prompt) => {
     try {
-      console.log("generating image.. this can take up to 15s");
-      // const response = await fetch(imageAPI, {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify({ prompt }),
-      // });
-      // const data = await response.json();
-      // console.log(data.imageUrl);
-      // ReactGA.event({
-      //   category: "User",
-      //   action: "Action Complete",
-      //   label: "Image successfully generated",
-      // });
-      // return data.imageUrl;
-
-      const url = "https://www.outdoorpainter.com/wp-content/uploads/2015/04/f8b84457f79954b52239c255e44b3bb1.jpg";
-      return url;
+      if (testMode === false) {
+        console.log("generating image.. this can take up to 15s");
+        const response = await fetch(imageAPI, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt }),
+        });
+        const data = await response.json();
+        console.log(data.imageUrl);
+        ReactGA.event({
+          category: "User",
+          action: "Action Complete",
+          label: "Image successfully generated",
+        });
+        return data.imageUrl;
+      } else {
+        const url =
+          "https://www.outdoorpainter.com/wp-content/uploads/2015/04/f8b84457f79954b52239c255e44b3bb1.jpg";
+        return url;
+      }
     } catch (error) {
       console.error("Error calling the API:", error);
       return "Cannot generate image";
