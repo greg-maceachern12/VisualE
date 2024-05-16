@@ -37,7 +37,7 @@ function App() {
   const segmentAPI =
     "https://visuaicalls.azurewebsites.net/api/segmentFinder?code=pNDxb_DAPifFYYNOr59_RjNuryY-49m3n9iscpdA3MewAzFu0bfNxg%3D%3D";
 
-  const testMode = true;
+  const testMode = false;
 
   const handleAccessGranted = () => {
     setIsAccessGranted(true);
