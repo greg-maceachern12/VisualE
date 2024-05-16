@@ -22,7 +22,6 @@ function App() {
   const [imageUrl, setImageUrl] = useState("");
 
   const [isLoading, setIsLoading] = useState(false);
-  const [epubReader, setEpubReader] = useState(null);
   const [showOptions, setShowOptions] = useState(false);
   const [selectedStyle, setSelectedStyle] = useState("");
   const [selectedColorScheme, setSelectedColorScheme] = useState("");
@@ -37,7 +36,7 @@ function App() {
   const segmentAPI =
     "https://visuaicalls.azurewebsites.net/api/segmentFinder?code=pNDxb_DAPifFYYNOr59_RjNuryY-49m3n9iscpdA3MewAzFu0bfNxg%3D%3D";
 
-  const testMode = false;
+  const testMode = true;
 
   const handleAccessGranted = () => {
     setIsAccessGranted(true);
@@ -132,7 +131,6 @@ function App() {
         type: "application/epub+zip",
       });
       const epubReader = epub(epubBlob);
-      setEpubReader(epubReader);
 
       try {
         const nav = await epubReader.loaded.navigation;
