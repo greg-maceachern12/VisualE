@@ -36,9 +36,9 @@ function App() {
     "https://visuaicalls.azurewebsites.net/api/segmentFinder?code=pNDxb_DAPifFYYNOr59_RjNuryY-49m3n9iscpdA3MewAzFu0bfNxg%3D%3D";
 
   const downloadAPI =
-   "https://visuaicalls.azurewebsites.net/api/downloadBook?code=stF_cd3PaNQ2JPydwM60_XBkpcmFNkLXswNf971-AnBoAzFu34Rf-w%3D%3D";
-    // const downloadAPI =
-    // "http://localhost:3001/download-book";
+    "https://visuaicalls.azurewebsites.net/api/downloadBook?code=stF_cd3PaNQ2JPydwM60_XBkpcmFNkLXswNf971-AnBoAzFu34Rf-w%3D%3D";
+  // const downloadAPI =
+  // "http://localhost:3001/download-book";
 
   const testMode = false;
 
@@ -116,7 +116,6 @@ function App() {
       console.log("Blob size:", blob.size, "bytes");
 
       const url = window.URL.createObjectURL(blob);
-      console.log(url)
       const link = document.createElement("a");
       link.href = url;
       link.download = `Visuai_${generatedBook.title}.epub`;
@@ -155,7 +154,6 @@ function App() {
       try {
         const metadata = await epubReader.loaded.metadata;
         generatedBook.title = metadata.title;
-        console.log(generatedBook);
       } catch (error) {
         console.error("Error accessing metadata:", error);
       }
@@ -253,7 +251,6 @@ function App() {
     const displayedChapter = await epubReader
       .renderTo("hiddenDiv")
       .display(chapter.href);
-    // console.log(displayedChapter.document.body.innerHTML)
     const chapterPrompt = {
       html: displayedChapter.document.body.innerHTML,
       text: displayedChapter.contents.innerText.slice(0, 16000),
