@@ -20,7 +20,6 @@ function App() {
   const [chapterTitle, setChapterTitle] = useState("");
   const [displayPrompt, setDisplayPrompt] = useState("");
   const [imageUrl, setImageUrl] = useState("");
-
   const [isLoading, setIsLoading] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
   const [selectedStyle, setSelectedStyle] = useState("");
@@ -36,10 +35,23 @@ function App() {
   const segmentAPI =
     "https://visuaicalls.azurewebsites.net/api/segmentFinder?code=pNDxb_DAPifFYYNOr59_RjNuryY-49m3n9iscpdA3MewAzFu0bfNxg%3D%3D";
 
+  const downloadAPI =
+   "https://visuaicalls.azurewebsites.net/api/downloadBook?code=stF_cd3PaNQ2JPydwM60_XBkpcmFNkLXswNf971-AnBoAzFu34Rf-w%3D%3D";
+    // const downloadAPI =
+    // "http://localhost:3001/download-book";
+
   const testMode = false;
 
   const handleAccessGranted = () => {
     setIsAccessGranted(true);
+  };
+
+  const generatedBook = {
+    title: "Generated Book_2",
+    author: "Visuai",
+    publisher: "Your Publisher",
+    cover: "http://demo.com/url-to-cover-image.jpg",
+    content: [],
   };
 
   useEffect(() => {
@@ -81,10 +93,18 @@ function App() {
     document.body.removeChild(link);
   };
 
+  //calls API to download the book.
   const handleDownloadBook = async () => {
     try {
       console.log("Downloading book...");
-      const response = await fetch("http://localhost:3001/download-book");
+      // const response = await fetch("http://localhost:3001/download-book");
+      const response = await fetch(downloadAPI, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(generatedBook),
+      });
       console.log("Response status:", response.status);
 
       if (!response.ok) {
@@ -96,9 +116,10 @@ function App() {
       console.log("Blob size:", blob.size, "bytes");
 
       const url = window.URL.createObjectURL(blob);
+      console.log(url)
       const link = document.createElement("a");
       link.href = url;
-      link.download = `Visuai_Generated_Book.epub`;
+      link.download = `Visuai_${generatedBook.title}.epub`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -131,7 +152,13 @@ function App() {
         type: "application/epub+zip",
       });
       const epubReader = epub(epubBlob);
-
+      try {
+        const metadata = await epubReader.loaded.metadata;
+        generatedBook.title = metadata.title;
+        console.log(generatedBook);
+      } catch (error) {
+        console.error("Error accessing metadata:", error);
+      }
       try {
         const nav = await epubReader.loaded.navigation;
         const toc = nav.toc;
@@ -176,6 +203,18 @@ function App() {
     );
   };
 
+  // reconstructs epub
+  const addChapter = (chapterTitle, chapterText, imageUrl) => {
+    generatedBook.content.push({
+      title: chapterTitle,
+      data:
+        `<body id='master-body'> \n` +
+        `<img src='${imageUrl}' /> \n` +
+        `<p>${chapterText}</p> \n` +
+        `</body>`,
+    });
+  };
+
   //main function: calls all of the generation pieces and constructs the books
   const processChapter = async (chapter, epubReader) => {
     setIsLoading(true);
@@ -183,7 +222,7 @@ function App() {
 
     const chapterPrompt = await getChapterText(chapter, epubReader);
     const chapterSegment = await findChapterSegment(chapterPrompt.text);
-    
+
     if (chapterSegment !== "False") {
       const processedPrompt = await generatePromptFromSegment(
         chapterSegment,
@@ -196,23 +235,7 @@ function App() {
       setDisplayPrompt(chapterSegment);
       setImageUrl(imageUrl);
 
-      // Send chapter data to the server
-      try {
-        console.log(chapter.label);
-        await fetch("http://localhost:3001/add-chapter", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            chapterTitle: chapter.label,
-            chapterText: chapterPrompt.html,
-            imageUrl,
-          }),
-        });
-      } catch (error) {
-        console.error("Error sending chapter data to server:", error);
-      }
+      addChapter(chapter.label, chapterPrompt.html, imageUrl);
 
       setIsLoading(false);
     } else {
@@ -230,8 +253,7 @@ function App() {
     const displayedChapter = await epubReader
       .renderTo("hiddenDiv")
       .display(chapter.href);
-
-      console.log(displayedChapter.document.body.innerHTML)
+    // console.log(displayedChapter.document.body.innerHTML)
     const chapterPrompt = {
       html: displayedChapter.document.body.innerHTML,
       text: displayedChapter.contents.innerText.slice(0, 16000),
@@ -245,18 +267,18 @@ function App() {
   const findChapterSegment = async (prompt) => {
     try {
       if (testMode === false) {
-      const response = await fetch(segmentAPI, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt }),
-      });
-      const data = await response.json();
-      console.log("Segment of text: " + data.response);
-      return data.response;
-    } else {
-      const resp = "ttttt";
-      return resp;
-    }
+        const response = await fetch(segmentAPI, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt }),
+        });
+        const data = await response.json();
+        console.log("Segment of text: " + data.response);
+        return data.response;
+      } else {
+        const resp = "ttttt";
+        return resp;
+      }
     } catch (error) {
       console.error("Error with ChatGPT API:", error);
       return "Chapter text invalid - try next chapter";

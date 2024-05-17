@@ -8,30 +8,10 @@ const fs = require("fs");
 app.use(cors());
 app.use(express.json());
 
-const generatedBook = {
-  title: "Generated Book",
-  author: "Visuai",
-  publisher: "Your Publisher",
-  cover: "http://demo.com/url-to-cover-image.jpg",
-  content: [],
-};
+app.post("/download-book", (req, res) => {
 
-app.post("/add-chapter", (req, res) => {
-  const { chapterTitle, chapterText, imageUrl } = req.body;
-  generatedBook.content.push({
-    title: chapterTitle,
-    data:
-      `<body id='master-body'> \n` +
-      `<img src='${imageUrl}' /> \n` +
-      `<p>${chapterText}</p> \n` +
-      `</body>`,
-  });
-  res.sendStatus(200);
-});
-
-app.get("/download-book", (req, res) => {
-  console.log("Generated Book:", generatedBook);
-
+  console.log("Generated Book:", req.body);
+  const generatedBook = req.body;
   const filePath = `./Visuai_${generatedBook.title}.epub`;
 
   new Epub(generatedBook, filePath).promise
@@ -45,7 +25,7 @@ app.get("/download-book", (req, res) => {
         }
 
         console.log("File Size:", stats.size, "bytes");
-
+        console.log(res)
         res.download(filePath, (err) => {
           if (err) {
             console.error("Error downloading EPUB:", err);
