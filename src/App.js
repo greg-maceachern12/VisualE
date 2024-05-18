@@ -171,7 +171,7 @@ function App() {
         // }
 
         // Testing code
-        const maxStoryChapters = 3; // Limit to 3 story chapters
+        const maxStoryChapters = 2; // Limit to 3 story chapters
         let storyChapterCount = 0; // Counter for processed story chapters
 
         // Loop through each chapter in the toc
@@ -347,10 +347,11 @@ function App() {
           body: JSON.stringify({
             prompt,
             size: "1792x1024",
+            title: generatedBook.title,
           }),
         });
         const data = await response.json();
-        console.log(data.imageUrl);
+        // console.log(data);
         ReactGA.event({
           category: "User",
           action: "Action Complete",
