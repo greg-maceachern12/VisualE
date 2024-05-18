@@ -8,7 +8,6 @@ import About from "./About";
 import { initGradientBackground } from "./gradBG/gradBG.js";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faFlask,
   faBook,
   faWandMagicSparkles,
 } from "@fortawesome/free-solid-svg-icons";
