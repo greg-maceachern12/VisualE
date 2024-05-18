@@ -277,6 +277,7 @@ function App() {
         body: JSON.stringify({ 
           prompt,
           size: "1024x1024",
+          title: bookName,
          }),
       });
       const data = await response.json();
