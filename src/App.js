@@ -23,6 +23,9 @@ function App() {
   const [fileError, setFileError] = useState("");
   const [isAccessGranted, setIsAccessGranted] = useState(false);
 
+  const [currentChapterIndex, setCurrentChapterIndex] = useState(0);
+  const [currentSubitemIndex, setCurrentSubitemIndex] = useState(0);
+
   const chatAPI =
     "https://visuaicalls.azurewebsites.net/api/chatgpt?code=QDubsyOhk_c8jC1RAGPBHNydCCNgpgfcSscjsSqVRdw_AzFuxUgufQ%3D%3D";
   const imageAPI =
@@ -35,7 +38,7 @@ function App() {
   // const downloadAPI =
   // "http://localhost:3001/download-book";
 
-  const testMode = false;
+  const testMode = true;
 
   const handleAccessGranted = () => {
     setIsAccessGranted(true);
@@ -153,38 +156,62 @@ function App() {
 
         /*Prod Code */
         // // Loop through each chapter in the toc
-
-        // for (let i = 0; i < toc.length; i++) {
-        //   console.log("Working on Chapter: " + i);
-        //   const chapter = toc[i];
-
+        // for (let currentChapterIndex = 0; currentChapterIndex < toc.length; currentChapterIndex++) {
+        //   const currentChapter = toc[currentChapterIndex];
+        //   console.log("Working on Chapter: " + currentChapterIndex + " " + currentChapter.label);
+        
         //   // Skip non-story chapters
-        //   if (isNonStoryChapter(chapter.label)) continue;
-
-        //   // Process the chapter and generate an image
-        //   await processChapter(chapter, epubReader);
+        //   if (isNonStoryChapter(currentChapter.label)) continue;
+        
+        //   if (currentChapter.subitems && currentChapter.subitems.length > 0) {
+        //     // If chapter has subitems, iterate through them
+        //     for (let currentSubitemIndex = 0; currentSubitemIndex < currentChapter.subitems.length; currentSubitemIndex++) {
+        //       console.log("Processing Chapter: " + currentChapterIndex + "." + currentSubitemIndex);
+        //       // Process each subitem as a chapter
+        //       await processChapter(currentChapter.subitems[currentSubitemIndex], epubReader);
+        //     }
+        //   } else {
+        //     // Process chapters without subitems
+        //     await processChapter(currentChapter, epubReader);
+        //   }
         // }
-
+        
         // Testing code
-        const bounds = 3; // Only process 3 chapters per book for testing purposes
-        let processedCount = 0; // Counter for processed chapters
-
+        const maxStoryChapters = 3; // Limit to 3 story chapters
+        let storyChapterCount = 0; // Counter for processed story chapters
+        
+        /*Prod Code */
         // Loop through each chapter in the toc
-        for (let i = 0; processedCount < bounds && i < toc.length; i++) {
-          const chapter = toc[i];
-          console.log("Working on Chapter: " + i + " " + chapter.label);
-
+        for (let currentChapterIndex = 0; currentChapterIndex < toc.length; currentChapterIndex++) {
+          const currentChapter = toc[currentChapterIndex];
+          console.log("Working on Chapter: " + currentChapterIndex + " " + currentChapter.label);
+        
           // Skip non-story chapters
-          if (isNonStoryChapter(chapter.label)) {
-            continue;
+          if (isNonStoryChapter(currentChapter.label)) continue;
+        
+          // Process chapters with or without subitems
+          if (currentChapter.subitems && currentChapter.subitems.length > 0) {
+            // If chapter has subitems, iterate through them
+            for (let currentSubitemIndex = 0; currentSubitemIndex < currentChapter.subitems.length; currentSubitemIndex++) {
+              console.log("Processing Subitem: " + currentSubitemIndex + " of Chapter: " + currentChapterIndex);
+              // Process each subitem as a chapter
+              await processChapter(currentChapter.subitems[currentSubitemIndex], epubReader);
+            }
+          } else {
+            // Process chapters without subitems
+            await processChapter(currentChapter, epubReader);
           }
-
-          // Process the chapter and generate an image
-          await processChapter(chapter, epubReader);
-
-          // Increment the counter for processed chapters
-          processedCount++;
+        
+          // Increment the story chapter counter
+          storyChapterCount++;
+        
+          // Check if the limit has been reached
+          if (storyChapterCount >= maxStoryChapters) {
+            console.log("Processed maximum allowed story chapters.");
+            break; // Stop processing further chapters
+          }
         }
+        
 
         handleDownloadBook();
       } catch (error) {
