@@ -8,7 +8,6 @@ import About from "./About";
 import { initGradientBackground } from "./gradBG/gradBG.js";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faFlask,
   faBook,
   faWandMagicSparkles,
 } from "@fortawesome/free-solid-svg-icons";
@@ -21,10 +20,6 @@ function App() {
   const [displayPrompt, setDisplayPrompt] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [showOptions, setShowOptions] = useState(false);
-  const [selectedStyle, setSelectedStyle] = useState("");
-  const [selectedColorScheme, setSelectedColorScheme] = useState("");
-  const [selectedComposition, setSelectedComposition] = useState("");
   const [fileError, setFileError] = useState("");
   const [isAccessGranted, setIsAccessGranted] = useState(false);
 
@@ -127,11 +122,6 @@ function App() {
     }
   };
 
-  //option toggle
-  const toggleOptions = () => {
-    setShowOptions(!showOptions);
-  };
-
   //When user clicks "Parse and Generate".. aka starts the flow and iterates through all chapters
   const handleParseAndGenerateImage = async () => {
     ReactGA.event({
@@ -161,21 +151,45 @@ function App() {
         const nav = await epubReader.loaded.navigation;
         const toc = nav.toc;
 
+        /*Prod Code */
+        // // Loop through each chapter in the toc
+
+        // for (let i = 0; i < toc.length; i++) {
+        //   console.log("Working on Chapter: " + i);
+        //   const chapter = toc[i];
+
+        //   // Skip non-story chapters
+        //   if (isNonStoryChapter(chapter.label)) continue;
+
+        //   // Process the chapter and generate an image
+        //   await processChapter(chapter, epubReader);
+        // }
+
+        // Testing code
+        const bounds = 3; // Only process 3 chapters per book for testing purposes
+        let processedCount = 0; // Counter for processed chapters
+
         // Loop through each chapter in the toc
-        for (let i = 0; i < toc.length; i++) {
-          console.log("Working on Chapter: " + i);
+        for (let i = 0; processedCount < bounds && i < toc.length; i++) {
           const chapter = toc[i];
+          console.log("Working on Chapter: " + i + " " + chapter.label);
 
           // Skip non-story chapters
-          if (isNonStoryChapter(chapter.label)) continue;
+          if (isNonStoryChapter(chapter.label)) {
+            continue;
+          }
 
           // Process the chapter and generate an image
           await processChapter(chapter, epubReader);
+
+          // Increment the counter for processed chapters
+          processedCount++;
         }
+
+        handleDownloadBook();
       } catch (error) {
         console.error("Error while parsing EPUB:", error);
       } finally {
-        handleDownloadBook();
         setIsLoading(false);
       }
     };
@@ -222,12 +236,7 @@ function App() {
     const chapterSegment = await findChapterSegment(chapterPrompt.text);
 
     if (chapterSegment !== "False") {
-      const processedPrompt = await generatePromptFromSegment(
-        chapterSegment,
-        selectedStyle,
-        selectedColorScheme,
-        selectedComposition
-      );
+      const processedPrompt = await generatePromptFromSegment(chapterSegment);
 
       const imageUrl = await generateImageFromPrompt(processedPrompt);
       setDisplayPrompt(chapterSegment);
@@ -291,9 +300,6 @@ function App() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             prompt,
-            style: selectedStyle,
-            colorScheme: selectedColorScheme,
-            composition: selectedComposition,
           }),
         });
         const data = await response.json();
@@ -317,7 +323,10 @@ function App() {
         const response = await fetch(imageAPI, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ prompt }),
+          body: JSON.stringify({ 
+            prompt,
+            size: "1792x1024", 
+          }),
         });
         const data = await response.json();
         console.log(data.imageUrl);
@@ -378,7 +387,7 @@ function App() {
                 <>
                   <div className="header-container">
                     <div className="title-container">
-                      <h1>Visuai - ePub to Image (alpha)</h1>
+                      <h1>Visuai - ePub to Image (alpha v2)</h1>
                     </div>
                     {isAccessGranted ? (
                       <div id="headings">
@@ -399,12 +408,6 @@ function App() {
                         <div className="control-container">
                           <div className="input-container">
                             <div className="file-input-wrapper">
-                              <button
-                                className="options-button"
-                                onClick={toggleOptions}
-                              >
-                                <FontAwesomeIcon icon={faFlask} />
-                              </button>
                               <input
                                 type="file"
                                 accept=".epub"
@@ -415,62 +418,6 @@ function App() {
                               <p className="error-message">{fileError}</p>
                             )}
                           </div>
-                          {showOptions && (
-                            <div className="options-dropdown">
-                              <div className="dropdown-item">
-                                <label>Style</label>
-                                <select
-                                  value={selectedStyle}
-                                  onChange={(e) =>
-                                    setSelectedStyle(e.target.value)
-                                  }
-                                >
-                                  <option value="Oilpainting">
-                                    Oilpainting
-                                  </option>
-                                  <option value="Hyper-realism">
-                                    Hyper-realism
-                                  </option>
-                                  <option value="Animated">Animated</option>
-                                  <option value="Watercolor">Watercolor</option>
-                                  <option value="Sketch">Sketch</option>
-                                  <option value="Digital art">
-                                    Digital art
-                                  </option>
-                                </select>
-                              </div>
-                              <div className="dropdown-item">
-                                <label>Coloring</label>
-                                <select
-                                  value={selectedColorScheme}
-                                  onChange={(e) =>
-                                    setSelectedColorScheme(e.target.value)
-                                  }
-                                >
-                                  <option value="Pastel">Pastel</option>
-                                  <option value="Vibrant">Vibrant</option>
-                                  <option value="Black and White">
-                                    Black and White
-                                  </option>
-                                </select>
-                              </div>
-                              <div className="dropdown-item">
-                                <label>Composition</label>
-                                <select
-                                  value={selectedComposition}
-                                  onChange={(e) =>
-                                    setSelectedComposition(e.target.value)
-                                  }
-                                >
-                                  <option value="Wide-angle">Wide-angle</option>
-                                  <option value="Close-up">Close-up</option>
-                                  <option value="Bird's eye view">
-                                    Bird's eye view
-                                  </option>
-                                </select>
-                              </div>
-                            </div>
-                          )}
                           {epubFile && (
                             <div className="button-container">
                               <button
