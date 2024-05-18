@@ -23,9 +23,6 @@ function App() {
   const [fileError, setFileError] = useState("");
   const [isAccessGranted, setIsAccessGranted] = useState(false);
 
-  const [currentChapterIndex, setCurrentChapterIndex] = useState(0);
-  const [currentSubitemIndex, setCurrentSubitemIndex] = useState(0);
-
   const chatAPI =
     "https://visuaicalls.azurewebsites.net/api/chatgpt?code=QDubsyOhk_c8jC1RAGPBHNydCCNgpgfcSscjsSqVRdw_AzFuxUgufQ%3D%3D";
   const imageAPI =
@@ -180,7 +177,6 @@ function App() {
         const maxStoryChapters = 3; // Limit to 3 story chapters
         let storyChapterCount = 0; // Counter for processed story chapters
         
-        /*Prod Code */
         // Loop through each chapter in the toc
         for (let currentChapterIndex = 0; currentChapterIndex < toc.length; currentChapterIndex++) {
           const currentChapter = toc[currentChapterIndex];
