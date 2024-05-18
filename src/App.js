@@ -18,22 +18,22 @@ import { Skeleton } from "@mui/material";
 function App() {
   const [epubFile, setEpubFile] = useState(null);
   const [chapterTitle, setChapterTitle] = useState("");
+  const [bookName, setBookName] = useState("");
   const [displayPrompt, setDisplayPrompt] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [currentChapterIndex, setCurrentChapterIndex] = useState(0);
   const [currentSubitemIndex, setCurrentSubitemIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [epubReader, setEpubReader] = useState(null);
-  const [showOptions, setShowOptions] = useState(false);
-  const [selectedStyle, setSelectedStyle] = useState("");
-  const [selectedColorScheme, setSelectedColorScheme] = useState("");
-  const [selectedComposition, setSelectedComposition] = useState("");
+  
   const [fileError, setFileError] = useState("");
   const [isAccessGranted, setIsAccessGranted] = useState(false);
   const [leftBorderColor, setLeftBorderColor] = useState("");
   const [topBorderColor, setTopBorderColor] = useState("");
   const [rightBorderColor, setRightBorderColor] = useState("");
   const [bottomBorderColor, setBottomBorderColor] = useState("");
+
+  
 
   const chatAPI =
     "https://visuaicalls.azurewebsites.net/api/chatgpt?code=QDubsyOhk_c8jC1RAGPBHNydCCNgpgfcSscjsSqVRdw_AzFuxUgufQ%3D%3D";
@@ -94,10 +94,6 @@ function App() {
     document.body.removeChild(link);
   };
 
-  const toggleOptions = () => {
-    setShowOptions(!showOptions);
-  };
-
   const handleParseAndGenerateImage = () => {
     ReactGA.event({
       category: "User",
@@ -112,7 +108,11 @@ function App() {
 
   const handleNextChapter = async () => {
     if (!epubReader) return;
+
     const nav = await epubReader.loaded.navigation;
+    const metadata = await epubReader.loaded.metadata;
+    setBookName(metadata.title)
+
     const toc = nav.toc;
     let nextChapterIndex = currentChapterIndex;
     let nextSubitemIndex = currentSubitemIndex + 1;
@@ -209,12 +209,7 @@ function App() {
     const chapterSegment = await findChapterPrompt(chapterPrompt);
     setTopBorderColor("lightblue"); // When findChapterPrompt is completed
     if (chapterSegment !== "False") {
-      const processedPrompt = await generatePromptFromText(
-        chapterSegment,
-        selectedStyle,
-        selectedColorScheme,
-        selectedComposition
-      )
+      const processedPrompt = await generatePromptFromText(chapterSegment)
       setRightBorderColor("lightblue"); // When generatePromptFromText is completed
       const imageUrl = await generateImageFromPrompt(processedPrompt);
       setBottomBorderColor("lightblue"); // When generateImageFromPrompt is completed
@@ -262,9 +257,7 @@ function App() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           prompt,
-          style: selectedStyle,
-          colorScheme: selectedColorScheme,
-          composition: selectedComposition,
+          bookTitle: bookName,
         }),
       });
       const data = await response.json();
@@ -282,7 +275,10 @@ function App() {
       const response = await fetch(imageAPI, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt }),
+        body: JSON.stringify({ 
+          prompt,
+          size: "1024x1024",
+         }),
       });
       const data = await response.json();
       console.log(data.imageUrl);
@@ -359,12 +355,6 @@ function App() {
                         <div className="control-container">
                           <div className="input-container">
                             <div className="file-input-wrapper">
-                              <button
-                                className="options-button"
-                                onClick={toggleOptions}
-                              >
-                                <FontAwesomeIcon icon={faFlask} />
-                              </button>
                               <input
                                 type="file"
                                 accept=".epub"
@@ -375,62 +365,6 @@ function App() {
                               <p className="error-message">{fileError}</p>
                             )}
                           </div>
-                          {showOptions && (
-                            <div className="options-dropdown">
-                              <div className="dropdown-item">
-                                <label>Style</label>
-                                <select
-                                  value={selectedStyle}
-                                  onChange={(e) =>
-                                    setSelectedStyle(e.target.value)
-                                  }
-                                >
-                                  <option value="Oilpainting">
-                                    Oilpainting
-                                  </option>
-                                  <option value="Hyper-realism">
-                                    Hyper-realism
-                                  </option>
-                                  <option value="Animated">Animated</option>
-                                  <option value="Watercolor">Watercolor</option>
-                                  <option value="Sketch">Sketch</option>
-                                  <option value="Digital art">
-                                    Digital art
-                                  </option>
-                                </select>
-                              </div>
-                              <div className="dropdown-item">
-                                <label>Coloring</label>
-                                <select
-                                  value={selectedColorScheme}
-                                  onChange={(e) =>
-                                    setSelectedColorScheme(e.target.value)
-                                  }
-                                >
-                                  <option value="Pastel">Pastel</option>
-                                  <option value="Vibrant">Vibrant</option>
-                                  <option value="Black and White">
-                                    Black and White
-                                  </option>
-                                </select>
-                              </div>
-                              <div className="dropdown-item">
-                                <label>Composition</label>
-                                <select
-                                  value={selectedComposition}
-                                  onChange={(e) =>
-                                    setSelectedComposition(e.target.value)
-                                  }
-                                >
-                                  <option value="Wide-angle">Wide-angle</option>
-                                  <option value="Close-up">Close-up</option>
-                                  <option value="Bird's eye view">
-                                    Bird's eye view
-                                  </option>
-                                </select>
-                              </div>
-                            </div>
-                          )}
                           {epubFile && (
                             <div className="button-container">
                               <button
