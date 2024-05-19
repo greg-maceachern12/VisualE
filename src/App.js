@@ -185,11 +185,15 @@ function App() {
           if (chapter.subitems && chapter.subitems.length > 0) {
             // If chapter has subitems, iterate through them
             for (const [subitemIndex, subitem] of chapter.subitems.entries()) {
-              console.log(
-                `Processing Subitem: ${subitemIndex} of Chapter: ${chapterIndex}`
-              );
+              console.log(storyChapterCount)
+              console.log(`Processing Subitem: ${subitemIndex} of Chapter: ${chapterIndex}`);
               // Process each subitem as a chapter
               await processChapter(subitem, epubReader);
+              storyChapterCount++;
+              if (storyChapterCount >= maxStoryChapters) {
+                console.log("Processed maximum allowed story chapters.");
+                break; // Stop processing further chapters
+              }
             }
           } else {
             // Process chapters without subitems
@@ -409,7 +413,7 @@ function App() {
                 <>
                   <div className="header-container">
                     <div className="title-container">
-                      <h1>Visuai - ePub to Image (alpha v2)</h1>
+                      <h1>Visuai - ePub to Image (alpha2 - limits 2 chapters/book)</h1>
                     </div>
                     {isAccessGranted ? (
                       <div id="headings">
