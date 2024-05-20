@@ -33,7 +33,7 @@ function App() {
   // "http://localhost:3001/download-book";
 
   const testMode = false;
-  let maxTimes = 0;
+  // let maxTimes = 0;
 
   const handleAccessGranted = () => {
     setIsAccessGranted(true);
