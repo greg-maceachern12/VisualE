@@ -13,10 +13,6 @@ import { Skeleton } from "@mui/material";
 
 function App() {
   const [epubFile, setEpubFile] = useState(null);
-  const [chapterTitle, setChapterTitle] = useState("");
-  const [displayPrompt, setDisplayPrompt] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [fileError, setFileError] = useState("");
   const [isAccessGranted, setIsAccessGranted] = useState(false);
 
@@ -29,10 +25,8 @@ function App() {
 
   const downloadAPI =
     "https://visuaicalls.azurewebsites.net/api/downloadBook?code=stF_cd3PaNQ2JPydwM60_XBkpcmFNkLXswNf971-AnBoAzFu34Rf-w%3D%3D";
-  // const downloadAPI =
-  // "http://localhost:3001/download-book";
 
-  const testMode = false;
+  const testMode = true;
   // let maxTimes = 0;
 
   const handleAccessGranted = () => {
@@ -158,14 +152,14 @@ function App() {
         // Loop through each chapter in the TOC
         let chapterCount = 0;
         for (const [chapterIndex, chapter] of toc.entries()) {
-          let chapIndex = parseFloat(`${chapterIndex}`);
-          console.log(`Working on Chapter: ${chapIndex} ${chapter.label}`);
+          // let chapIndex = parseFloat(`${chapterIndex}`);
           if (isNonStoryChapter(chapter.label)) continue;
           // Check if chapter has subitems
           if (chapter.subitems && chapter.subitems.length > 0) {
             // Iterate through each subitem in the chapter
             for (const [subitemIndex, subitem] of chapter.subitems.entries()) {
-              chapIndex = parseFloat(`${chapterIndex}.${subitemIndex}`);
+              // chapIndex = parseFloat(`${chapterIndex}.${subitemIndex}`);
+              // console.log(`Processing Chapter: ` + chapterCount);
               console.log(`Processing Chapter: ` + chapterCount);
               // Add a promise for each subitem to the chapterPromises array
               chapterPromises.push(
@@ -191,7 +185,7 @@ function App() {
       } catch (error) {
         console.error("Error while parsing EPUB:", error);
       } finally {
-        setIsLoading(false);
+        // setIsLoading(false);
       }
     };
     reader.readAsArrayBuffer(epubFile);
@@ -233,8 +227,7 @@ function App() {
   const processChapter = async (chapter, chapterIndex, epubReader) => {
     return new Promise(async (resolve, reject) => {
       try {
-        setIsLoading(true);
-        setChapterTitle(chapter.label);
+        // setIsLoading(true);
         const chapterPrompt = await getChapterText(chapter, epubReader);
         const chapterSegment = await findChapterSegment(chapterPrompt.text);
 
@@ -244,22 +237,13 @@ function App() {
           );
 
           const imageUrl = await generateImageFromPrompt(processedPrompt);
-          setDisplayPrompt(chapterSegment);
-          setImageUrl(imageUrl);
-
           addChapter(chapter.label, chapterPrompt.html, imageUrl, chapterIndex);
         } else {
-          const imageUrl =
-            "https://cdn2.iconfinder.com/data/icons/picons-basic-2/57/basic2-085_warning_attention-512.png";
-          setDisplayPrompt(
-            "This chapter is not part of the plot, please click next chapter."
-          );
-          setImageUrl(imageUrl);
           console.log("Not processing " + chapter.label);
           // addChapter(chapter.label, chapterPrompt.html, "", chapterIndex);
         }
 
-        setIsLoading(false);
+        // setIsLoading(false);
         resolve(); // Resolve the promise when chapter processing is complete
       } catch (error) {
         reject(error); // Reject the promise if an error occurs
@@ -401,26 +385,15 @@ function App() {
                 <>
                   <div className="header-container">
                     <div className="title-container">
-                      <h1>
-                        Visuai - ePub to Image (alpha2))
-                      </h1>
+                      <h1>Visuai - ePub to Image</h1>
+                      <h4>alpha v2</h4>
                     </div>
                     {isAccessGranted ? (
                       <div id="headings">
                         <h3>
-                          Visuai automatically skips the intro chapters of the
-                          book (TOC, Dedications etc.)
+                          Visuai skips the intro chapters of the book (TOC,
+                          Dedications etc.)
                         </h3>
-                        <h4>
-                          <FontAwesomeIcon icon={faBook} /> No ePub? Click{" "}
-                          <button
-                            onClick={handleDownloadSampleBook}
-                            className="download-link"
-                          >
-                            here
-                          </button>{" "}
-                          to download an AI generated one.
-                        </h4>
                         <div className="control-container">
                           <div className="input-container">
                             <div className="file-input-wrapper">
@@ -450,70 +423,20 @@ function App() {
                     ) : (
                       <AccessCode onAccessGranted={handleAccessGranted} />
                     )}
+                    <h4>
+                      <FontAwesomeIcon icon={faBook} /> No ePub? Click{" "}
+                      <button
+                        onClick={handleDownloadSampleBook}
+                        className="download-link"
+                      >
+                        here
+                      </button>{" "}
+                      to download an AI generated one.
+                    </h4>
                     <Link to="/about" className="about-button">
                       About
                     </Link>
                   </div>
-                  {chapterTitle && (
-                    <div className="chapterContainer">
-                      <h2>{chapterTitle}</h2>
-                      <div className="container">
-                        {!isLoading ? (
-                          <>
-                            {imageUrl && (
-                              <img
-                                src={imageUrl}
-                                alt="Generated from chapter"
-                                className="generatedImage"
-                              />
-                            )}
-                            <div className="chapterPrompt">
-                              <p>
-                                <i>{displayPrompt}</i>
-                              </p>
-                            </div>
-                          </>
-                        ) : (
-                          <div className="loadingContainer">
-                            <div className="skeletonWrapper">
-                              <Skeleton
-                                variant="rounded"
-                                width={400}
-                                height={300}
-                                animation="wave"
-                              />
-                              <div className="textSkeletons">
-                                <Skeleton
-                                  variant="text"
-                                  sx={{ fontSize: "1rem" }}
-                                />
-                                <Skeleton
-                                  variant="text"
-                                  sx={{ fontSize: "1rem" }}
-                                  animation="wave"
-                                />
-                                <Skeleton
-                                  variant="text"
-                                  sx={{ fontSize: "1rem" }}
-                                  animation="wave"
-                                />
-                                <Skeleton
-                                  variant="text"
-                                  sx={{ fontSize: "1rem" }}
-                                  animation="wave"
-                                />
-                                <Skeleton
-                                  variant="text"
-                                  sx={{ fontSize: "1rem" }}
-                                  animation={false}
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
                   <div id="hiddenDiv"></div>
                 </>
               }
