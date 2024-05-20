@@ -33,6 +33,7 @@ function App() {
   // "http://localhost:3001/download-book";
 
   const testMode = false;
+  let maxTimes = 0;
 
   const handleAccessGranted = () => {
     setIsAccessGranted(true);
@@ -89,6 +90,7 @@ function App() {
   const handleDownloadBook = async () => {
     try {
       console.log("Downloading book...");
+      console.log(generatedBook);
       // const response = await fetch("http://localhost:3001/download-book");
       const response = await fetch(downloadAPI, {
         method: "POST",
@@ -148,67 +150,42 @@ function App() {
         const nav = await epubReader.loaded.navigation;
         const toc = nav.toc;
 
-        /* Prod Code */
-        // // Loop through each chapter in the TOC
-        // for (const [chapterIndex, chapter] of toc.entries()) {
-        //   console.log(`Working on Chapter: ${chapterIndex} ${chapter.label}`);
+        // Create an array of promises for each chapter
+        const chapterPromises = [];
 
-        //   // Skip non-story chapters
-        //   if (isNonStoryChapter(chapter.label)) continue;
+        /*Prod Code (no testing #) */
 
-        //   // Check if chapter has subitems
-        //   if (chapter.subitems && chapter.subitems.length > 0) {
-        //     // Iterate through each subitem in the chapter
-        //     for (const [subitemIndex, subitem] of chapter.subitems.entries()) {
-        //       console.log(`Processing Chapter: ${chapterIndex}.${subitemIndex}`);
-        //       // Process each subitem as a chapter
-        //       await processChapter(subitem, epubReader);
-        //     }
-        //   } else {
-        //     // Process chapters without subitems
-        //     await processChapter(chapter, epubReader);
-        //   }
-        // }
-
-        // Testing code
-        const maxStoryChapters = 2; // Limit to 3 story chapters
-        let storyChapterCount = 0; // Counter for processed story chapters
-
-        // Loop through each chapter in the toc
+        // Loop through each chapter in the TOC
+        let chapterCount = 0;
         for (const [chapterIndex, chapter] of toc.entries()) {
-          console.log(`Working on Chapter: ${chapterIndex} ${chapter.label}`);
-
-          // Skip non-story chapters
+          let chapIndex = parseFloat(`${chapterIndex}`);
+          console.log(`Working on Chapter: ${chapIndex} ${chapter.label}`);
           if (isNonStoryChapter(chapter.label)) continue;
-
-          // Process chapters with or without subitems
+          // Check if chapter has subitems
           if (chapter.subitems && chapter.subitems.length > 0) {
-            // If chapter has subitems, iterate through them
+            // Iterate through each subitem in the chapter
             for (const [subitemIndex, subitem] of chapter.subitems.entries()) {
-              console.log(storyChapterCount)
-              console.log(`Processing Subitem: ${subitemIndex} of Chapter: ${chapterIndex}`);
-              // Process each subitem as a chapter
-              await processChapter(subitem, epubReader);
-              storyChapterCount++;
-              if (storyChapterCount >= maxStoryChapters) {
-                console.log("Processed maximum allowed story chapters.");
-                break; // Stop processing further chapters
-              }
+              chapIndex = parseFloat(`${chapterIndex}.${subitemIndex}`);
+              console.log(`Processing Chapter: ` + chapterCount);
+              // Add a promise for each subitem to the chapterPromises array
+              chapterPromises.push(
+                processChapter(subitem, chapterCount, epubReader)
+              );
+              chapterCount++;
             }
           } else {
-            // Process chapters without subitems
-            await processChapter(chapter, epubReader);
-          }
-
-          // Increment the story chapter counter
-          storyChapterCount++;
-
-          // Check if the limit has been reached
-          if (storyChapterCount >= maxStoryChapters) {
-            console.log("Processed maximum allowed story chapters.");
-            break; // Stop processing further chapters
+            console.log(`Processing Chapter: ` + chapterCount);
+            // Add a promise for the chapter to the chapterPromises array
+            chapterPromises.push(
+              processChapter(chapter, chapterCount, epubReader)
+            );
+            chapterCount++;
           }
         }
+
+        // Wait for all chapter promises to resolve
+        await Promise.all(chapterPromises);
+        // console.log(chapterPromises)
 
         handleDownloadBook();
       } catch (error) {
@@ -240,43 +217,54 @@ function App() {
   };
 
   // reconstructs epub
-  const addChapter = (chapterTitle, chapterText, imageUrl) => {
-    generatedBook.content.push({
+  const addChapter = (chapterTitle, chapterText, imageUrl, chapterIndex) => {
+    generatedBook.content[chapterIndex] = {
       title: chapterTitle,
       data:
         `<body id='master-body'> \n` +
         `<img src='${imageUrl}' /> \n` +
         `<p>${chapterText}</p> \n` +
         `</body>`,
-    });
+    };
+    // console.log('index: ' + chapterIndex);
   };
 
   //main function: calls all of the generation pieces and constructs the books
-  const processChapter = async (chapter, epubReader) => {
-    setIsLoading(true);
-    setChapterTitle(chapter.label);
+  const processChapter = async (chapter, chapterIndex, epubReader) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        setIsLoading(true);
+        setChapterTitle(chapter.label);
+        const chapterPrompt = await getChapterText(chapter, epubReader);
+        const chapterSegment = await findChapterSegment(chapterPrompt.text);
 
-    const chapterPrompt = await getChapterText(chapter, epubReader);
-    const chapterSegment = await findChapterSegment(chapterPrompt.text);
+        if (chapterSegment !== "False" && !isNonStoryChapter(chapter.label)) {
+          const processedPrompt = await generatePromptFromSegment(
+            chapterSegment
+          );
 
-    if (chapterSegment !== "False") {
-      const processedPrompt = await generatePromptFromSegment(chapterSegment);
+          const imageUrl = await generateImageFromPrompt(processedPrompt);
+          setDisplayPrompt(chapterSegment);
+          setImageUrl(imageUrl);
 
-      const imageUrl = await generateImageFromPrompt(processedPrompt);
-      setDisplayPrompt(chapterSegment);
-      setImageUrl(imageUrl);
+          addChapter(chapter.label, chapterPrompt.html, imageUrl, chapterIndex);
+        } else {
+          const imageUrl =
+            "https://cdn2.iconfinder.com/data/icons/picons-basic-2/57/basic2-085_warning_attention-512.png";
+          setDisplayPrompt(
+            "This chapter is not part of the plot, please click next chapter."
+          );
+          setImageUrl(imageUrl);
+          console.log("Not processing " + chapter.label);
+          // addChapter(chapter.label, chapterPrompt.html, "", chapterIndex);
+        }
 
-      addChapter(chapter.label, chapterPrompt.html, imageUrl);
-
-      setIsLoading(false);
-    } else {
-      const imageUrl =
-        "https://cdn2.iconfinder.com/data/icons/picons-basic-2/57/basic2-085_warning_attention-512.png";
-      setDisplayPrompt(
-        "This chapter is not part of the plot, please click next chapter."
-      );
-      setImageUrl(imageUrl);
-    }
+        setIsLoading(false);
+        resolve(); // Resolve the promise when chapter processing is complete
+      } catch (error) {
+        reject(error); // Reject the promise if an error occurs
+      }
+    });
   };
 
   // Step1: Gets the text from the chapter
@@ -303,7 +291,7 @@ function App() {
           body: JSON.stringify({ prompt }),
         });
         const data = await response.json();
-        console.log("Segment of text: " + data.response);
+        console.log("Segment for: " + data.response);
         return data.response;
       } else {
         const resp = "ttttt";
@@ -413,7 +401,9 @@ function App() {
                 <>
                   <div className="header-container">
                     <div className="title-container">
-                      <h1>Visuai - ePub to Image (alpha2 - limits 2 chapters/book)</h1>
+                      <h1>
+                        Visuai - ePub to Image (alpha2))
+                      </h1>
                     </div>
                     {isAccessGranted ? (
                       <div id="headings">
