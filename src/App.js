@@ -7,10 +7,7 @@ import AccessCode from "./AccessCode.js";
 import About from "./About";
 import { initGradientBackground } from "./gradBG/gradBG.js";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faBook,
-  faWandMagicSparkles,
-} from "@fortawesome/free-solid-svg-icons";
+import { faBook, faWandMagicSparkles } from "@fortawesome/free-solid-svg-icons";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { Skeleton } from "@mui/material";
 
@@ -24,7 +21,7 @@ function App() {
   const [currentSubitemIndex, setCurrentSubitemIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [epubReader, setEpubReader] = useState(null);
-  
+
   const [fileError, setFileError] = useState("");
   const [isAccessGranted, setIsAccessGranted] = useState(false);
   const [leftBorderColor, setLeftBorderColor] = useState("");
@@ -32,7 +29,7 @@ function App() {
   const [rightBorderColor, setRightBorderColor] = useState("");
   const [bottomBorderColor, setBottomBorderColor] = useState("");
 
-  
+  const isTest = false;
 
   const chatAPI =
     "https://visuaicalls.azurewebsites.net/api/chatgpt?code=QDubsyOhk_c8jC1RAGPBHNydCCNgpgfcSscjsSqVRdw_AzFuxUgufQ%3D%3D";
@@ -61,12 +58,18 @@ function App() {
     }
   }, [isLoading]);
 
-  const handleFileChange = (event) => {
+  const handleFileChange = async (event) => {
     const file = event.target.files[0];
     if (file) {
       if (file.type === "application/epub+zip") {
         setEpubFile(file);
         setFileError("");
+        try {
+          const toc = await parseEpubFile(file);
+          populateChapterDropdown(toc);
+        } catch (error) {
+          console.error("Error parsing EPUB file, could not retrieve TOC.");
+        }
       } else {
         setEpubFile(null);
         setFileError("Please select a valid EPUB file.");
@@ -76,7 +79,6 @@ function App() {
       setFileError("No file selected.");
     }
   };
-
   const handleDownloadSampleBook = () => {
     ReactGA.event({
       category: "User",
@@ -100,22 +102,80 @@ function App() {
       label: "Start Generation",
     });
 
-    setCurrentChapterIndex(0);
-    setCurrentSubitemIndex(0);
-    loadChapter(0);
+    const chapterDropdown = document.getElementById("chapterDropdown");
+    const selectedValue = chapterDropdown.value;
+    const indices = selectedValue.split(".").map(Number);
+    const chapterIndex = indices[0];
+    const subitemIndex = indices[1] || 0;
+
+    setCurrentChapterIndex(chapterIndex);
+    setCurrentSubitemIndex(subitemIndex);
+    loadChapter(chapterIndex, subitemIndex);
+  };
+
+  const parseEpubFile = (epubFile) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        try {
+          const epubBlob = new Blob([event.target.result], {
+            type: "application/epub+zip",
+          });
+          const epubReader = epub(epubBlob);
+          const nav = await epubReader.loaded.navigation;
+          const toc = nav.toc;
+          console.log(toc);
+          resolve(toc);
+        } catch (error) {
+          console.error("Error parsing EPUB file:", error);
+          reject(error);
+        }
+      };
+      reader.onerror = (error) => {
+        console.error("Error reading EPUB file:", error);
+        reject(error);
+      };
+      reader.readAsArrayBuffer(epubFile);
+    });
+  };
+
+  const populateChapterDropdown = (toc) => {
+    const chapterDropdown = document.getElementById("chapterDropdown");
+    chapterDropdown.innerHTML = "";
+
+    const addChapterToDropdown = (chapter, index, isSubitem = false) => {
+      const option = document.createElement("option");
+      option.value = index;
+      option.text = `${isSubitem ? "└ " : ""}${chapter.label}`;
+      chapterDropdown.add(option);
+    };
+
+    toc.forEach((chapter, index) => {
+      addChapterToDropdown(chapter, index);
+
+      if (chapter.subitems && chapter.subitems.length > 0) {
+        chapter.subitems.forEach((subitem, subitemIdx) => {
+          const subitemIndex = `${index}.${subitemIdx}`;
+          addChapterToDropdown(subitem, subitemIndex, true);
+        });
+      }
+    });
   };
 
   const handleNextChapter = async () => {
+    console.log("handleNextChapter called");
+
     if (!epubReader) return;
 
     const nav = await epubReader.loaded.navigation;
     const metadata = await epubReader.loaded.metadata;
-    setBookName(metadata.title)
+    setBookName(metadata.title);
 
     const toc = nav.toc;
     let nextChapterIndex = currentChapterIndex;
     let nextSubitemIndex = currentSubitemIndex + 1;
-    const currentChapter = toc[currentChapterIndex];
+
+    const currentChapter = toc[nextChapterIndex];
     if (currentChapter.subitems && currentChapter.subitems.length > 0) {
       if (nextSubitemIndex >= currentChapter.subitems.length) {
         nextChapterIndex++;
@@ -125,11 +185,15 @@ function App() {
       nextChapterIndex++;
       nextSubitemIndex = 0;
     }
+
     if (nextChapterIndex >= toc.length) {
       console.error("Reached the end of the book.");
       return;
     }
+
     await loadChapter(nextChapterIndex, nextSubitemIndex);
+    setCurrentChapterIndex(nextChapterIndex);
+    setCurrentSubitemIndex(nextSubitemIndex);
   };
 
   const isNonStoryChapter = (chapterLabel) => {
@@ -163,7 +227,6 @@ function App() {
       });
       const reader = epub(epubBlob);
       setEpubReader(reader);
-
       try {
         const nav = await reader.loaded.navigation;
         const toc = nav.toc;
@@ -203,26 +266,36 @@ function App() {
     setIsLoading(true);
     setChapterTitle(chapter.label);
 
-    const chapterPrompt = await getChapterPrompt(chapter, epubReader);
-    setLeftBorderColor("lightblue"); // When getChapterPrompt is completed
-    const chapterSegment = await findChapterPrompt(chapterPrompt);
-    setTopBorderColor("lightblue"); // When findChapterPrompt is completed
-    if (chapterSegment !== "False") {
-      const processedPrompt = await generatePromptFromText(chapterSegment)
-      setRightBorderColor("lightblue"); // When generatePromptFromText is completed
-      const imageUrl = await generateImageFromPrompt(processedPrompt);
-      setBottomBorderColor("lightblue"); // When generateImageFromPrompt is completed
+    if (isTest == true) {
+      const chapterPrompt = await getChapterPrompt(chapter, epubReader);
+      const chapterSegment = await findChapterPrompt(chapterPrompt);
       setDisplayPrompt(chapterSegment);
-      setImageUrl(imageUrl);
+      setImageUrl(
+        "https://cdn.pixabay.com/photo/2023/08/02/18/21/yoga-8165759_640.jpg"
+      );
       setIsLoading(false);
     } else {
-      const imageUrl =
-        "https://cdn2.iconfinder.com/data/icons/picons-basic-2/57/basic2-085_warning_attention-512.png";
-      setDisplayPrompt(
-        "This chapter is not part of the plot, please click next chapter."
-      );
-      setImageUrl(imageUrl);
-      setIsLoading(false);
+      const chapterPrompt = await getChapterPrompt(chapter, epubReader);
+      setLeftBorderColor("lightblue"); // When getChapterPrompt is completed
+      const chapterSegment = await findChapterPrompt(chapterPrompt);
+      setTopBorderColor("lightblue"); // When findChapterPrompt is completed
+      if (chapterSegment !== "False") {
+        const processedPrompt = await generatePromptFromText(chapterSegment);
+        setRightBorderColor("lightblue"); // When generatePromptFromText is completed
+        const imageUrl = await generateImageFromPrompt(processedPrompt);
+        setBottomBorderColor("lightblue"); // When generateImageFromPrompt is completed
+        setDisplayPrompt(chapterSegment);
+        setImageUrl(imageUrl);
+        setIsLoading(false);
+      } else {
+        const imageUrl =
+          "https://cdn2.iconfinder.com/data/icons/picons-basic-2/57/basic2-085_warning_attention-512.png";
+        setDisplayPrompt(
+          "This chapter is not part of the plot, please click next chapter."
+        );
+        setImageUrl(imageUrl);
+        setIsLoading(false);
+      }
     }
   };
 
@@ -274,11 +347,11 @@ function App() {
       const response = await fetch(imageAPI, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           prompt,
           size: "1024x1024",
           title: bookName,
-         }),
+        }),
       });
       const data = await response.json();
       console.log(data.imageUrl);
@@ -338,10 +411,10 @@ function App() {
                     </div>
                     {isAccessGranted ? (
                       <div id="headings">
-                        <h3>
+                        {/* <h3>
                           Visuai automatically skips the intro chapters of the
                           book (TOC, Dedications etc.)
-                        </h3>
+                        </h3> */}
                         <h4>
                           <FontAwesomeIcon icon={faBook} /> No ePub? Click{" "}
                           <button
@@ -367,12 +440,14 @@ function App() {
                           </div>
                           {epubFile && (
                             <div className="button-container">
+                              {/* <p>Select a chapter and click "Generate"</p> */}
+                              <select id="chapterDropdown"></select>
                               <button
                                 id="parse"
                                 onClick={handleParseAndGenerateImage}
                               >
                                 <FontAwesomeIcon icon={faWandMagicSparkles} />
-                                Parse and Generate Image
+                                Generate Image
                               </button>
                             </div>
                           )}
@@ -410,7 +485,10 @@ function App() {
                               <p>
                                 <i>{displayPrompt}</i>
                               </p>
-                              <button id="nextbtn" onClick={handleNextChapter}>
+                              <button
+                                id="nextbtn"
+                                onClick={() => handleNextChapter()}
+                              >
                                 Next Chapter
                               </button>
                             </div>
