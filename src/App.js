@@ -124,6 +124,9 @@ function App() {
           const epubReader = epub(epubBlob);
           const nav = await epubReader.loaded.navigation;
           const toc = nav.toc;
+
+          const metadata = await epubReader.loaded.metadata;
+          setBookName(metadata.title);
           console.log(toc);
           resolve(toc);
         } catch (error) {
@@ -168,8 +171,6 @@ function App() {
     if (!epubReader) return;
 
     const nav = await epubReader.loaded.navigation;
-    const metadata = await epubReader.loaded.metadata;
-    setBookName(metadata.title);
 
     const toc = nav.toc;
     let nextChapterIndex = currentChapterIndex;
@@ -451,14 +452,19 @@ function App() {
                               </button>
                             </div>
                           )}
+                          <span className='link'>
+                            Issues with generation? Click{" "}
+                            <a
+                             className='link' href={`mailto:gregmaceachern98@gmail.com?subject=Issues%20generating%20${bookName}&body=-%20This%20was%20broken%3A%0A-%20This%20is%20how%20it%20should%20have%20worked%3A%0A-%20Images%20(optional)%3A`}
+                            >
+                              here.
+                            </a>
+                          </span>
                         </div>
                       </div>
                     ) : (
                       <AccessCode onAccessGranted={handleAccessGranted} />
                     )}
-                    <Link to="/about" className="about-button">
-                      About
-                    </Link>
                   </div>
                   {chapterTitle && (
                     <div
@@ -535,6 +541,12 @@ function App() {
                     </div>
                   )}
                   <div id="hiddenDiv"></div>
+                  <Link to="/about" className="about-button">
+                      About
+                    </Link>
+                  <a className="feedback" href="mailto:gregmaceachern98@gmail.com?subject=Feedback%20for%20Visuai">
+                    Feedback
+                  </a>
                 </>
               }
             />

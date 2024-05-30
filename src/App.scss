@@ -55,6 +55,11 @@ a {
     // margin-bottom: 2em;
   }
   .about-button {
+    float: left;
+    margin-top: 2rem;
+  }
+  .feedback {
+    float: right;
     margin-top: 2rem;
   }
 }
@@ -359,6 +364,11 @@ img {
 #hiddenDiv {
   display: none;
   height: 0;
+}
+
+.link {
+  color: #191919;
+  font-size: 12px;
 }
 
 .aboutText {
