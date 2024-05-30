@@ -266,7 +266,7 @@ function App() {
     setIsLoading(true);
     setChapterTitle(chapter.label);
 
-    if (isTest == true) {
+    if (isTest === true) {
       const chapterPrompt = await getChapterPrompt(chapter, epubReader);
       const chapterSegment = await findChapterPrompt(chapterPrompt);
       setDisplayPrompt(chapterSegment);
