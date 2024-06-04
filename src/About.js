@@ -22,9 +22,8 @@ function About() {
         <i>
           I discovered that authors invest significant effort in crafting rich
           visual details for many scenes, and my mind struggled to fully
-          visualize them.
-        </i>
-        See the <a href="https://landvisuai.netlify.app/">landing page</a> for
+          visualize them. 
+        </i> See the <a href="https://landvisuai.netlify.app/">landing page</a> for
         examples. I often found myself searching online for fan renditions of
         the characters to aid my imagination.
         <br></br>
@@ -37,7 +36,9 @@ function About() {
         Thus, Visuai was born!
         <br></br>
         <br></br>
-        IMO, the ideal user experience would be a Kindle extension directly
+        The reading market today shows approximately 20-30% of users leverage digital/e-reader technology. The majority still reads on traditional paperback. But that 20-30% is expected to hit approx <b>1.2B</b> TAM by 2027.
+        <br></br>
+        IMO, the ideal user experience would be a Kindle or Apple Books extension directly
         integrated into the product, automatically generating visuals for the
         user or based on highlighted content. Until Amazon opens up Kindle
         extensions, Visuai will operate as a self-serve platform.
