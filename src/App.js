@@ -455,7 +455,7 @@ function App() {
                           <span className='link'>
                             Issues with generation? Click{" "}
                             <a
-                             className='link' href={`mailto:gregmaceachern98@gmail.com?subject=Issues%20generating%20${bookName}&body=-%20This%20was%20broken%3A%0A-%20This%20is%20how%20it%20should%20have%20worked%3A%0A-%20Images%20(optional)%3A`}
+                             className='link' href={`mailto:gregmaceachern98@gmail.com?subject=Issues%20generating%20${bookName}&body=-%20This%20was%20broken%3A%0A-%20This%20is%20how%20it%20should%20have%20worked%3A%0A-%20Images%20or%20console%20errors%20(optional)%3A`}
                             >
                               here.
                             </a>

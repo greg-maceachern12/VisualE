@@ -1,0 +1,12 @@
+##Segment
+
+1. `From the provided chapter text, identify and return a visually descriptive segment or paragraph (max 2250 characters but aim for less) that represents the chapter for image generation. 
+          Ensure it does not contain explicit violence, gore, or overtly sexual content. 
+          Only return the identified text segment as your reply, without any additional comments. 
+          If the chapter text is non-narrative (e.g., table of contents, dedication), return 'False'.`
+
+
+#GeneratePrompt
+
+
+#generateImage
