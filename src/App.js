@@ -420,7 +420,9 @@ function App() {
                 <>
                   <div className="header-container">
                     <div className="title-container">
-                      <h1>Visuai - ePub to Image</h1>
+                      <h1>Visuai</h1>
+                      <h2>Turn your epub into a picture book</h2>
+                      <h4>Free users limited to 2 chapters</h4>
                     </div>
                     {isAccessGranted ? (
                       <div id="headings">
