@@ -158,16 +158,13 @@ function App() {
 
         if (max_iterate === 0) {
           let chapterCount = 0;
-          for (const [chapterIndex, chapter] of toc.entries()) {
+          for (const [chapter] of toc.entries()) {
             // let chapIndex = parseFloat(`${chapterIndex}`);
             if (isNonStoryChapter(chapter.label)) continue;
             // Check if chapter has subitems
             if (chapter.subitems && chapter.subitems.length > 0) {
               // Iterate through each subitem in the chapter
-              for (const [
-                subitemIndex,
-                subitem,
-              ] of chapter.subitems.entries()) {
+              for (const [subitem] of chapter.subitems.entries()) {
                 // chapIndex = parseFloat(`${chapterIndex}.${subitemIndex}`);
                 // console.log(`Processing Chapter: ` + chapterCount);
                 console.log(`Processing Chapter: ` + chapterCount);
@@ -190,15 +187,12 @@ function App() {
           /* -------- Testing Code -------- */
           let chapterCount = 0;
 
-          for (const [chapterIndex, chapter] of toc.entries()) {
+          for (const [chapter] of toc.entries()) {
             if (isNonStoryChapter(chapter.label) || chapterCount >= max_iterate)
               continue;
 
             if (chapter.subitems && chapter.subitems.length > 0) {
-              for (const [
-                subitemIndex,
-                subitem,
-              ] of chapter.subitems.entries()) {
+              for (const [subitem] of chapter.subitems.entries()) {
                 if (chapterCount >= max_iterate) break;
                 console.log(`Processing Chapter: ${chapterCount}`);
                 chapterPromises.push(
