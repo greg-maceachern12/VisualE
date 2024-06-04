@@ -9,12 +9,15 @@ import { initGradientBackground } from "./gradBG/gradBG.js";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBook, faWandMagicSparkles } from "@fortawesome/free-solid-svg-icons";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-import { Skeleton } from "@mui/material";
+import { mirage } from "ldrs";
+
+mirage.register();
 
 function App() {
   const [epubFile, setEpubFile] = useState(null);
   const [fileError, setFileError] = useState("");
   const [isAccessGranted, setIsAccessGranted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const chatAPI =
     "https://visuaicalls.azurewebsites.net/api/chatgpt?code=QDubsyOhk_c8jC1RAGPBHNydCCNgpgfcSscjsSqVRdw_AzFuxUgufQ%3D%3D";
@@ -26,8 +29,8 @@ function App() {
   const downloadAPI =
     "https://visuaicalls.azurewebsites.net/api/downloadBook?code=stF_cd3PaNQ2JPydwM60_XBkpcmFNkLXswNf971-AnBoAzFu34Rf-w%3D%3D";
 
-  const testMode = true;
-  // let maxTimes = 0;
+  const testMode = false;
+  const max_iterate = 2; // Set the desired maximum number of iterations
 
   const handleAccessGranted = () => {
     setIsAccessGranted(true);
@@ -112,6 +115,8 @@ function App() {
       document.body.removeChild(link);
     } catch (error) {
       console.error("Error downloading the book:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -122,7 +127,7 @@ function App() {
       action: "Button Click",
       label: "Start Generation",
     });
-
+    setIsLoading(true);
     if (!epubFile) {
       console.error("No EPUB file selected.");
       return;
@@ -139,6 +144,7 @@ function App() {
         generatedBook.title = metadata.title;
       } catch (error) {
         console.error("Error accessing metadata:", error);
+        setIsLoading(false);
       }
       try {
         const nav = await epubReader.loaded.navigation;
@@ -147,33 +153,67 @@ function App() {
         // Create an array of promises for each chapter
         const chapterPromises = [];
 
-        /*Prod Code (no testing #) */
-
+        /*-------Prod Code (no testing max) ---------*/
         // Loop through each chapter in the TOC
-        let chapterCount = 0;
-        for (const [chapterIndex, chapter] of toc.entries()) {
-          // let chapIndex = parseFloat(`${chapterIndex}`);
-          if (isNonStoryChapter(chapter.label)) continue;
-          // Check if chapter has subitems
-          if (chapter.subitems && chapter.subitems.length > 0) {
-            // Iterate through each subitem in the chapter
-            for (const [subitemIndex, subitem] of chapter.subitems.entries()) {
-              // chapIndex = parseFloat(`${chapterIndex}.${subitemIndex}`);
-              // console.log(`Processing Chapter: ` + chapterCount);
+
+        if (max_iterate === 0) {
+          let chapterCount = 0;
+          for (const [chapterIndex, chapter] of toc.entries()) {
+            // let chapIndex = parseFloat(`${chapterIndex}`);
+            if (isNonStoryChapter(chapter.label)) continue;
+            // Check if chapter has subitems
+            if (chapter.subitems && chapter.subitems.length > 0) {
+              // Iterate through each subitem in the chapter
+              for (const [
+                subitemIndex,
+                subitem,
+              ] of chapter.subitems.entries()) {
+                // chapIndex = parseFloat(`${chapterIndex}.${subitemIndex}`);
+                // console.log(`Processing Chapter: ` + chapterCount);
+                console.log(`Processing Chapter: ` + chapterCount);
+                // Add a promise for each subitem to the chapterPromises array
+                chapterPromises.push(
+                  processChapter(subitem, chapterCount, epubReader)
+                );
+                chapterCount++;
+              }
+            } else {
               console.log(`Processing Chapter: ` + chapterCount);
-              // Add a promise for each subitem to the chapterPromises array
+              // Add a promise for the chapter to the chapterPromises array
               chapterPromises.push(
-                processChapter(subitem, chapterCount, epubReader)
+                processChapter(chapter, chapterCount, epubReader)
               );
               chapterCount++;
             }
-          } else {
-            console.log(`Processing Chapter: ` + chapterCount);
-            // Add a promise for the chapter to the chapterPromises array
-            chapterPromises.push(
-              processChapter(chapter, chapterCount, epubReader)
-            );
-            chapterCount++;
+          }
+        } else {
+          /* -------- Testing Code -------- */
+          let chapterCount = 0;
+
+          for (const [chapterIndex, chapter] of toc.entries()) {
+            if (isNonStoryChapter(chapter.label) || chapterCount >= max_iterate)
+              continue;
+
+            if (chapter.subitems && chapter.subitems.length > 0) {
+              for (const [
+                subitemIndex,
+                subitem,
+              ] of chapter.subitems.entries()) {
+                if (chapterCount >= max_iterate) break;
+                console.log(`Processing Chapter: ${chapterCount}`);
+                chapterPromises.push(
+                  processChapter(subitem, chapterCount, epubReader)
+                );
+                chapterCount++;
+              }
+            } else {
+              if (chapterCount >= max_iterate) break;
+              console.log(`Processing Chapter: ${chapterCount}`);
+              chapterPromises.push(
+                processChapter(chapter, chapterCount, epubReader)
+              );
+              chapterCount++;
+            }
           }
         }
 
@@ -184,8 +224,9 @@ function App() {
         handleDownloadBook();
       } catch (error) {
         console.error("Error while parsing EPUB:", error);
+        setIsLoading(false);
       } finally {
-        // setIsLoading(false);
+        console.log("Done processing book... queuing download");
       }
     };
     reader.readAsArrayBuffer(epubFile);
@@ -386,7 +427,6 @@ function App() {
                   <div className="header-container">
                     <div className="title-container">
                       <h1>Visuai - ePub to Image</h1>
-                      <h4>alpha v2</h4>
                     </div>
                     {isAccessGranted ? (
                       <div id="headings">
@@ -394,6 +434,16 @@ function App() {
                           Visuai skips the intro chapters of the book (TOC,
                           Dedications etc.)
                         </h3>
+                        <h4>
+                          <FontAwesomeIcon icon={faBook} /> No ePub? Click{" "}
+                          <button
+                            onClick={handleDownloadSampleBook}
+                            className="download-link"
+                          >
+                            here
+                          </button>{" "}
+                          to download an AI generated one.
+                        </h4>
                         <div className="control-container">
                           <div className="input-container">
                             <div className="file-input-wrapper">
@@ -423,21 +473,21 @@ function App() {
                     ) : (
                       <AccessCode onAccessGranted={handleAccessGranted} />
                     )}
-                    <h4>
-                      <FontAwesomeIcon icon={faBook} /> No ePub? Click{" "}
-                      <button
-                        onClick={handleDownloadSampleBook}
-                        className="download-link"
-                      >
-                        here
-                      </button>{" "}
-                      to download an AI generated one.
-                    </h4>
-                    <Link to="/about" className="about-button">
-                      About
-                    </Link>
+                    {isLoading ? (
+                      <div>
+                        <br></br>
+                        <l-mirage
+                          size="111"
+                          speed="2.9"
+                          color="#CDB8FF"
+                        ></l-mirage>
+                      </div>
+                    ) : null}
                   </div>
                   <div id="hiddenDiv"></div>
+                  <Link to="/about" className="about-button">
+                    About
+                  </Link>
                 </>
               }
             />
