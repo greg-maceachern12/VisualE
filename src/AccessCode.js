@@ -10,7 +10,7 @@ function AccessCode({ onAccessGranted }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (accessCode === "full-book") {
+    if (accessCode === "gene") {
       onAccessGranted();
     } else {
       alert("Invalid access code. Please try again.");

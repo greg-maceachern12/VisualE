@@ -31,7 +31,7 @@ function App() {
   const downloadAPI =
     "https://visuaicalls.azurewebsites.net/api/downloadBook?code=stF_cd3PaNQ2JPydwM60_XBkpcmFNkLXswNf971-AnBoAzFu34Rf-w%3D%3D";
 
-  const testMode = false;
+  const testMode = true;
   const max_iterate = 0; // Set the desired maximum number of iterations
 
   const handleAccessGranted = () => {
@@ -223,7 +223,8 @@ function App() {
 
     console.log(`Total chapters to process: ${chapterBatch.length}`);
 
-    const totalChapterProcessingTime = chapterBatch.length * chapterProcessingTime;
+    const totalChapterProcessingTime =
+      chapterBatch.length * chapterProcessingTime;
     const batchCount = Math.ceil(chapterBatch.length / batchSize);
     const totalTime = totalChapterProcessingTime + (batchCount - 1) * delayMs;
     const estimatedTimeRemaining = msToHumanReadableTime(totalTime);
@@ -300,7 +301,11 @@ function App() {
             chapterSegment
           );
 
-          const imageUrl = await generateImageFromPrompt(processedPrompt);
+          let imageUrl = await generateImageFromPrompt(processedPrompt);
+          if (imageUrl.startsWith("Error: ")) {
+            console.error(imageUrl);
+            imageUrl = "https://cdn.pixabay.com/photo/2017/02/12/21/29/false-2061132_640.png";
+          }
           addChapter(chapter.label, chapterPrompt.html, imageUrl, chapterIndex);
         } else {
           console.log("Not processing " + chapter.label);
@@ -391,7 +396,15 @@ function App() {
           }),
         });
         const data = await response.json();
-        // console.log(data);
+        if (data.error) {
+          console.error("Error generating image:", data.error);
+          ReactGA.event({
+            category: "User",
+            action: "Error",
+            label: "Image generation failed",
+          });
+          return `Error: ${data.error}`;
+        }
         ReactGA.event({
           category: "User",
           action: "Action Complete",
@@ -405,7 +418,12 @@ function App() {
       }
     } catch (error) {
       console.error("Error calling the API:", error);
-      return "Cannot generate image";
+      ReactGA.event({
+        category: "User",
+        action: "Error",
+        label: "Image generation failed",
+      });
+      return `Error: ${error.message}`;
     }
   };
 
@@ -493,10 +511,11 @@ function App() {
                               </button>
                             </div>
                           )}
-                          <span className='link'>
+                          <span className="link">
                             Issues with generation? Click{" "}
                             <a
-                             className='link' href={`mailto:gregmaceachern98@gmail.com?subject=Issues%20Generating%20Book&body=-%20This%20was%20broken%3A%0A-%20This%20is%20how%20it%20should%20have%20worked%3A%0A-%20Images%20or%20console%20errors%20(optional)%3A`}
+                              className="link"
+                              href={`mailto:gregmaceachern98@gmail.com?subject=Issues%20Generating%20Book&body=-%20This%20was%20broken%3A%0A-%20This%20is%20how%20it%20should%20have%20worked%3A%0A-%20Images%20or%20console%20errors%20(optional)%3A`}
                             >
                               here.
                             </a>
