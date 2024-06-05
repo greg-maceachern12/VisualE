@@ -16,7 +16,7 @@ mirage.register();
 function App() {
   const [epubFile, setEpubFile] = useState(null);
   const [fileError, setFileError] = useState("");
-  const [isAccessGranted, setIsAccessGranted] = useState(true);
+  const [isAccessGranted, setIsAccessGranted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   // const [estimatedWaitTime, setEstimatedWaitTime] = useState("");
   const [loadingInfo, setLoadingInfo] = useState("");
@@ -451,7 +451,7 @@ function App() {
                     <div className="title-container">
                       <h1>Visuai</h1>
                       <h2>Turn your epub into a picture book</h2>
-                      <h4>Free users limited to 2 chapters</h4>
+                      {/* <h4>Free users limited to 2 chapters</h4> */}
                     </div>
                     {isAccessGranted ? (
                       <div id="headings">
@@ -460,7 +460,7 @@ function App() {
                           Dedications etc.)
                         </h3>
                         <h4>
-                          <FontAwesomeIcon icon={faBook} /> No ePub? Click{" "}
+                          <FontAwesomeIcon icon={faBook} /> Need an ePub? Click{" "}
                           <button
                             onClick={handleDownloadSampleBook}
                             className="download-link"
@@ -493,6 +493,14 @@ function App() {
                               </button>
                             </div>
                           )}
+                          <span className='link'>
+                            Issues with generation? Click{" "}
+                            <a
+                             className='link' href={`mailto:gregmaceachern98@gmail.com?subject=Issues%20Generating%20Book&body=-%20This%20was%20broken%3A%0A-%20This%20is%20how%20it%20should%20have%20worked%3A%0A-%20Images%20or%20console%20errors%20(optional)%3A`}
+                            >
+                              here.
+                            </a>
+                          </span>
                         </div>
                       </div>
                     ) : (
