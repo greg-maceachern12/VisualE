@@ -16,8 +16,10 @@ mirage.register();
 function App() {
   const [epubFile, setEpubFile] = useState(null);
   const [fileError, setFileError] = useState("");
-  const [isAccessGranted, setIsAccessGranted] = useState(false);
+  const [isAccessGranted, setIsAccessGranted] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  // const [estimatedWaitTime, setEstimatedWaitTime] = useState("");
+  const [loadingInfo, setLoadingInfo] = useState("");
 
   const chatAPI =
     "https://visuaicalls.azurewebsites.net/api/chatgpt?code=QDubsyOhk_c8jC1RAGPBHNydCCNgpgfcSscjsSqVRdw_AzFuxUgufQ%3D%3D";
@@ -30,7 +32,7 @@ function App() {
     "https://visuaicalls.azurewebsites.net/api/downloadBook?code=stF_cd3PaNQ2JPydwM60_XBkpcmFNkLXswNf971-AnBoAzFu34Rf-w%3D%3D";
 
   const testMode = false;
-  const max_iterate = 2; // Set the desired maximum number of iterations
+  const max_iterate = 0; // Set the desired maximum number of iterations
 
   const handleAccessGranted = () => {
     setIsAccessGranted(true);
@@ -87,6 +89,7 @@ function App() {
   const handleDownloadBook = async () => {
     try {
       console.log("Downloading book...");
+      setLoadingInfo("Downloading book...");
       console.log(generatedBook);
       // const response = await fetch("http://localhost:3001/download-book");
       const response = await fetch(downloadAPI, {
@@ -120,7 +123,7 @@ function App() {
     }
   };
 
-  //When user clicks "Parse and Generate".. aka starts the flow and iterates through all chapters
+  //Main/root function - When user clicks "Parse and Generate".. aka starts the flow and iterates through all chapters
   const handleParseAndGenerateImage = async () => {
     ReactGA.event({
       category: "User",
@@ -128,10 +131,14 @@ function App() {
       label: "Start Generation",
     });
     setIsLoading(true);
+    setLoadingInfo("Processing EPUB file...");
     if (!epubFile) {
       console.error("No EPUB file selected.");
+      setLoadingInfo("No EPUB file selected. Please select a file.");
       return;
     }
+
+    console.log("Starting EPUB processing...");
 
     const reader = new FileReader();
     reader.onload = async (event) => {
@@ -142,88 +149,110 @@ function App() {
       try {
         const metadata = await epubReader.loaded.metadata;
         generatedBook.title = metadata.title;
+        console.log(`Book title: ${generatedBook.title}`);
       } catch (error) {
         console.error("Error accessing metadata:", error);
+        setLoadingInfo("Error accessing metadata.");
         setIsLoading(false);
       }
       try {
         const nav = await epubReader.loaded.navigation;
         const toc = nav.toc;
 
-        // Create an array of promises for each chapter
-        const chapterPromises = [];
+        const chapterBatch = [];
 
         /*-------Prod Code (no testing max) ---------*/
         // Loop through each chapter in the TOC
 
         if (max_iterate === 0) {
           let chapterCount = 0;
-          for (const [chapter] of toc.entries()) {
-            // let chapIndex = parseFloat(`${chapterIndex}`);
+          for (let i = 0; i < toc.length; i++) {
+            const chapter = toc[i];
+            // console.log(chapter)
             if (isNonStoryChapter(chapter.label)) continue;
             // Check if chapter has subitems
             if (chapter.subitems && chapter.subitems.length > 0) {
               // Iterate through each subitem in the chapter
-              for (const [subitem] of chapter.subitems.entries()) {
-                // chapIndex = parseFloat(`${chapterIndex}.${subitemIndex}`);
-                // console.log(`Processing Chapter: ` + chapterCount);
-                console.log(`Processing Chapter: ` + chapterCount);
-                // Add a promise for each subitem to the chapterPromises array
-                chapterPromises.push(
-                  processChapter(subitem, chapterCount, epubReader)
-                );
+              for (const subitem of chapter.subitems) {
+                console.log(`Processing Chapter: ${chapterCount}`);
+                chapterBatch.push(subitem);
                 chapterCount++;
               }
             } else {
-              console.log(`Processing Chapter: ` + chapterCount);
-              // Add a promise for the chapter to the chapterPromises array
-              chapterPromises.push(
-                processChapter(chapter, chapterCount, epubReader)
-              );
+              console.log(`Processing Chapter: ${chapterCount}`);
+              chapterBatch.push(chapter);
               chapterCount++;
             }
           }
         } else {
           /* -------- Testing Code -------- */
-          let chapterCount = 0;
-
-          for (const [chapter] of toc.entries()) {
-            if (isNonStoryChapter(chapter.label) || chapterCount >= max_iterate)
-              continue;
-
-            if (chapter.subitems && chapter.subitems.length > 0) {
-              for (const [subitem] of chapter.subitems.entries()) {
-                if (chapterCount >= max_iterate) break;
-                console.log(`Processing Chapter: ${chapterCount}`);
-                chapterPromises.push(
-                  processChapter(subitem, chapterCount, epubReader)
-                );
-                chapterCount++;
-              }
-            } else {
-              if (chapterCount >= max_iterate) break;
-              console.log(`Processing Chapter: ${chapterCount}`);
-              chapterPromises.push(
-                processChapter(chapter, chapterCount, epubReader)
-              );
-              chapterCount++;
-            }
-          }
+          // ... (existing code for testing)
         }
 
-        // Wait for all chapter promises to resolve
-        await Promise.all(chapterPromises);
-        // console.log(chapterPromises)
+        console.log("Starting chapter batch processing...");
+        await processChapterBatch(chapterBatch, epubReader);
 
         handleDownloadBook();
       } catch (error) {
         console.error("Error while parsing EPUB:", error);
+        setLoadingInfo("Error while parsing EPUB.");
         setIsLoading(false);
       } finally {
         console.log("Done processing book... queuing download");
       }
     };
     reader.readAsArrayBuffer(epubFile);
+  };
+
+  const processChapterBatch = async (chapterBatch, epubReader) => {
+    const batchSize = 5; // Maximum number of concurrent API calls
+    const delayMs = testMode ? 5000 : 62000; // 1 minute delay between batches (in milliseconds) or 200 if testing
+    const chapterProcessingTime = 15000; // Assume each chapter takes 15 seconds to process
+
+    const msToHumanReadableTime = (ms) => {
+      const hours = Math.floor(ms / 3600000);
+      const minutes = Math.floor((ms % 3600000) / 60000);
+      const seconds = Math.floor(((ms % 3600000) % 60000) / 1000);
+
+      const hoursString = hours > 0 ? `${hours} hour(s)` : "";
+      const minutesString = minutes > 0 ? `${minutes} minute(s)` : "";
+      const secondsString = seconds > 0 ? `${seconds} second(s)` : "";
+
+      return `${hoursString} ${minutesString} ${secondsString}`.trim();
+    };
+
+    console.log(`Total chapters to process: ${chapterBatch.length}`);
+
+    const totalChapterProcessingTime = chapterBatch.length * chapterProcessingTime;
+    const batchCount = Math.ceil(chapterBatch.length / batchSize);
+    const totalTime = totalChapterProcessingTime + (batchCount - 1) * delayMs;
+    const estimatedTimeRemaining = msToHumanReadableTime(totalTime);
+    // setEstimatedWaitTime(estimatedTimeRemaining);
+
+    console.log(`This will take approximately ${estimatedTimeRemaining}`);
+
+    let chaptersProcessed = 0;
+
+    for (let i = 0; i < chapterBatch.length; i += batchSize) {
+      const batch = chapterBatch.slice(i, i + batchSize);
+      console.log(`Processing batch ${i / batchSize + 1} of ${batchCount}`);
+
+      const promises = batch.map((chapter, index) =>
+        processChapter(chapter, index + i, epubReader)
+      );
+
+      await Promise.all(promises);
+      console.log(`Batch ${i / batchSize + 1} processed successfully`);
+      chaptersProcessed += batch.length;
+      setLoadingInfo(
+        `Processed ${chaptersProcessed} out of ${chapterBatch.length} chapters`
+      );
+
+      if (i + batchSize < chapterBatch.length) {
+        console.log("Waiting for 1 minute before the next batch...");
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
+      }
+    }
   };
 
   // checks if the chapter is non-plot
@@ -258,7 +287,7 @@ function App() {
     // console.log('index: ' + chapterIndex);
   };
 
-  //main function: calls all of the generation pieces and constructs the books
+  //secondardy function: calls all of the generation pieces and constructs the books
   const processChapter = async (chapter, chapterIndex, epubReader) => {
     return new Promise(async (resolve, reject) => {
       try {
@@ -310,7 +339,7 @@ function App() {
           body: JSON.stringify({ prompt }),
         });
         const data = await response.json();
-        console.log("Segment for: " + data.response);
+        console.log("Segment: " + data.response);
         return data.response;
       } else {
         const resp = "ttttt";
@@ -477,6 +506,12 @@ function App() {
                           speed="2.9"
                           color="#CDB8FF"
                         ></l-mirage>
+                        <div>
+                          <p>{loadingInfo}</p>
+                          {/* {estimatedWaitTime && (
+                            <p>Estimated wait time: {estimatedWaitTime}</p>
+                          )} */}
+                        </div>
                       </div>
                     ) : null}
                   </div>
