@@ -31,7 +31,7 @@ function App() {
   const downloadAPI =
     "https://visuaicalls.azurewebsites.net/api/downloadBook?code=stF_cd3PaNQ2JPydwM60_XBkpcmFNkLXswNf971-AnBoAzFu34Rf-w%3D%3D";
 
-  const testMode = true;
+  const testMode = false;
   const max_iterate = 0; // Set the desired maximum number of iterations
 
   const handleAccessGranted = () => {
@@ -103,6 +103,7 @@ function App() {
 
       if (!response.ok) {
         console.error("Error downloading book:", response.statusText);
+        setLoadingInfo("Error downloading the book.");
         return;
       }
 
@@ -116,8 +117,10 @@ function App() {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      setLoadingInfo("Book downloaded successfully.");
     } catch (error) {
       console.error("Error downloading the book:", error);
+      setLoadingInfo("Error downloading the book.");
     } finally {
       setIsLoading(false);
     }
@@ -206,7 +209,7 @@ function App() {
 
   const processChapterBatch = async (chapterBatch, epubReader) => {
     const batchSize = 5; // Maximum number of concurrent API calls
-    const delayMs = testMode ? 5000 : 62000; // 1 minute delay between batches (in milliseconds) or 200 if testing
+    const delayMs = testMode ? 2000 : 62000; // 1 minute delay between batches (in milliseconds) or 200 if testing
     const chapterProcessingTime = 15000; // Assume each chapter takes 15 seconds to process
 
     const msToHumanReadableTime = (ms) => {
@@ -287,6 +290,11 @@ function App() {
     };
     // console.log('index: ' + chapterIndex);
   };
+  const removeImages = (chapterText) => {
+    const regex = /<img[^>]+>/g;
+    const result = chapterText.replace(regex, "");
+    return result;
+  };
 
   //secondardy function: calls all of the generation pieces and constructs the books
   const processChapter = async (chapter, chapterIndex, epubReader) => {
@@ -306,7 +314,9 @@ function App() {
             console.error(imageUrl);
             imageUrl = "https://cdn.pixabay.com/photo/2017/02/12/21/29/false-2061132_640.png";
           }
-          addChapter(chapter.label, chapterPrompt.html, imageUrl, chapterIndex);
+          // I need to remove the images from the chapter text so the lame epub-generator can work it's magic in an azure environment.
+          const cleanedBook = removeImages(chapterPrompt.html);
+          addChapter(chapter.label, cleanedBook, imageUrl, chapterIndex);
         } else {
           console.log("Not processing " + chapter.label);
           // addChapter(chapter.label, chapterPrompt.html, "", chapterIndex);
@@ -533,14 +543,9 @@ function App() {
                           speed="2.9"
                           color="#CDB8FF"
                         ></l-mirage>
-                        <div>
-                          <p>{loadingInfo}</p>
-                          {/* {estimatedWaitTime && (
-                            <p>Estimated wait time: {estimatedWaitTime}</p>
-                          )} */}
-                        </div>
                       </div>
                     ) : null}
+                    <p>{loadingInfo}</p>
                   </div>
                   <div id="hiddenDiv"></div>
                   <Link to="/about" className="about-button">
