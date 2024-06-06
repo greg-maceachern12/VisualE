@@ -17,7 +17,7 @@ function App() {
   const [epubFile, setEpubFile] = useState(null);
   const [fileError, setFileError] = useState("");
   const [isAccessGranted, setIsAccessGranted] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   // const [estimatedWaitTime, setEstimatedWaitTime] = useState("");
   const [loadingInfo, setLoadingInfo] = useState("");
 
