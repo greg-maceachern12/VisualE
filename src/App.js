@@ -16,7 +16,7 @@ mirage.register();
 function App() {
   const [epubFile, setEpubFile] = useState(null);
   const [fileError, setFileError] = useState("");
-  const [isAccessGranted, setIsAccessGranted] = useState(false);
+  const [isAccessGranted, setIsAccessGranted] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   // const [estimatedWaitTime, setEstimatedWaitTime] = useState("");
   const [loadingInfo, setLoadingInfo] = useState("");
@@ -171,7 +171,7 @@ function App() {
           let chapterCount = 0;
           for (let i = 0; i < toc.length; i++) {
             const chapter = toc[i];
-            // console.log(chapter)
+
             if (isNonStoryChapter(chapter.label)) continue;
             // Check if chapter has subitems
             if (chapter.subitems && chapter.subitems.length > 0) {
@@ -318,8 +318,11 @@ function App() {
           const cleanedBook = removeImages(chapterPrompt.html);
           addChapter(chapter.label, cleanedBook, imageUrl, chapterIndex);
         } else {
-          console.log("Not processing " + chapter.label);
-          // addChapter(chapter.label, chapterPrompt.html, "", chapterIndex);
+          // if the chapter is not a story, we will just add a default image. Removing the chapter is... messy
+          console.log("Non-story: " + chapter.label);
+          const cleanedBook = removeImages(chapterPrompt.html);
+          const nonImageUrl = "https://cdn.pixabay.com/photo/2017/02/12/21/29/false-2061132_640.png";
+          addChapter(chapter.label, cleanedBook, nonImageUrl, chapterIndex);
         }
 
         // setIsLoading(false);
