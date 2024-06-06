@@ -25,9 +25,9 @@ yarn-debug.log*
 yarn-error.log*
 
 *.epub
-/temp.js
-/exam.js
-/working_azure_code.js
+temp_book.js
+exam.js
+working_azure_code.js
 
 # Local Netlify folder
 .netlify
