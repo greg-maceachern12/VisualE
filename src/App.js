@@ -81,7 +81,6 @@ function App() {
     link.href = sampleBookUrl;
     link.download = "The_Crystal_Throne.epub";
     document.body.appendChild(link);
-    link.click();
     document.body.removeChild(link);
   };
 
@@ -447,15 +446,13 @@ function App() {
       <div className="App">
         <div className="navbar">
           <div className="logo-container">
-            <img
-              src='logo.png'
-              alt="Visuai Logo"
-              className="logo"
-            />
+            <img src="logo.png" alt="Visuai Logo" className="logo" />
             <h1>Visuai</h1>
           </div>
           <div className="nav-links">
-            <a href= "https://visuai.io/" target="_blank" className="nav-link">Home</a>
+            <a href="https://visuai.io/" target="_blank" rel="noopener noreferrer" className="nav-link">
+              Home
+            </a>
             <Link to="/about" className="nav-link">
               About
             </Link>
@@ -465,6 +462,12 @@ function App() {
             >
               Issues?
             </a>
+            <button
+              onClick={handleDownloadSampleBook}
+              className="nav-link"
+            >
+              <FontAwesomeIcon icon={faBook} /> Download an ePub{" "}
+            </button>
           </div>
         </div>
         <div className="gradient-bg">
@@ -503,36 +506,19 @@ function App() {
               element={
                 <>
                   <div className="header-container">
-                    <div className="title-container">
-                      <h1>Visuai</h1>
-                      <h2>Turn your epub into a picture book</h2>
+                      <h1>Let's Get Reading Again</h1>
                       {/* <h4>Free users limited to 2 chapters</h4> */}
-                    </div>
                     {isAccessGranted ? (
                       <div id="headings">
-                        {/* <h3>
-                          Visuai skips the intro chapters of the book (TOC,
-                          Dedications etc.)
-                        </h3> */}
-                        <h4>
-                          <FontAwesomeIcon icon={faBook} /> Need an ePub? Click{" "}
-                          <button
-                            onClick={handleDownloadSampleBook}
-                            className="download-link"
-                          >
-                            here
-                          </button>{" "}
-                          to download an AI generated one.
-                        </h4>
                         <div className="control-container">
                           <div className="input-container">
-                            <div className="file-input-wrapper">
+                            {/* <div className="file-input-wrapper"> */}
                               <input
                                 type="file"
                                 accept=".epub"
                                 onChange={handleFileChange}
                               />
-                            </div>
+                            {/* </div> */}
                             {fileError && (
                               <p className="error-message">{fileError}</p>
                             )}
