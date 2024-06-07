@@ -7,7 +7,7 @@ import AccessCode from "./AccessCode.js";
 import About from "./About";
 import { initGradientBackground } from "./gradBG/gradBG.js";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBook, faWandMagicSparkles } from "@fortawesome/free-solid-svg-icons";
+import { faWandMagicSparkles } from "@fortawesome/free-solid-svg-icons";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { mirage } from "ldrs";
 
@@ -16,7 +16,7 @@ mirage.register();
 function App() {
   const [epubFile, setEpubFile] = useState(null);
   const [fileError, setFileError] = useState("");
-  const [isAccessGranted, setIsAccessGranted] = useState(true);
+  const [isAccessGranted, setIsAccessGranted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   // const [estimatedWaitTime, setEstimatedWaitTime] = useState("");
   const [loadingInfo, setLoadingInfo] = useState("");
@@ -32,7 +32,7 @@ function App() {
     "https://visuaicalls.azurewebsites.net/api/downloadBook?code=stF_cd3PaNQ2JPydwM60_XBkpcmFNkLXswNf971-AnBoAzFu34Rf-w%3D%3D";
 
   const testMode = false;
-  const max_iterate = 0; // Set the desired maximum number of iterations
+  // const max_iterate = 2; // Set the desired maximum number of iterations
 
   const handleAccessGranted = () => {
     setIsAccessGranted(true);
@@ -116,7 +116,7 @@ function App() {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      setLoadingInfo("Book downloaded successfully.");
+      setLoadingInfo("Book downloaded successfully!");
     } catch (error) {
       console.error("Error downloading the book:", error);
       setLoadingInfo("Error downloading the book.");
@@ -166,29 +166,24 @@ function App() {
         /*-------Prod Code (no testing max) ---------*/
         // Loop through each chapter in the TOC
 
-        if (max_iterate === 0) {
-          let chapterCount = 0;
-          for (let i = 0; i < toc.length; i++) {
-            const chapter = toc[i];
+        let chapterCount = 0;
+        for (let i = 0; i < toc.length; i++) {
+          const chapter = toc[i];
 
-            if (isNonStoryChapter(chapter.label)) continue;
-            // Check if chapter has subitems
-            if (chapter.subitems && chapter.subitems.length > 0) {
-              // Iterate through each subitem in the chapter
-              for (const subitem of chapter.subitems) {
-                console.log(`Processing Chapter: ${chapterCount}`);
-                chapterBatch.push(subitem);
-                chapterCount++;
-              }
-            } else {
+          if (isNonStoryChapter(chapter.label)) continue;
+          // Check if chapter has subitems
+          if (chapter.subitems && chapter.subitems.length > 0) {
+            // Iterate through each subitem in the chapter
+            for (const subitem of chapter.subitems) {
               console.log(`Processing Chapter: ${chapterCount}`);
-              chapterBatch.push(chapter);
+              chapterBatch.push(subitem);
               chapterCount++;
             }
+          } else {
+            console.log(`Processing Chapter: ${chapterCount}`);
+            chapterBatch.push(chapter);
+            chapterCount++;
           }
-        } else {
-          /* -------- Testing Code -------- */
-          // ... (existing code for testing)
         }
 
         console.log("Starting chapter batch processing...");
@@ -250,6 +245,8 @@ function App() {
       setLoadingInfo(
         `Processed ${chaptersProcessed} out of ${chapterBatch.length} chapters`
       );
+
+      // Check if successful generations have reached the limit
 
       if (i + batchSize < chapterBatch.length) {
         console.log("Waiting for 1 minute before the next batch...");
@@ -424,6 +421,7 @@ function App() {
           action: "Action Complete",
           label: "Image successfully generated",
         });
+
         return data.imageUrl;
       } else {
         const url =
@@ -445,29 +443,34 @@ function App() {
     <Router>
       <div className="App">
         <div className="navbar">
-          <div className="logo-container">
-            <img src="logo.png" alt="Visuai Logo" className="logo" />
-            <h1>Visuai</h1>
-          </div>
+          <Link to="/" className="link-button">
+            <div className="logo-container">
+              <img src="logo.png" alt="Visuai Logo" className="logo" />
+              <h1>Visuai</h1>
+            </div>
+          </Link>
           <div className="nav-links">
-            <a href="https://visuai.io/" target="_blank" rel="noopener noreferrer" className="nav-link">
+            <a
+              href="https://visuai.io/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="nav-link"
+            >
               Home
             </a>
             <Link to="/about" className="nav-link">
               About
             </Link>
+            <button onClick={handleDownloadSampleBook} className="nav-link">
+              {" "}
+              Download an ePub
+            </button>
             <a
               className="nav-link"
               href={`mailto:gregmaceachern98@gmail.com?subject=Issues%20Generating%20Book&body=-%20This%20was%20broken%3A%0A-%20This%20is%20how%20it%20should%20have%20worked%3A%0A-%20Images%20or%20console%20errors%20(optional)%3A`}
             >
               Issues?
             </a>
-            <button
-              onClick={handleDownloadSampleBook}
-              className="nav-link"
-            >
-              <FontAwesomeIcon icon={faBook} /> Download an ePub{" "}
-            </button>
           </div>
         </div>
         <div className="gradient-bg">
@@ -506,18 +509,22 @@ function App() {
               element={
                 <>
                   <div className="header-container">
-                      <h1>Let's Get Reading Again</h1>
-                      {/* <h4>Free users limited to 2 chapters</h4> */}
+                    <h1>Turn Words in Worlds</h1>
                     {isAccessGranted ? (
                       <div id="headings">
+                        <button id="paynow">
+                          <FontAwesomeIcon icon={faWandMagicSparkles} />
+                          Go Premium
+                        </button>
+                        <h4>Free users limited to 2 chapters</h4>
                         <div className="control-container">
                           <div className="input-container">
                             {/* <div className="file-input-wrapper"> */}
-                              <input
-                                type="file"
-                                accept=".epub"
-                                onChange={handleFileChange}
-                              />
+                            <input
+                              type="file"
+                              accept=".epub"
+                              onChange={handleFileChange}
+                            />
                             {/* </div> */}
                             {fileError && (
                               <p className="error-message">{fileError}</p>

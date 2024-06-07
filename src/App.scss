@@ -2,14 +2,31 @@
 @import url("https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&family=Outfit:wght@100..900&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap");
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
-body {
-  font-family: "Bebas Neue", "Lora", "Roboto", sans-serif;
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+
+@font-face {
+  font-family: 'Teresa-bold';
+  src: url('../public/fonts/Teresa-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Teresa-semibold';
+  src: url('../public/fonts/Teresa-Semibold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+body, button{
+  font-family: "Teresa-semibold", "Bebas Neue", "Lora", "Roboto", sans-serif;
   color: #eaeaea;
   line-height: 1.5;
   margin: 0;
   padding: 0;
-  letter-spacing: 1.2px;
+  // background-color: black;
+  
 }
+
 a {
   color: #eaeaea;
 }
@@ -23,6 +40,7 @@ a {
   align-items: center;
   padding: 2rem;
   box-sizing: border-box;
+  background-color: #00000082;
 
   .gradient-bg {
     position: fixed;
@@ -179,12 +197,25 @@ input[type="file"]:focus::file-selector-button {
 }
 
 .header-container {
-  // background-color: #0000005c;
+  background-color: #0000005c;
   padding: 40px;
   border-radius: 10px;
 
   h1 {
     font-size: 5rem;
+    font-family: "Teresa-bold", "Bebas Neue", "Lora", "Roboto", sans-serif;
+  }
+
+  #paynow {
+    width: 18%;
+    height: 44px;
+    border-radius: 10px;
+    border-style: none;
+    background-color: #b596ff;
+    cursor: pointer;
+  }
+  #paynow:hover {
+    background-color: #4d8cf5;
   }
 }
 
@@ -238,12 +269,19 @@ input[type="file"]:focus::file-selector-button {
   margin-bottom: 25px;
   border-radius: 15px;
   background-color: #ffffff6b; /* Adjust the background color as needed */
+
+  .link-button {
+    text-decoration: none;
+  }
 }
 
 .logo-container {
   display: flex;
   align-items: center;
   height: 100%;
+  font-family: "Pacifico",cursive;
+  letter-spacing: 1.2px;
+  font-weight: 100;
 }
 
 .logo {
@@ -258,6 +296,14 @@ input[type="file"]:focus::file-selector-button {
   transform: translateX(-50%);
   display: flex;
   gap: 5rem; /* Space between links */
+
+  button {
+    text-decoration: none;
+    color: #333;
+    font-size: 16px;
+    background-color: transparent;
+    border: none;
+  }
 }
 
 .nav-link {

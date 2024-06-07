@@ -14,6 +14,9 @@ function About() {
   return (
     <div className="about-container">
       <h2>About Visuai</h2>
+      <Link to="/" className="link-button">
+          Back to App
+        </Link>
       <p className="aboutText">
         Welcome to Visuai - a project inspired by the captivating visual
         descriptions found in recent fiction books I've been immersed in, from
