@@ -312,7 +312,8 @@ function App() {
           let imageUrl = await generateImageFromPrompt(processedPrompt);
           if (imageUrl.startsWith("Error: ")) {
             console.error(imageUrl);
-            imageUrl = "https://cdn.pixabay.com/photo/2017/02/12/21/29/false-2061132_640.png";
+            imageUrl =
+              "https://cdn.pixabay.com/photo/2017/02/12/21/29/false-2061132_640.png";
           }
           // I need to remove the images from the chapter text so the lame epub-generator can work it's magic in an azure environment.
           const cleanedBook = removeImages(chapterPrompt.html);
@@ -321,7 +322,8 @@ function App() {
           // if the chapter is not a story, we will just add a default image. Removing the chapter is... messy
           console.log("Non-story: " + chapter.label);
           const cleanedBook = removeImages(chapterPrompt.html);
-          const nonImageUrl = "https://cdn.pixabay.com/photo/2017/02/12/21/29/false-2061132_640.png";
+          const nonImageUrl =
+            "https://cdn.pixabay.com/photo/2017/02/12/21/29/false-2061132_640.png";
           addChapter(chapter.label, cleanedBook, nonImageUrl, chapterIndex);
         }
 
@@ -443,6 +445,28 @@ function App() {
   return (
     <Router>
       <div className="App">
+        <div className="navbar">
+          <div className="logo-container">
+            <img
+              src='logo.png'
+              alt="Visuai Logo"
+              className="logo"
+            />
+            <h1>Visuai</h1>
+          </div>
+          <div className="nav-links">
+            <a href= "https://visuai.io/" target="_blank" className="nav-link">Home</a>
+            <Link to="/about" className="nav-link">
+              About
+            </Link>
+            <a
+              className="nav-link"
+              href={`mailto:gregmaceachern98@gmail.com?subject=Issues%20Generating%20Book&body=-%20This%20was%20broken%3A%0A-%20This%20is%20how%20it%20should%20have%20worked%3A%0A-%20Images%20or%20console%20errors%20(optional)%3A`}
+            >
+              Issues?
+            </a>
+          </div>
+        </div>
         <div className="gradient-bg">
           <svg xmlns="http://www.w3.org/2000/svg">
             <defs>
@@ -486,10 +510,10 @@ function App() {
                     </div>
                     {isAccessGranted ? (
                       <div id="headings">
-                        <h3>
+                        {/* <h3>
                           Visuai skips the intro chapters of the book (TOC,
                           Dedications etc.)
-                        </h3>
+                        </h3> */}
                         <h4>
                           <FontAwesomeIcon icon={faBook} /> Need an ePub? Click{" "}
                           <button
@@ -524,15 +548,6 @@ function App() {
                               </button>
                             </div>
                           )}
-                          <span className="link">
-                            Issues with generation? Click{" "}
-                            <a
-                              className="link"
-                              href={`mailto:gregmaceachern98@gmail.com?subject=Issues%20Generating%20Book&body=-%20This%20was%20broken%3A%0A-%20This%20is%20how%20it%20should%20have%20worked%3A%0A-%20Images%20or%20console%20errors%20(optional)%3A`}
-                            >
-                              here.
-                            </a>
-                          </span>
                         </div>
                       </div>
                     ) : (
@@ -551,9 +566,6 @@ function App() {
                     <p>{loadingInfo}</p>
                   </div>
                   <div id="hiddenDiv"></div>
-                  <Link to="/about" className="about-button">
-                    About
-                  </Link>
                 </>
               }
             />
