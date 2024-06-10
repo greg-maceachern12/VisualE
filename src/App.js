@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
 import epub from "epubjs";
 import ReactGA from "react-ga";
+
 import "./App.scss";
 import "./gradBG/gradBG.scss";
 import AccessCode from "./AccessCode.js";
 import About from "./About";
+
+import { loadStripe } from '@stripe/stripe-js';
 import { initGradientBackground } from "./gradBG/gradBG.js";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faWandMagicSparkles } from "@fortawesome/free-solid-svg-icons";
@@ -31,7 +34,9 @@ function App() {
   const downloadAPI =
     "https://visuaicalls.azurewebsites.net/api/downloadBook?code=stF_cd3PaNQ2JPydwM60_XBkpcmFNkLXswNf971-AnBoAzFu34Rf-w%3D%3D";
 
-  const testMode = false;
+    const payAPI = "https://visuaicalls.azurewebsites.net/api/stripe?code=iibdFb1TpBPK8jeOinKo7Bdw-YbioQ-FVLqTeBkbhK_xAzFuSC6dcA%3D%3D";
+
+  const testMode = true;
   // const max_iterate = 2; // Set the desired maximum number of iterations
 
   const handleAccessGranted = () => {
@@ -125,6 +130,33 @@ function App() {
     }
   };
 
+  const handlePayNow = async () => {
+    // const stripe = await loadStripe('pk_live_51PMDZsHMeAmZ2ytpfyzeNN9ExgQBqQml8ROGTFF7pyztT4pue5iEyZW5brLeinKWeEg7ToU0XPrY4so6TPTs92vE0027R3L6B0');
+   //test
+    const stripe = await loadStripe('pk_test_51PMDZsHMeAmZ2ytpSpivpSert86xt8kqmM6bWFbdOxem4vZVE74Lr2t4Frkbl5sfleouQjDvlsKdF4jEH37ii0in00xnLCRaB3');
+    try {
+      const response = await fetch(payAPI, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      const session = await response.json();
+      console.log(session);
+  
+      const result = await stripe.redirectToCheckout({
+        sessionId: session.sessionId,
+      });
+  
+      if (result.error) {
+        console.error(result.error.message);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
   //Main/root function - When user clicks "Parse and Generate".. aka starts the flow and iterates through all chapters
   const handleParseAndGenerateImage = async () => {
     ReactGA.event({
@@ -132,73 +164,63 @@ function App() {
       action: "Button Click",
       label: "Start Generation",
     });
+
     setIsLoading(true);
     setLoadingInfo("Processing EPUB file...");
+
     if (!epubFile) {
-      console.error("No EPUB file selected.");
       setLoadingInfo("No EPUB file selected. Please select a file.");
+      setIsLoading(false);
       return;
     }
 
-    console.log("Starting EPUB processing...");
+    try {
+      console.log("Starting EPUB processing...");
 
-    const reader = new FileReader();
-    reader.onload = async (event) => {
-      const epubBlob = new Blob([event.target.result], {
-        type: "application/epub+zip",
-      });
-      const epubReader = epub(epubBlob);
-      try {
-        const metadata = await epubReader.loaded.metadata;
-        generatedBook.title = metadata.title;
-        console.log(`Book title: ${generatedBook.title}`);
-      } catch (error) {
-        console.error("Error accessing metadata:", error);
-        setLoadingInfo("Error accessing metadata.");
-        setIsLoading(false);
-      }
-      try {
-        const nav = await epubReader.loaded.navigation;
-        const toc = nav.toc;
+      const epubReader = epub(epubFile);
 
-        const chapterBatch = [];
+      const metadata = await epubReader.loaded.metadata;
 
-        /*-------Prod Code (no testing max) ---------*/
-        // Loop through each chapter in the TOC
+      generatedBook.title = metadata.title;
+      generatedBook.author = metadata.creator;
 
-        let chapterCount = 0;
-        for (let i = 0; i < toc.length; i++) {
-          const chapter = toc[i];
+      console.log(`Book title: ${generatedBook.title}`);
 
-          if (isNonStoryChapter(chapter.label)) continue;
-          // Check if chapter has subitems
-          if (chapter.subitems && chapter.subitems.length > 0) {
-            // Iterate through each subitem in the chapter
-            for (const subitem of chapter.subitems) {
-              console.log(`Processing Chapter: ${chapterCount}`);
-              chapterBatch.push(subitem);
-              chapterCount++;
-            }
-          } else {
+      const nav = await epubReader.loaded.navigation;
+      const toc = nav.toc;
+
+      const chapterBatch = [];
+
+      let chapterCount = 0;
+      for (let i = 0; i < toc.length; i++) {
+        const chapter = toc[i];
+
+        if (isNonStoryChapter(chapter.label)) continue;
+
+        if (chapter.subitems && chapter.subitems.length > 0) {
+          for (const subitem of chapter.subitems) {
             console.log(`Processing Chapter: ${chapterCount}`);
-            chapterBatch.push(chapter);
+            chapterBatch.push(subitem);
             chapterCount++;
           }
+        } else {
+          console.log(`Processing Chapter: ${chapterCount}`);
+          chapterBatch.push(chapter);
+          chapterCount++;
         }
-
-        console.log("Starting chapter batch processing...");
-        await processChapterBatch(chapterBatch, epubReader);
-
-        handleDownloadBook();
-      } catch (error) {
-        console.error("Error while parsing EPUB:", error);
-        setLoadingInfo("Error while parsing EPUB.");
-        setIsLoading(false);
-      } finally {
-        console.log("Done processing book... queuing download");
       }
-    };
-    reader.readAsArrayBuffer(epubFile);
+
+      console.log("Starting chapter batch processing...");
+      await processChapterBatch(chapterBatch, epubReader);
+
+      handleDownloadBook();
+    } catch (error) {
+      console.error("Error while parsing EPUB:", error);
+      setLoadingInfo("Error while parsing EPUB.");
+    } finally {
+      setIsLoading(false);
+      console.log("Done processing book... queuing download");
+    }
   };
 
   const processChapterBatch = async (chapterBatch, epubReader) => {
@@ -512,7 +534,7 @@ function App() {
                     <h1>Turn Words in Worlds</h1>
                     {isAccessGranted ? (
                       <div id="headings">
-                        <button id="paynow">
+                        <button id="paynow" onClick={handlePayNow}>
                           <FontAwesomeIcon icon={faWandMagicSparkles} />
                           Go Premium
                         </button>
