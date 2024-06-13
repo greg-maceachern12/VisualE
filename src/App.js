@@ -7,7 +7,7 @@ import AccessCode from "./AccessCode.js";
 import About from "./About";
 import { initGradientBackground } from "./gradBG/gradBG.js";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBook, faWandMagicSparkles } from "@fortawesome/free-solid-svg-icons";
+import { faWandMagicSparkles } from "@fortawesome/free-solid-svg-icons";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { Skeleton } from "@mui/material";
 
@@ -23,7 +23,7 @@ function App() {
   const [epubReader, setEpubReader] = useState(null);
 
   const [fileError, setFileError] = useState("");
-  const [isAccessGranted, setIsAccessGranted] = useState(false);
+  const [isAccessGranted, setIsAccessGranted] = useState(true);
   const [leftBorderColor, setLeftBorderColor] = useState("");
   const [topBorderColor, setTopBorderColor] = useState("");
   const [rightBorderColor, setRightBorderColor] = useState("");
@@ -371,6 +371,32 @@ function App() {
   return (
     <Router>
       <div className="App">
+        <div className="navbar">
+          <Link to="/" className="link-button">
+            <div className="logo-container">
+              <img src="logo.png" alt="Visuai Logo" className="logo" />
+              <h1>Visuai</h1>
+            </div>
+          </Link>
+          <div className="nav-links">
+            <Link to="/" className="nav-link">
+              Home
+            </Link>
+            <Link to="/about" className="nav-link">
+              About
+            </Link>
+            <button onClick={handleDownloadSampleBook} className="nav-link">
+              {" "}
+              Download an ePub
+            </button>
+            <a
+              className="nav-link"
+              href={`mailto:gregmaceachern98@gmail.com?subject=Issues%20Generating%20Book&body=-%20This%20was%20broken%3A%0A-%20This%20is%20how%20it%20should%20have%20worked%3A%0A-%20Images%20or%20console%20errors%20(optional)%3A`}
+            >
+              Issues?
+            </a>
+          </div>
+        </div>
         <div className="gradient-bg">
           <svg xmlns="http://www.w3.org/2000/svg">
             <defs>
@@ -408,24 +434,13 @@ function App() {
                 <>
                   <div className="header-container">
                     <div className="title-container">
-                      <h1>Visuai - ePub to Image (alpha)</h1>
+                      <h1>Turn Words Into Worlds</h1>
                     </div>
                     {isAccessGranted ? (
                       <div id="headings">
-                        {/* <h3>
-                          Visuai automatically skips the intro chapters of the
-                          book (TOC, Dedications etc.)
-                        </h3> */}
-                        <h4>
-                          <FontAwesomeIcon icon={faBook} /> No ePub? Click{" "}
-                          <button
-                            onClick={handleDownloadSampleBook}
-                            className="download-link"
-                          >
-                            here
-                          </button>{" "}
-                          to download an AI generated one.
-                        </h4>
+                        <h3>
+                          Upload an ePub file to get started
+                        </h3>
                         <div className="control-container">
                           <div className="input-container">
                             <div className="file-input-wrapper">
@@ -452,14 +467,6 @@ function App() {
                               </button>
                             </div>
                           )}
-                          <span className='link'>
-                            Issues with generation? Click{" "}
-                            <a
-                             className='link' href={`mailto:gregmaceachern98@gmail.com?subject=Issues%20generating%20${bookName}&body=-%20This%20was%20broken%3A%0A-%20This%20is%20how%20it%20should%20have%20worked%3A%0A-%20Images%20or%20console%20errors%20(optional)%3A`}
-                            >
-                              here.
-                            </a>
-                          </span>
                         </div>
                       </div>
                     ) : (
@@ -541,12 +548,6 @@ function App() {
                     </div>
                   )}
                   <div id="hiddenDiv"></div>
-                  <Link to="/about" className="about-button">
-                      About
-                    </Link>
-                  <a className="feedback" href="mailto:gregmaceachern98@gmail.com?subject=Feedback%20for%20Visuai">
-                    Feedback
-                  </a>
                 </>
               }
             />
