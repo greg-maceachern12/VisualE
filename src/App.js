@@ -581,7 +581,7 @@ function App() {
                                   handleParseAndGenerateImage();
                                 }}
                               >
-                                Free Trial
+                                Visualize (Free)
                               </button>
                               <button
                                 id="paynow"
