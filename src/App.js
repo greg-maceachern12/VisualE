@@ -463,7 +463,7 @@ function App() {
                                 onClick={handleParseAndGenerateImage}
                               >
                                 <FontAwesomeIcon icon={faWandMagicSparkles} />
-                                Generate Image
+                                Visualize
                               </button>
                             </div>
                           )}
