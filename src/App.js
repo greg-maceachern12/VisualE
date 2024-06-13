@@ -4,15 +4,16 @@ import ReactGA from "react-ga";
 
 import "./App.scss";
 import "./gradBG/gradBG.scss";
-import AccessCode from "./AccessCode.js";
-import About from "./About";
-
-import { loadStripe } from '@stripe/stripe-js';
+import AccessCode from "./components/AccessCode.js";
+import About from "./components/About.js";
+import AuthPage from "./components/AuthPage.js";
+import { loadStripe } from "@stripe/stripe-js";
 import { initGradientBackground } from "./gradBG/gradBG.js";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faWandMagicSparkles } from "@fortawesome/free-solid-svg-icons";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { mirage } from "ldrs";
+import { supabase } from "./supabaseClient";
 
 mirage.register();
 
@@ -21,8 +22,13 @@ function App() {
   const [fileError, setFileError] = useState("");
   const [isAccessGranted, setIsAccessGranted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  // const [estimatedWaitTime, setEstimatedWaitTime] = useState("");
   const [loadingInfo, setLoadingInfo] = useState("");
+  // const [purchaseMessage, setPurchaseMessage] = useState("");
+  const [user, setUser] = useState(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  // const [isTrialMode, setIsTrialMode] = useState(false);
+  const testMode = false;
 
   const chatAPI =
     "https://visuaicalls.azurewebsites.net/api/chatgpt?code=QDubsyOhk_c8jC1RAGPBHNydCCNgpgfcSscjsSqVRdw_AzFuxUgufQ%3D%3D";
@@ -34,10 +40,8 @@ function App() {
   const downloadAPI =
     "https://visuaicalls.azurewebsites.net/api/downloadBook?code=stF_cd3PaNQ2JPydwM60_XBkpcmFNkLXswNf971-AnBoAzFu34Rf-w%3D%3D";
 
-    const payAPI = "https://visuaicalls.azurewebsites.net/api/stripe?code=iibdFb1TpBPK8jeOinKo7Bdw-YbioQ-FVLqTeBkbhK_xAzFuSC6dcA%3D%3D";
-
-  const testMode = true;
-  // const max_iterate = 2; // Set the desired maximum number of iterations
+  const payAPI =
+    "https://visuaicalls.azurewebsites.net/api/stripe?code=iibdFb1TpBPK8jeOinKo7Bdw-YbioQ-FVLqTeBkbhK_xAzFuSC6dcA%3D%3D";
 
   const handleAccessGranted = () => {
     setIsAccessGranted(true);
@@ -52,12 +56,30 @@ function App() {
   };
 
   useEffect(() => {
+    const { subscription } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        const currentUser = session?.user;
+        setUser(currentUser ?? null);
+      }
+    );
     ReactGA.initialize("G-74BZMF8F67");
     ReactGA.pageview(window.location.pathname + window.location.search);
     const cleanupGradientBackground = initGradientBackground();
-    return () => cleanupGradientBackground();
+
+    return () => {
+      subscription?.unsubscribe();
+      cleanupGradientBackground();
+    };
   }, []);
 
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    setIsDropdownOpen(false);
+  };
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -132,28 +154,30 @@ function App() {
 
   const handlePayNow = async () => {
     // const stripe = await loadStripe('pk_live_51PMDZsHMeAmZ2ytpfyzeNN9ExgQBqQml8ROGTFF7pyztT4pue5iEyZW5brLeinKWeEg7ToU0XPrY4so6TPTs92vE0027R3L6B0');
-   //test
-    const stripe = await loadStripe('pk_test_51PMDZsHMeAmZ2ytpSpivpSert86xt8kqmM6bWFbdOxem4vZVE74Lr2t4Frkbl5sfleouQjDvlsKdF4jEH37ii0in00xnLCRaB3');
+    //test
+    const stripe = await loadStripe(
+      "pk_test_51PMDZsHMeAmZ2ytpSpivpSert86xt8kqmM6bWFbdOxem4vZVE74Lr2t4Frkbl5sfleouQjDvlsKdF4jEH37ii0in00xnLCRaB3"
+    );
     try {
       const response = await fetch(payAPI, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       });
-  
+
       const session = await response.json();
       console.log(session);
-  
+
       const result = await stripe.redirectToCheckout({
         sessionId: session.sessionId,
       });
-  
+
       if (result.error) {
         console.error(result.error.message);
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error("Error:", error);
     }
   };
 
@@ -225,37 +249,15 @@ function App() {
 
   const processChapterBatch = async (chapterBatch, epubReader) => {
     const batchSize = 5; // Maximum number of concurrent API calls
-    const delayMs = testMode ? 2000 : 62000; // 1 minute delay between batches (in milliseconds) or 200 if testing
-    const chapterProcessingTime = 15000; // Assume each chapter takes 15 seconds to process
-
-    const msToHumanReadableTime = (ms) => {
-      const hours = Math.floor(ms / 3600000);
-      const minutes = Math.floor((ms % 3600000) / 60000);
-      const seconds = Math.floor(((ms % 3600000) % 60000) / 1000);
-
-      const hoursString = hours > 0 ? `${hours} hour(s)` : "";
-      const minutesString = minutes > 0 ? `${minutes} minute(s)` : "";
-      const secondsString = seconds > 0 ? `${seconds} second(s)` : "";
-
-      return `${hoursString} ${minutesString} ${secondsString}`.trim();
-    };
+    const delayMs = testMode ? 2000 : 63000; // 1 minute delay between batches (in milliseconds) or 200 if testing
 
     console.log(`Total chapters to process: ${chapterBatch.length}`);
-
-    const totalChapterProcessingTime =
-      chapterBatch.length * chapterProcessingTime;
-    const batchCount = Math.ceil(chapterBatch.length / batchSize);
-    const totalTime = totalChapterProcessingTime + (batchCount - 1) * delayMs;
-    const estimatedTimeRemaining = msToHumanReadableTime(totalTime);
-    // setEstimatedWaitTime(estimatedTimeRemaining);
-
-    console.log(`This will take approximately ${estimatedTimeRemaining}`);
 
     let chaptersProcessed = 0;
 
     for (let i = 0; i < chapterBatch.length; i += batchSize) {
       const batch = chapterBatch.slice(i, i + batchSize);
-      console.log(`Processing batch ${i / batchSize + 1} of ${batchCount}`);
+      console.log(`Processing batch ${i / batchSize + 1} of ${chapterBatch.length}`);
 
       const promises = batch.map((chapter, index) =>
         processChapter(chapter, index + i, epubReader)
@@ -308,6 +310,7 @@ function App() {
     };
     // console.log('index: ' + chapterIndex);
   };
+
   const removeImages = (chapterText) => {
     const regex = /<img[^>]+>/g;
     const result = chapterText.replace(regex, "");
@@ -332,6 +335,9 @@ function App() {
             console.error(imageUrl);
             imageUrl =
               "https://cdn.pixabay.com/photo/2017/02/12/21/29/false-2061132_640.png";
+            resolve(false);
+          } else {
+            resolve(true);
           }
           // I need to remove the images from the chapter text so the lame epub-generator can work it's magic in an azure environment.
           const cleanedBook = removeImages(chapterPrompt.html);
@@ -343,10 +349,8 @@ function App() {
           const nonImageUrl =
             "https://cdn.pixabay.com/photo/2017/02/12/21/29/false-2061132_640.png";
           addChapter(chapter.label, cleanedBook, nonImageUrl, chapterIndex);
+          resolve(false);
         }
-
-        // setIsLoading(false);
-        resolve(); // Resolve the promise when chapter processing is complete
       } catch (error) {
         reject(error); // Reject the promise if an error occurs
       }
@@ -377,6 +381,7 @@ function App() {
           body: JSON.stringify({ prompt }),
         });
         const data = await response.json();
+        // console.log("Prompt: " + prompt)
         console.log("Segment: " + data.response);
         return data.response;
       } else {
@@ -425,6 +430,8 @@ function App() {
           body: JSON.stringify({
             prompt,
             size: "1792x1024",
+            // size: "1024x1024",
+            quality: "hd",
             title: generatedBook.title,
           }),
         });
@@ -443,7 +450,6 @@ function App() {
           action: "Action Complete",
           label: "Image successfully generated",
         });
-
         return data.imageUrl;
       } else {
         const url =
@@ -472,27 +478,44 @@ function App() {
             </div>
           </Link>
           <div className="nav-links">
-            <a
-              href="https://visuai.io/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="nav-link"
-            >
+          <Link to="/" className="nav-link">
               Home
-            </a>
+            </Link>
             <Link to="/about" className="nav-link">
               About
             </Link>
             <button onClick={handleDownloadSampleBook} className="nav-link">
-              {" "}
               Download an ePub
             </button>
             <a
               className="nav-link"
-              href={`mailto:gregmaceachern98@gmail.com?subject=Issues%20Generating%20Book&body=-%20This%20was%20broken%3A%0A-%20This%20is%20how%20it%20should%20have%20worked%3A%0A-%20Images%20or%20console%20errors%20(optional)%3A`}
+              href={`mailto:gregmaceachern98@gmail.com?subject=Visuai%20Issues&body=-%20This%20was%20broken%3A%0A-%20This%20is%20how%20it%20should%20have%20worked%3A%0A-%20Images%20or%20console%20errors%20(optional)%3A`}
             >
               Issues?
             </a>
+            <div className="nav-link dropdown">
+              <button className="dropdown-toggle" onClick={toggleDropdown}>
+                {user ? user.user_metadata.name : "Sign In"}
+              </button>
+              {isDropdownOpen && (
+                <div className="dropdown-menu">
+                  {user ? (
+                    <>
+                      <Link to="/account" className="dropdown-item">
+                        Account
+                      </Link>
+                      <button className="dropdown-item" onClick={handleSignOut}>
+                        Sign Out
+                      </button>
+                    </>
+                  ) : (
+                    <Link to="/auth" className="dropdown-item">
+                      Sign In
+                    </Link>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
         <div className="gradient-bg">
@@ -534,11 +557,7 @@ function App() {
                     <h1>Turn Words in Worlds</h1>
                     {isAccessGranted ? (
                       <div id="headings">
-                        <button id="paynow" onClick={handlePayNow}>
-                          <FontAwesomeIcon icon={faWandMagicSparkles} />
-                          Go Premium
-                        </button>
-                        <h4>Free users limited to 2 chapters</h4>
+                        <h4>Free users limited to 5 chapters</h4>
                         <div className="control-container">
                           <div className="input-container">
                             {/* <div className="file-input-wrapper"> */}
@@ -556,10 +575,21 @@ function App() {
                             <div className="button-container">
                               <button
                                 id="parse"
-                                onClick={handleParseAndGenerateImage}
+                                className="go-button"
+                                onClick={() => {
+                                  // setIsTrialMode(true);
+                                  handleParseAndGenerateImage();
+                                }}
+                              >
+                                Free Trial
+                              </button>
+                              <button
+                                id="paynow"
+                                onClick={handlePayNow}
+                                className="go-button"
                               >
                                 <FontAwesomeIcon icon={faWandMagicSparkles} />
-                                Parse and Generate Image
+                                Full Book (Pay Now)
                               </button>
                             </div>
                           )}
@@ -584,6 +614,7 @@ function App() {
                 </>
               }
             />
+            <Route path="/auth" element={<AuthPage />} />
           </Routes>
         </div>
       </div>
