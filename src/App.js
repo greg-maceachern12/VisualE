@@ -7,7 +7,6 @@ import "./gradBG/gradBG.scss";
 import AccessCode from "./AccessCode.js";
 import About from "./About";
 
-import { loadStripe } from '@stripe/stripe-js';
 import { initGradientBackground } from "./gradBG/gradBG.js";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faWandMagicSparkles } from "@fortawesome/free-solid-svg-icons";
@@ -34,9 +33,9 @@ function App() {
   const downloadAPI =
     "https://visuaicalls.azurewebsites.net/api/downloadBook?code=stF_cd3PaNQ2JPydwM60_XBkpcmFNkLXswNf971-AnBoAzFu34Rf-w%3D%3D";
 
-    const payAPI = "https://visuaicalls.azurewebsites.net/api/stripe?code=iibdFb1TpBPK8jeOinKo7Bdw-YbioQ-FVLqTeBkbhK_xAzFuSC6dcA%3D%3D";
+    // const payAPI = "https://visuaicalls.azurewebsites.net/api/stripe?code=iibdFb1TpBPK8jeOinKo7Bdw-YbioQ-FVLqTeBkbhK_xAzFuSC6dcA%3D%3D";
 
-  const testMode = true;
+  const testMode = false;
   // const max_iterate = 2; // Set the desired maximum number of iterations
 
   const handleAccessGranted = () => {
@@ -127,33 +126,6 @@ function App() {
       setLoadingInfo("Error downloading the book.");
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handlePayNow = async () => {
-    // const stripe = await loadStripe('pk_live_51PMDZsHMeAmZ2ytpfyzeNN9ExgQBqQml8ROGTFF7pyztT4pue5iEyZW5brLeinKWeEg7ToU0XPrY4so6TPTs92vE0027R3L6B0');
-   //test
-    const stripe = await loadStripe('pk_test_51PMDZsHMeAmZ2ytpSpivpSert86xt8kqmM6bWFbdOxem4vZVE74Lr2t4Frkbl5sfleouQjDvlsKdF4jEH37ii0in00xnLCRaB3');
-    try {
-      const response = await fetch(payAPI, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-  
-      const session = await response.json();
-      console.log(session);
-  
-      const result = await stripe.redirectToCheckout({
-        sessionId: session.sessionId,
-      });
-  
-      if (result.error) {
-        console.error(result.error.message);
-      }
-    } catch (error) {
-      console.error('Error:', error);
     }
   };
 
@@ -534,11 +506,7 @@ function App() {
                     <h1>Turn Words in Worlds</h1>
                     {isAccessGranted ? (
                       <div id="headings">
-                        <button id="paynow" onClick={handlePayNow}>
-                          <FontAwesomeIcon icon={faWandMagicSparkles} />
-                          Go Premium
-                        </button>
-                        <h4>Free users limited to 2 chapters</h4>
+                        <h4>Free for a limited time</h4>
                         <div className="control-container">
                           <div className="input-container">
                             {/* <div className="file-input-wrapper"> */}
