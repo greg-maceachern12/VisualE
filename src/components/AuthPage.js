@@ -32,6 +32,7 @@ function AuthPage() {
         }
       } else {
         console.log('Sign-in successful. Redirecting to home page.');
+        console.log('User data:', data);
         navigate('/');
       }
     } catch (error) {
@@ -77,6 +78,7 @@ function AuthPage() {
         setError('An error occurred during OAuth sign-in. Please try again.');
       } else {
         console.log('OAuth sign-in successful. Redirecting to home page.');
+        console.log(user);
         // navigate('/');
       }
     } catch (error) {
