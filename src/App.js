@@ -127,7 +127,7 @@ function App() {
 
           const metadata = await epubReader.loaded.metadata;
           setBookName(metadata.title);
-          console.log(toc);
+          // console.log(toc);
           resolve(toc);
         } catch (error) {
           console.error("Error parsing EPUB file:", error);
