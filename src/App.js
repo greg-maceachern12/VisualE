@@ -20,7 +20,7 @@ mirage.register();
 function App() {
   const [epubFile, setEpubFile] = useState(null);
   const [fileError, setFileError] = useState("");
-  const [isAccessGranted, setIsAccessGranted] = useState(false);
+  const [isAccessGranted, setIsAccessGranted] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingInfo, setLoadingInfo] = useState("");
   // const [purchaseMessage, setPurchaseMessage] = useState("");
@@ -154,6 +154,7 @@ function App() {
 
   const handlePayNow = async () => {
     // const stripe = await loadStripe('pk_live_51PMDZsHMeAmZ2ytpfyzeNN9ExgQBqQml8ROGTFF7pyztT4pue5iEyZW5brLeinKWeEg7ToU0XPrY4so6TPTs92vE0027R3L6B0');
+    
     //test
     const stripe = await loadStripe(
       "pk_test_51PMDZsHMeAmZ2ytpSpivpSert86xt8kqmM6bWFbdOxem4vZVE74Lr2t4Frkbl5sfleouQjDvlsKdF4jEH37ii0in00xnLCRaB3"
@@ -164,17 +165,23 @@ function App() {
         headers: {
           "Content-Type": "application/json",
         },
+        body: JSON.stringify({ userId: user.id }),
       });
-
-      const session = await response.json();
-      console.log(session);
-
-      const result = await stripe.redirectToCheckout({
-        sessionId: session.sessionId,
-      });
-
-      if (result.error) {
-        console.error(result.error.message);
+  
+      if (response.ok) {
+        const data = await response.json();
+        const sessionId = data.sessionId;
+        console.log(data)
+  
+        const result = await stripe.redirectToCheckout({
+          sessionId: sessionId,
+        });
+  
+        if (result.error) {
+          console.error(result.error.message);
+        }
+      } else {
+        console.error("Error creating Stripe checkout session:", response.status);
       }
     } catch (error) {
       console.error("Error:", error);
