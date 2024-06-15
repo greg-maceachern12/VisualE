@@ -33,7 +33,7 @@ function App() {
   const downloadAPI =
     "https://visuaicalls.azurewebsites.net/api/downloadBook?code=stF_cd3PaNQ2JPydwM60_XBkpcmFNkLXswNf971-AnBoAzFu34Rf-w%3D%3D";
 
-    // const payAPI = "https://visuaicalls.azurewebsites.net/api/stripe?code=iibdFb1TpBPK8jeOinKo7Bdw-YbioQ-FVLqTeBkbhK_xAzFuSC6dcA%3D%3D";
+  // const payAPI = "https://visuaicalls.azurewebsites.net/api/stripe?code=iibdFb1TpBPK8jeOinKo7Bdw-YbioQ-FVLqTeBkbhK_xAzFuSC6dcA%3D%3D";
 
   const testMode = false;
   // const max_iterate = 2; // Set the desired maximum number of iterations
@@ -217,7 +217,9 @@ function App() {
       await Promise.all(promises);
       console.log(`Batch ${i / batchSize + 1} processed successfully`);
       chaptersProcessed += batch.length;
-      const processedPercentage = Math.round(chaptersProcessed / chapterBatch.length * 100);
+      const processedPercentage = Math.round(
+        (chaptersProcessed / chapterBatch.length) * 100
+      );
       setLoadingInfo(
         `Processed ${processedPercentage}% of chapters... Please wait...`
       );
@@ -426,7 +428,7 @@ function App() {
             </div>
           </Link>
           <div className="nav-links">
-          <Link to="/" className="nav-link">
+            <Link to="/" className="nav-link">
               Home
             </Link>
             <Link to="/about" className="nav-link">
@@ -440,6 +442,9 @@ function App() {
               href={`mailto:greg@visuai.io?subject=Issues%20Generating%20Book&body=-%20This%20was%20broken%3A%0A-%20This%20is%20how%20it%20should%20have%20worked%3A%0A-%20Images%20or%20console%20errors%20(optional)%3A`}
             >
               Issues?
+            </a>
+            <a className='nav-link' href="https://app.visuai.io" target="_blank" rel="noreferrer">
+              Try V1
             </a>
           </div>
         </div>
@@ -482,7 +487,10 @@ function App() {
                     <h1>Turn Words in Worlds</h1>
                     {isAccessGranted ? (
                       <div id="headings">
-                        <h4>Add illustations to your full ePub - Free for a limited time</h4>
+                        <h4>
+                          Add illustations to your full ePub - Free for a
+                          limited time
+                        </h4>
                         <div className="control-container">
                           <div className="input-container">
                             {/* <div className="file-input-wrapper"> */}
