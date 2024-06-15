@@ -102,12 +102,12 @@ function App() {
       action: "Button Click",
       label: "Download Sample Book",
     });
-
     const sampleBookUrl = `${process.env.PUBLIC_URL}/The_Crystal_Throne.epub`;
     const link = document.createElement("a");
     link.href = sampleBookUrl;
     link.download = "The_Crystal_Throne.epub";
     document.body.appendChild(link);
+    link.click();
     document.body.removeChild(link);
   };
 
