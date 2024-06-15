@@ -1,30 +1,30 @@
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&family=Outfit:wght@100..900&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap");
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Pacifico&display=swap");
 
 @font-face {
-  font-family: 'Teresa-bold';
-  src: url('../public/fonts/Teresa-Bold.ttf') format('truetype');
+  font-family: "Teresa-bold";
+  src: url("../public/fonts/Teresa-Bold.ttf") format("truetype");
   font-weight: bold;
   font-style: normal;
 }
 @font-face {
-  font-family: 'Teresa-semibold';
-  src: url('../public/fonts/Teresa-Semibold.ttf') format('truetype');
+  font-family: "Teresa-semibold";
+  src: url("../public/fonts/Teresa-Semibold.ttf") format("truetype");
   font-weight: bold;
   font-style: normal;
 }
 
-body, button{
+body,
+button {
   font-family: "Teresa-semibold", "Bebas Neue", "Lora", "Roboto", sans-serif;
   color: #eaeaea;
   line-height: 1.5;
   margin: 0;
   padding: 0;
   // background-color: black;
-  
 }
 
 a {
@@ -146,7 +146,6 @@ input[type="file"]:focus::file-selector-button {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-
 .button-container {
   display: flex;
   justify-content: space-between;
@@ -177,7 +176,6 @@ input[type="file"]:focus::file-selector-button {
 .button-container button:last-child {
   margin-right: 0;
 }
-
 
 #parse {
   background: #ffa4e8;
@@ -239,15 +237,22 @@ input[type="file"]:focus::file-selector-button {
   color: #191919;
   font-size: 12px;
 }
+.about-container {
 
-.aboutText {
-  background-color: #00000080;
-  border-radius: 10px;
-  padding: 40px;
-  text-align: left;
-}
-.link-button {
-  color: white;
+  h2 {
+    font-size: 2.5rem;
+  }
+
+  .aboutText {
+    background-color: #00000080;
+    border-radius: 10px;
+    padding: 40px;
+    text-align: left;
+  }
+
+  .link-button {
+    color: white;
+  }
 }
 .download-link {
   background: none;
@@ -279,7 +284,7 @@ input[type="file"]:focus::file-selector-button {
   display: flex;
   align-items: center;
   height: 100%;
-  font-family: "Pacifico",cursive;
+  font-family: "Pacifico", cursive;
   letter-spacing: 1.2px;
   font-weight: 100;
 }
@@ -310,12 +315,12 @@ input[type="file"]:focus::file-selector-button {
   text-decoration: none;
   color: #333; /* Adjust the color as needed */
   font-size: 16px;
+  cursor: pointer;
 }
 
 .nav-link:hover {
   text-decoration: underline;
 }
-
 
 @keyframes gradientBackground {
   0% {

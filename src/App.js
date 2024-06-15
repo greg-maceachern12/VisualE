@@ -197,31 +197,11 @@ function App() {
 
   const processChapterBatch = async (chapterBatch, epubReader) => {
     const batchSize = 5; // Maximum number of concurrent API calls
-    const delayMs = testMode ? 2000 : 62000; // 1 minute delay between batches (in milliseconds) or 200 if testing
-    const chapterProcessingTime = 15000; // Assume each chapter takes 15 seconds to process
-
-    const msToHumanReadableTime = (ms) => {
-      const hours = Math.floor(ms / 3600000);
-      const minutes = Math.floor((ms % 3600000) / 60000);
-      const seconds = Math.floor(((ms % 3600000) % 60000) / 1000);
-
-      const hoursString = hours > 0 ? `${hours} hour(s)` : "";
-      const minutesString = minutes > 0 ? `${minutes} minute(s)` : "";
-      const secondsString = seconds > 0 ? `${seconds} second(s)` : "";
-
-      return `${hoursString} ${minutesString} ${secondsString}`.trim();
-    };
+    const delayMs = testMode ? 2000 : 62000; // 1 minute delay between batches (in milliseconds) or 2000 if testing
 
     console.log(`Total chapters to process: ${chapterBatch.length}`);
 
-    const totalChapterProcessingTime =
-      chapterBatch.length * chapterProcessingTime;
     const batchCount = Math.ceil(chapterBatch.length / batchSize);
-    const totalTime = totalChapterProcessingTime + (batchCount - 1) * delayMs;
-    const estimatedTimeRemaining = msToHumanReadableTime(totalTime);
-    // setEstimatedWaitTime(estimatedTimeRemaining);
-
-    console.log(`This will take approximately ${estimatedTimeRemaining}`);
 
     let chaptersProcessed = 0;
 
@@ -236,8 +216,9 @@ function App() {
       await Promise.all(promises);
       console.log(`Batch ${i / batchSize + 1} processed successfully`);
       chaptersProcessed += batch.length;
+      const processedPercentage = Math.round(chaptersProcessed / chapterBatch.length * 100);
       setLoadingInfo(
-        `Processed ${chaptersProcessed} out of ${chapterBatch.length} chapters`
+        `Processed ${processedPercentage}% of chapters... Please wait...`
       );
 
       // Check if successful generations have reached the limit
@@ -444,19 +425,13 @@ function App() {
             </div>
           </Link>
           <div className="nav-links">
-            <a
-              href="https://visuai.io/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="nav-link"
-            >
+          <Link to="/" className="nav-link">
               Home
-            </a>
+            </Link>
             <Link to="/about" className="nav-link">
               About
             </Link>
             <button onClick={handleDownloadSampleBook} className="nav-link">
-              {" "}
               Download an ePub
             </button>
             <a

@@ -18,49 +18,45 @@ function About() {
           Back to App
         </Link>
       <p className="aboutText">
-        Welcome to Visuai - a project inspired by the captivating visual
-        descriptions found in recent fiction books I've been immersed in, from
-        the likes of Dune, the Way of Kings and Eragon (again).
-        <br></br>
+        Welcome to Visuai - a project inspired by the rich visual
+        descriptions found in recent fictional books I've been immersed in, from
+        the likes of the Dune series, the Way of Kings and Eragon.
+        <br></br><br></br>
         <i>
-          I discovered that authors invest significant effort in crafting rich
-          visual details for many scenes, and my mind struggled to fully
-          visualize them.
+          While reading these books, I discovered that authors significantly invest in crafting rich
+          visual details for many of their scenes, environments, characters etc. My brain (and many others) struggles to fully
+          comprehend and visualize them. I often found myself searching Google for fan renditions of
+          the characters to aid my imagination rather than lean on the descriptions provided by the author.
         </i>
-        See the <a href="https://landvisuai.netlify.app/">landing page</a> for
-        examples. I often found myself searching online for fan renditions of
-        the characters to aid my imagination.
         <br></br>
+         See the <a href="https://landvisuai.netlify.app/" target="_blank" rel="noreferrer">landing page</a> for
+        examples of such scenes.
+        <br></br><br></br>
         It became apparent that the authors were essentially providing
         well-written prompts to generate this content, encompassing scenes,
         characters, environments, and more, for the reader. What was missing was
-        an interface to seamlessly connect these elements together.
+        an interface to connect these elements together.
         <br></br>
         <br></br>
-        Thus, Visuai was born!
+        Hence, this app.
         <br></br>
         <br></br>
-        IMO, the ideal user experience would be a Kindle extension directly
-        integrated into the product, automatically generating visuals for the
-        user or based on highlighted content. Until Amazon opens up Kindle
-        extensions, Visuai will operate as a self-serve platform.
-        <br></br>
-        <b>The longer-term vision for this app is to enable users to:</b>
-        <ol>
-          <li>Upload their epub files</li>
-          <li>Have the app generate and cache images for each chapter</li>
-          <li>Integrate the images inline with the text</li>
-        </ol>
+        IMO, the best user experience would be a Kindle/iBooks extension directly
+        integrated into the reading experience, automatically generating visuals for the
+        user or based on highlighted content. Until Amazon or Apple opens up an
+        extensions marketplace, Visuai will operate as a self-serve platform.
+        <br></br><br></br>
         For now, users can browse chapter by chapter and/or select a specific
         chapter <i>(coming soon)</i> to explore a visual representation of that
-        portion of the book.
-        <br></br>
+        portion of the book. In the <a href='pro.visuai.app' target="_blank" rel="noreferrer">pro version</a>, you can upload a whole epub and Visuai will generate visuals for the entire book,
+        adding them to the beginning of each chapter.
+        <br></br><br></br>
         There are numerous improvements planned for Visuai, including:
         <ol>
           <li>Move to Groq for faster inference on parts of the generation.</li>
           <li>
             Migrate to Midjourney for consistent characters in the generation
-            (massively important!)
+            (massively important!) once the API is opened up.
           </li>
           <li>Utilization of control nets for enhanced image generation</li>
           <li>
