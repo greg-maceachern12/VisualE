@@ -395,6 +395,15 @@ function App() {
             >
               Issues?
             </a>
+            <a
+              className="nav-link"
+              href="https://pro.visuai.io"
+              target="_blank"
+              rel="noreferrer"
+              id='goPro'
+            >
+              Go Pro
+            </a>
           </div>
         </div>
         <div className="gradient-bg">
@@ -438,9 +447,7 @@ function App() {
                     </div>
                     {isAccessGranted ? (
                       <div id="headings">
-                        <h3>
-                          Upload an ePub file to get started
-                        </h3>
+                        <h3>Upload an ePub file to get started</h3>
                         <div className="control-container">
                           <div className="input-container">
                             <div className="file-input-wrapper">
