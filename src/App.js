@@ -18,7 +18,7 @@ mirage.register();
 function App() {
   const [epubFile, setEpubFile] = useState(null);
   const [fileError, setFileError] = useState("");
-  const [isAccessGranted, setIsAccessGranted] = useState(false);
+  const [isAccessGranted, setIsAccessGranted] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   // const [estimatedWaitTime, setEstimatedWaitTime] = useState("");
   const [loadingInfo, setLoadingInfo] = useState("");
@@ -506,7 +506,7 @@ function App() {
                     <h1>Turn Words in Worlds</h1>
                     {isAccessGranted ? (
                       <div id="headings">
-                        <h4>Free for a limited time</h4>
+                        <h4>Add illustations to your full ePub - Free for a limited time</h4>
                         <div className="control-container">
                           <div className="input-container">
                             {/* <div className="file-input-wrapper"> */}
