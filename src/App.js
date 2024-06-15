@@ -85,6 +85,7 @@ function App() {
     link.href = sampleBookUrl;
     link.download = "The_Crystal_Throne.epub";
     document.body.appendChild(link);
+    link.click();
     document.body.removeChild(link);
   };
 
