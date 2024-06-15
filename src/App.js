@@ -447,7 +447,7 @@ function App() {
                     </div>
                     {isAccessGranted ? (
                       <div id="headings">
-                        <h3>Upload an ePub file to get started</h3>
+                        <h3>Illustate each chapter of your book - Upload an ePub file to get started</h3>
                         <div className="control-container">
                           <div className="input-container">
                             <div className="file-input-wrapper">
