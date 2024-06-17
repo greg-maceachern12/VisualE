@@ -5,6 +5,8 @@ import "./App.scss";
 import "./gradBG/gradBG.scss";
 import AccessCode from "./AccessCode.js";
 import About from "./About";
+
+import { chatAPI, imageAPI, segmentAPI } from "./utils/apiConfig.js";
 import { initGradientBackground } from "./gradBG/gradBG.js";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faWandMagicSparkles } from "@fortawesome/free-solid-svg-icons";
@@ -30,13 +32,6 @@ function App() {
   const [bottomBorderColor, setBottomBorderColor] = useState("");
 
   const isTest = false;
-
-  const chatAPI =
-    "https://visuaicalls.azurewebsites.net/api/chatgpt?code=QDubsyOhk_c8jC1RAGPBHNydCCNgpgfcSscjsSqVRdw_AzFuxUgufQ%3D%3D";
-  const imageAPI =
-    "https://visuaicalls.azurewebsites.net/api/generateImage?code=sbKw5c6I6xFV6f9AWYKAbR5IGBIj-td2aUly5oNP4QZMAzFuSvLDYw%3D%3D";
-  const segmentAPI =
-    "https://visuaicalls.azurewebsites.net/api/segmentFinder?code=pNDxb_DAPifFYYNOr59_RjNuryY-49m3n9iscpdA3MewAzFu0bfNxg%3D%3D";
 
   const handleAccessGranted = () => {
     setIsAccessGranted(true);
@@ -277,14 +272,14 @@ function App() {
       setIsLoading(false);
     } else {
       const chapterPrompt = await getChapterPrompt(chapter, epubReader);
-      setLeftBorderColor("lightblue"); // When getChapterPrompt is completed
+      setLeftBorderColor("#fce700"); // When getChapterPrompt is completed
       const chapterSegment = await findChapterPrompt(chapterPrompt);
-      setTopBorderColor("lightblue"); // When findChapterPrompt is completed
+      setTopBorderColor("#fce700"); // When findChapterPrompt is completed
       if (chapterSegment !== "False") {
         const processedPrompt = await generatePromptFromText(chapterSegment);
-        setRightBorderColor("lightblue"); // When generatePromptFromText is completed
+        setRightBorderColor("#fce700"); // When generatePromptFromText is completed
         const imageUrl = await generateImageFromPrompt(processedPrompt);
-        setBottomBorderColor("lightblue"); // When generateImageFromPrompt is completed
+        setBottomBorderColor("#fce700"); // When generateImageFromPrompt is completed
         setDisplayPrompt(chapterSegment);
         setImageUrl(imageUrl);
         setIsLoading(false);
