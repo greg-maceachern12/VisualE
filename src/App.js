@@ -7,6 +7,8 @@ import "./gradBG/gradBG.scss";
 import AccessCode from "./components/AccessCode.js";
 import About from "./components/About.js";
 import AuthPage from "./components/AuthPage.js";
+
+import { chatAPI, imageAPI, segmentAPI, downloadAPI, payAPI } from "./utils/apiConfig.js";
 import { loadStripe } from "@stripe/stripe-js";
 import { initGradientBackground } from "./gradBG/gradBG.js";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -30,18 +32,6 @@ function App() {
   // const [isTrialMode, setIsTrialMode] = useState(false);
   const testMode = false;
 
-  const chatAPI =
-    "https://visuaicalls.azurewebsites.net/api/chatgpt?code=QDubsyOhk_c8jC1RAGPBHNydCCNgpgfcSscjsSqVRdw_AzFuxUgufQ%3D%3D";
-  const imageAPI =
-    "https://visuaicalls.azurewebsites.net/api/generateImage?code=sbKw5c6I6xFV6f9AWYKAbR5IGBIj-td2aUly5oNP4QZMAzFuSvLDYw%3D%3D";
-  const segmentAPI =
-    "https://visuaicalls.azurewebsites.net/api/segmentFinder?code=pNDxb_DAPifFYYNOr59_RjNuryY-49m3n9iscpdA3MewAzFu0bfNxg%3D%3D";
-
-  const downloadAPI =
-    "https://visuaicalls.azurewebsites.net/api/downloadBook?code=stF_cd3PaNQ2JPydwM60_XBkpcmFNkLXswNf971-AnBoAzFu34Rf-w%3D%3D";
-
-  const payAPI =
-    "https://visuaicalls.azurewebsites.net/api/stripe?code=iibdFb1TpBPK8jeOinKo7Bdw-YbioQ-FVLqTeBkbhK_xAzFuSC6dcA%3D%3D";
 
   const handleAccessGranted = () => {
     setIsAccessGranted(true);
@@ -341,7 +331,7 @@ function App() {
           if (imageUrl.startsWith("Error: ")) {
             console.error(imageUrl);
             imageUrl =
-              "https://cdn.pixabay.com/photo/2017/02/12/21/29/false-2061132_640.png";
+              "https://cdn.iconscout.com/icon/free/png-256/free-error-2653315-2202987.png";
             resolve(false);
           } else {
             resolve(true);
@@ -354,7 +344,7 @@ function App() {
           console.log("Non-story: " + chapter.label);
           const cleanedBook = removeImages(chapterPrompt.html);
           const nonImageUrl =
-            "https://cdn.pixabay.com/photo/2017/02/12/21/29/false-2061132_640.png";
+            "https://cdn.iconscout.com/icon/free/png-256/free-error-2653315-2202987.png";
           addChapter(chapter.label, cleanedBook, nonImageUrl, chapterIndex);
           resolve(false);
         }
