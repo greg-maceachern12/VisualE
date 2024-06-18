@@ -10,7 +10,7 @@ function Access() {
 
   return (
     <div className="about-container">
-      <form name="waitlist" method="POST" data-netlify="true">
+      <form name="waitlist" netlify>
         <label for="email">
           <b>Request Access to the Pro Version</b>
         </label>
