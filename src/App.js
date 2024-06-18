@@ -32,7 +32,6 @@ function App() {
   // const [isTrialMode, setIsTrialMode] = useState(false);
   const testMode = false;
 
-
   const handleAccessGranted = () => {
     setIsAccessGranted(true);
   };
@@ -70,6 +69,7 @@ function App() {
     await supabase.auth.signOut();
     setIsDropdownOpen(false);
   };
+
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -323,9 +323,7 @@ function App() {
         const chapterSegment = await findChapterSegment(chapterPrompt.text);
 
         if (chapterSegment !== "False" && !isNonStoryChapter(chapter.label)) {
-          const processedPrompt = await generatePromptFromSegment(
-            chapterSegment
-          );
+          const processedPrompt = await generatePromptFromSegment(chapterSegment);
 
           let imageUrl = await generateImageFromPrompt(processedPrompt);
           if (imageUrl.startsWith("Error: ")) {
