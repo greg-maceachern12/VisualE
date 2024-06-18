@@ -1,0 +1,35 @@
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+    gap: 20px;
+  }
+  .form-row {
+    display: flex; /* Use Flexbox */
+    gap: 10px; /* Space between the email input and the Join button */
+  }
+  
+  input[type="email"] {
+    padding-left: 15px;
+    border-radius: 30px;
+    border: 1px solid #ddd;
+    font-size: 0.9rem;
+    width: 300px; /* Adjust based on your layout */
+    flex-grow: 1; /* Allows the input to grow and fill the available space */
+  }
+  
+  button[type="submit"] {
+    padding: 15px 30px;
+    font-size: 0.9rem; /* Larger button text */
+    border-radius: 30px;
+    border: none;
+    background-color: #5e6ad2; /* Vibrant purple */
+    color: white;
+    cursor: pointer;
+  }
+  
+  button[type="submit"]:hover {
+    filter: brightness(115%);
+  }
+  

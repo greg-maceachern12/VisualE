@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./AccessCode.scss";
+import { Link } from "react-router-dom";
 
 function AccessCode({ onAccessGranted }) {
   const [accessCode, setAccessCode] = useState("");
@@ -20,6 +21,7 @@ function AccessCode({ onAccessGranted }) {
   return (
     <div className="access-code-container">
       <h1>Enter Password</h1>
+
       <form onSubmit={handleSubmit}>
         <input
           value={accessCode}
@@ -28,6 +30,9 @@ function AccessCode({ onAccessGranted }) {
         />
         <button type="submit">Submit</button>
       </form>
+      <Link to="/access" className="nav-link access">
+              Or Request Access
+      </Link>
     </div>
   );
 }

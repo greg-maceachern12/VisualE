@@ -6,7 +6,13 @@ import "./App.scss";
 import "./gradBG/gradBG.scss";
 import AccessCode from "./AccessCode.js";
 import About from "./About";
-import { chatAPI, imageAPI, segmentAPI, downloadAPI } from "./utils/apiConfig.js";
+import Access from './Access';
+import {
+  chatAPI,
+  imageAPI,
+  segmentAPI,
+  downloadAPI,
+} from "./utils/apiConfig.js";
 import { initGradientBackground } from "./gradBG/gradBG.js";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faWandMagicSparkles } from "@fortawesome/free-solid-svg-icons";
@@ -433,7 +439,12 @@ function App() {
             >
               Issues?
             </a>
-            <a className='nav-link' href="https://app.visuai.io" target="_blank" rel="noreferrer">
+            <a
+              className="nav-link"
+              href="https://app.visuai.io"
+              target="_blank"
+              rel="noreferrer"
+            >
               Try V1
             </a>
           </div>
@@ -469,18 +480,19 @@ function App() {
         <div className="content-container">
           <Routes>
             <Route path="/about" element={<About />} />
+            <Route path="/access" element={<Access />} />
             <Route
               path="/"
               element={
                 <>
                   <div className="header-container">
                     <h1>Turn Words in Worlds</h1>
+                    <h4>
+                      Add illustations to your full ePub - Free for a limited
+                      time
+                    </h4>
                     {isAccessGranted ? (
                       <div id="headings">
-                        <h4>
-                          Add illustations to your full ePub - Free for a
-                          limited time
-                        </h4>
                         <div className="control-container">
                           <div className="input-container">
                             {/* <div className="file-input-wrapper"> */}
