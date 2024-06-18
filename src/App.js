@@ -6,7 +6,6 @@ import "./App.scss";
 import "./gradBG/gradBG.scss";
 import AccessCode from "./AccessCode.js";
 import About from "./About";
-import Access from './Access';
 import {
   chatAPI,
   imageAPI,
@@ -480,7 +479,7 @@ function App() {
         <div className="content-container">
           <Routes>
             <Route path="/about" element={<About />} />
-            <Route path="/access" element={<Access />} />
+            {/* <Route path="/access" element={<Access />} /> */}
             <Route
               path="/"
               element={
@@ -520,7 +519,9 @@ function App() {
                         </div>
                       </div>
                     ) : (
+                      <div>
                       <AccessCode onAccessGranted={handleAccessGranted} />
+                      </div>
                     )}
                     {isLoading ? (
                       <div>
