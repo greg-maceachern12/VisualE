@@ -397,7 +397,7 @@ function App() {
               rel="noreferrer"
               id='goPro'
             >
-              Go Pro
+              Visuai Pro
             </a>
           </div>
         </div>
