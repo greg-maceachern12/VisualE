@@ -18,7 +18,7 @@ mirage.register();
 function App() {
   const [epubFile, setEpubFile] = useState(null);
   const [fileError, setFileError] = useState("");
-  const [isAccessGranted, setIsAccessGranted] = useState(true);
+  const [isAccessGranted, setIsAccessGranted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   // const [estimatedWaitTime, setEstimatedWaitTime] = useState("");
   const [loadingInfo, setLoadingInfo] = useState("");
