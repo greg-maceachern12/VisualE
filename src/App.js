@@ -263,8 +263,11 @@ function App() {
       await Promise.all(promises);
       console.log(`Batch ${i / batchSize + 1} processed successfully`);
       chaptersProcessed += batch.length;
+      const processedPercentage = Math.round(
+        (chaptersProcessed / chapterBatch.length) * 100
+      );
       setLoadingInfo(
-        `Processed ${chaptersProcessed} out of ${chapterBatch.length} chapters`
+        `Processed ${processedPercentage}% of chapters... Please wait...`
       );
 
       // Check if successful generations have reached the limit
@@ -426,7 +429,7 @@ function App() {
             prompt,
             size: "1792x1024",
             // size: "1024x1024",
-            quality: "hd",
+            quality: "standard",
             title: generatedBook.title,
           }),
         });
