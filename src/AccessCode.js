@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import "./AccessCode.scss";
-import { Link } from "react-router-dom";
 
 function AccessCode({ onAccessGranted }) {
   const [accessCode, setAccessCode] = useState("");
