@@ -5,3 +5,5 @@ export const downloadAPI =
 "https://visuaicalls.azurewebsites.net/api/downloadBook?code=stF_cd3PaNQ2JPydwM60_XBkpcmFNkLXswNf971-AnBoAzFu34Rf-w%3D%3D";
 export const payAPI =
 "https://visuaicalls.azurewebsites.net/api/stripe?code=iibdFb1TpBPK8jeOinKo7Bdw-YbioQ-FVLqTeBkbhK_xAzFuSC6dcA%3D%3D";
+
+export const checkAPI = "https://visuaicalls.azurewebsites.net/api/checkAndDownload?code=UzhzCYbRW47rJN7Hgy7aDzrVtgjlZ3LFVIelJ29S-9oKAzFu-jaU3w%3D%3D";

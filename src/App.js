@@ -8,7 +8,14 @@ import AccessCode from "./components/AccessCode.js";
 import About from "./components/About.js";
 import AuthPage from "./components/AuthPage.js";
 
-import { chatAPI, imageAPI, segmentAPI, downloadAPI, payAPI } from "./utils/apiConfig.js";
+import {
+  chatAPI,
+  imageAPI,
+  segmentAPI,
+  downloadAPI,
+  payAPI,
+  checkAPI,
+} from "./utils/apiConfig.js";
 import { loadStripe } from "@stripe/stripe-js";
 import { initGradientBackground } from "./gradBG/gradBG.js";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -144,7 +151,7 @@ function App() {
 
   const handlePayNow = async () => {
     // const stripe = await loadStripe('pk_live_51PMDZsHMeAmZ2ytpfyzeNN9ExgQBqQml8ROGTFF7pyztT4pue5iEyZW5brLeinKWeEg7ToU0XPrY4so6TPTs92vE0027R3L6B0');
-    
+
     //test
     const stripe = await loadStripe(
       "pk_test_51PMDZsHMeAmZ2ytpSpivpSert86xt8kqmM6bWFbdOxem4vZVE74Lr2t4Frkbl5sfleouQjDvlsKdF4jEH37ii0in00xnLCRaB3"
@@ -157,21 +164,24 @@ function App() {
         },
         body: JSON.stringify({ userId: user.id }),
       });
-  
+
       if (response.ok) {
         const data = await response.json();
         const sessionId = data.sessionId;
-        console.log(data)
-  
+        console.log(data);
+
         const result = await stripe.redirectToCheckout({
           sessionId: sessionId,
         });
-  
+
         if (result.error) {
           console.error(result.error.message);
         }
       } else {
-        console.error("Error creating Stripe checkout session:", response.status);
+        console.error(
+          "Error creating Stripe checkout session:",
+          response.status
+        );
       }
     } catch (error) {
       console.error("Error:", error);
@@ -206,6 +216,14 @@ function App() {
       generatedBook.author = metadata.creator;
 
       console.log(`Book title: ${generatedBook.title}`);
+
+      // Check if the book already exists in Azure Blob Storage
+      await checkAndDownloadBook(generatedBook.title);
+
+      // If the book was found and downloaded, skip the generation process
+      if (!isLoading) {
+        return;
+      }
 
       const nav = await epubReader.loaded.navigation;
       const toc = nav.toc;
@@ -254,7 +272,9 @@ function App() {
 
     for (let i = 0; i < chapterBatch.length; i += batchSize) {
       const batch = chapterBatch.slice(i, i + batchSize);
-      console.log(`Processing batch ${i / batchSize + 1} of ${chapterBatch.length}`);
+      console.log(
+        `Processing batch ${i / batchSize + 1} of ${chapterBatch.length}`
+      );
 
       const promises = batch.map((chapter, index) =>
         processChapter(chapter, index + i, epubReader)
@@ -326,7 +346,9 @@ function App() {
         const chapterSegment = await findChapterSegment(chapterPrompt.text);
 
         if (chapterSegment !== "False" && !isNonStoryChapter(chapter.label)) {
-          const processedPrompt = await generatePromptFromSegment(chapterSegment);
+          const processedPrompt = await generatePromptFromSegment(
+            chapterSegment
+          );
 
           let imageUrl = await generateImageFromPrompt(processedPrompt);
           if (imageUrl.startsWith("Error: ")) {
@@ -355,6 +377,43 @@ function App() {
     });
   };
 
+  const checkAndDownloadBook = async (bookTitle) => {
+    try {
+      const response = await fetch(checkAPI, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bookTitle }),
+      });
+
+      if (response.ok) {
+        const blobUrl = await response.text();
+        console.log(`Book with title "${bookTitle}" found.`);
+
+        // Create a temporary anchor element
+        const link = document.createElement("a");
+        link.href = blobUrl;
+        link.download = `Visuai_${bookTitle}.epub`;
+
+        // Append the anchor element to the document
+        document.body.appendChild(link);
+
+        // Trigger the click event to start the download
+        link.click();
+
+        // Remove the temporary anchor element
+        document.body.removeChild(link);
+
+        console.log(`Book with title "${bookTitle}" downloaded successfully.`);
+        setLoadingInfo(`"${bookTitle}" downloaded successfully.`);
+      } else {
+        console.log(`Book with title "${bookTitle}" not found.`);
+        setLoadingInfo(`Book with title "${bookTitle}" not found.`);
+      }
+    } catch (error) {
+      console.error("Error checking/downloading book:", error);
+      setLoadingInfo("Error checking/downloading the book.");
+    }
+  };
   // Step1: Gets the text from the chapter
   const getChapterText = async (chapter, epubReader) => {
     const displayedChapter = await epubReader
@@ -476,7 +535,7 @@ function App() {
             </div>
           </Link>
           <div className="nav-links">
-          <Link to="/" className="nav-link">
+            <Link to="/" className="nav-link">
               Home
             </Link>
             <Link to="/about" className="nav-link">
