@@ -362,6 +362,32 @@ function App() {
       return "Cannot generate image";
     }
   };
+  const generateImageFromPromptSD = async (prompt) => {
+    try {
+      console.log("generating image.. this can take up to 15s");
+      const response = await fetch(imageAPI, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt: prompt,
+          aspect_ratio: "16:9",
+          style_preset: "cinematic",
+          title: bookName,
+        }),
+      });
+      const data = await response.json();
+      console.log(data.imageUrl);
+      ReactGA.event({
+        category: "User",
+        action: "Action Complete",
+        label: "Image successfully generated",
+      });
+      return data.imageUrl;
+    } catch (error) {
+      console.error("Error calling the API:", error);
+      return "Cannot generate image";
+    }
+  };
 
   return (
     <Router>
