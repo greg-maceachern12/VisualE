@@ -218,10 +218,10 @@ function App() {
       console.log(`Book title: ${generatedBook.title}`);
 
       // Check if the book already exists in Azure Blob Storage
-      await checkAndDownloadBook(generatedBook.title);
+      const bookExists = await checkAndDownloadBook(generatedBook.title);
 
       // If the book was found and downloaded, skip the generation process
-      if (!isLoading) {
+      if (bookExists) {
         return;
       }
 
@@ -405,13 +405,14 @@ function App() {
 
         console.log(`Book with title "${bookTitle}" downloaded successfully.`);
         setLoadingInfo(`"${bookTitle}" downloaded successfully.`);
+        return true;
       } else {
         console.log(`Book with title "${bookTitle}" not found.`);
-        setLoadingInfo(`Book with title "${bookTitle}" not found.`);
+        return false;
       }
     } catch (error) {
       console.error("Error checking/downloading book:", error);
-      setLoadingInfo("Error checking/downloading the book.");
+      return false;
     }
   };
   // Step1: Gets the text from the chapter
