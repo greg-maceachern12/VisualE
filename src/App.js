@@ -228,9 +228,8 @@ function App() {
       const nav = await epubReader.loaded.navigation;
       const toc = nav.toc;
 
-      const chapterBatch = [];
+      const chaptersToProcess = [];
 
-      let chapterCount = 0;
       for (let i = 0; i < toc.length; i++) {
         const chapter = toc[i];
 
@@ -238,19 +237,16 @@ function App() {
 
         if (chapter.subitems && chapter.subitems.length > 0) {
           for (const subitem of chapter.subitems) {
-            console.log(`Processing Chapter: ${chapterCount}`);
-            chapterBatch.push(subitem);
-            chapterCount++;
+            chaptersToProcess.push(subitem);
           }
         } else {
-          console.log(`Processing Chapter: ${chapterCount}`);
-          chapterBatch.push(chapter);
-          chapterCount++;
+          chaptersToProcess.push(chapter);
         }
       }
 
-      console.log("Starting chapter batch processing...");
-      await processChapterBatch(chapterBatch, epubReader);
+      console.log("Starting chapter processing...");
+      console.log(chaptersToProcess)
+      await processAllChapters(chaptersToProcess, epubReader);
 
       handleDownloadBook();
     } catch (error) {
@@ -262,41 +258,30 @@ function App() {
     }
   };
 
-  const processChapterBatch = async (chapterBatch, epubReader) => {
-    const batchSize = 5; // Maximum number of concurrent API calls
-    const delayMs = testMode ? 2000 : 63000; // 1 minute delay between batches (in milliseconds) or 200 if testing
-
-    console.log(`Total chapters to process: ${chapterBatch.length}`);
-
-    let chaptersProcessed = 0;
-
-    for (let i = 0; i < chapterBatch.length; i += batchSize) {
-      const batch = chapterBatch.slice(i, i + batchSize);
-      console.log(
-        `Processing batch ${i / batchSize + 1} of ${chapterBatch.length}`
-      );
-
-      const promises = batch.map((chapter, index) =>
-        processChapter(chapter, index + i, epubReader)
-      );
-
-      await Promise.all(promises);
-      console.log(`Batch ${i / batchSize + 1} processed successfully`);
-      chaptersProcessed += batch.length;
-      const processedPercentage = Math.round(
-        (chaptersProcessed / chapterBatch.length) * 100
-      );
-      setLoadingInfo(
-        `Processed ${processedPercentage}% of chapters... Please wait...`
-      );
-
-      // Check if successful generations have reached the limit
-
-      if (i + batchSize < chapterBatch.length) {
-        console.log("Waiting for 1 minute before the next batch...");
-        await new Promise((resolve) => setTimeout(resolve, delayMs));
-      }
-    }
+  const processAllChapters = async (chapters, epubReader) => {
+    console.log(`Total chapters to process: ${chapters.length}`);
+  
+    let completedChapters = 0;
+  
+    const updateProgress = () => {
+      completedChapters++;
+      const percentComplete = Math.round((completedChapters / chapters.length) * 100);
+      setLoadingInfo(`Processed ${percentComplete}% of chapters.`);
+    };
+  
+    const results = await Promise.all(
+      chapters.map((chapter, index) =>
+        processChapter(chapter, index, epubReader).then(result => {
+          updateProgress();
+          return result;
+        })
+      )
+    );
+  
+    const successfulGenerations = results.filter(result => result === true).length;
+  
+    console.log(`All chapters processed. Successful generations: ${successfulGenerations}`);
+    setLoadingInfo(`Processed 100% of chapters. ${successfulGenerations} images generated successfully.`);
   };
 
   // checks if the chapter is non-plot
@@ -350,7 +335,7 @@ function App() {
             chapterSegment
           );
 
-          let imageUrl = await generateImageFromPrompt(processedPrompt);
+          let imageUrl = await generateImageFromPromptSD(processedPrompt);
           if (imageUrl.startsWith("Error: ")) {
             console.error(imageUrl);
             imageUrl =
@@ -384,8 +369,7 @@ function App() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ bookTitle }),
       });
-
-      if (response.ok) {
+      if (response.status === 200) {
         const blobUrl = await response.text();
         console.log(`Book with title "${bookTitle}" found.`);
 
@@ -439,11 +423,10 @@ function App() {
           body: JSON.stringify({ prompt }),
         });
         const data = await response.json();
-        // console.log("Prompt: " + prompt)
         console.log("Segment: " + data.response);
         return data.response;
       } else {
-        const resp = "ttttt";
+        const resp = "Failed to summarize the chapter.";
         return resp;
       }
     } catch (error) {
@@ -465,10 +448,10 @@ function App() {
           }),
         });
         const data = await response.json();
-        console.log("DALL-E Prompt: " + data.response);
+        console.log("Stable-Diffusion Prompt: " + data.response);
         return data.response;
       } else {
-        const resp = "ttttt";
+        const resp = "Failed to find a segement.";
         return resp;
       }
     } catch (error) {
@@ -478,7 +461,54 @@ function App() {
   };
 
   // Step4: takes the prompt from OAI and calls DALL-E
-  const generateImageFromPrompt = async (prompt) => {
+  // const generateImageFromPrompt = async (prompt) => {
+  //   try {
+  //     if (testMode === false) {
+  //       console.log("generating image.. this can take up to 15s");
+  //       const response = await fetch(imageAPI, {
+  //         method: "POST",
+  //         headers: { "Content-Type": "application/json" },
+  //         body: JSON.stringify({
+  //           prompt,
+  //           size: "1792x1024",
+  //           // size: "1024x1024",
+  //           quality: "standard",
+  //           title: generatedBook.title,
+  //         }),
+  //       });
+  //       const data = await response.json();
+  //       if (data.error) {
+  //         console.error("Error generating image:", data.error);
+  //         ReactGA.event({
+  //           category: "User",
+  //           action: "Error",
+  //           label: "Image generation failed",
+  //         });
+  //         return `Error: ${data.error}`;
+  //       }
+  //       ReactGA.event({
+  //         category: "User",
+  //         action: "Action Complete",
+  //         label: "Image successfully generated",
+  //       });
+  //       return data.imageUrl;
+  //     } else {
+  //       const url =
+  //         "https://www.outdoorpainter.com/wp-content/uploads/2015/04/f8b84457f79954b52239c255e44b3bb1.jpg";
+  //       return url;
+  //     }
+  //   } catch (error) {
+  //     console.error("Error calling the API:", error);
+  //     ReactGA.event({
+  //       category: "User",
+  //       action: "Error",
+  //       label: "Image generation failed",
+  //     });
+  //     return `Error: ${error.message}`;
+  //   }
+  // };
+
+  const generateImageFromPromptSD = async (prompt) => {
     try {
       if (testMode === false) {
         console.log("generating image.. this can take up to 15s");
@@ -486,10 +516,9 @@ function App() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            prompt,
-            size: "1792x1024",
-            // size: "1024x1024",
-            quality: "standard",
+            prompt: prompt,
+            aspect_ratio: "16:9",
+            style_preset: "digital-art",
             title: generatedBook.title,
           }),
         });
@@ -612,6 +641,7 @@ function App() {
               element={
                 <>
                   <div className="header-container">
+                    <p>**Now with Stable Diffusion instead of DALL-E**</p>
                     <h1>Turn Words in Worlds</h1>
                     {isAccessGranted ? (
                       <div id="headings">
