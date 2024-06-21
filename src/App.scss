@@ -203,11 +203,8 @@ select {
 
 .button-container {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   margin-bottom: 20px;
-}
-
-.button-container {
   display: flex;
   gap: 10px;
 
@@ -225,6 +222,10 @@ select {
     &:hover {
       background-color: #218838;
     }
+  }
+
+  select {
+    max-width: 60%;
   }
 }
 
