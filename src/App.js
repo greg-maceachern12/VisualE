@@ -641,7 +641,7 @@ function App() {
               element={
                 <>
                   <div className="header-container">
-                    <p>**Now with Stable Diffusion instead of DALL-E 3**</p>
+                    <p>**Now with Stable Diffusion**</p>
                     <h1>Turn Words in Worlds</h1>
                     {isAccessGranted ? (
                       <div id="headings">
