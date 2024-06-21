@@ -33,7 +33,7 @@ export const generatePromptFromSegment = async (prompt, bookTitle) => {
   }
 };
 
-export const generateImageFromPromptSD = async (prompt, bookTitle) => {
+export const generateImageFromPrompt = async (prompt, bookTitle) => {
   try {
     console.log("generating image.. this can take up to 15s");
     const response = await fetch(imageAPI, {

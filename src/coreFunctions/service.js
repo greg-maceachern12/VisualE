@@ -1,6 +1,6 @@
 import ReactGA from "react-ga";
 import { checkAPI, downloadAPI, payAPI } from '../utils/apiConfig';
-import { parseEpubFile, processAllChapters } from './bookLogic';
+import { parseEpubFile, processAllChapters, isNonStoryChapter } from './bookLogic';
 import { loadStripe } from "@stripe/stripe-js";
 
 export const initializeGoogleAnalytics = () => {
@@ -137,6 +137,11 @@ export const checkAndDownloadBook = async (bookTitle, setLoadingInfo) => {
 };
 
 export const handleParseAndGenerateImage = async (epubFile, setIsLoading, setLoadingInfo) => {
+    ReactGA.event({
+      category: "User",
+      action: "Button Click",
+      label: "Start Generation",
+    });
     setIsLoading(true);
     setLoadingInfo("Processing EPUB file...");
   
@@ -168,8 +173,22 @@ export const handleParseAndGenerateImage = async (epubFile, setIsLoading, setLoa
         return;
       }
   
+      const chaptersToProcess = [];
+      for (let i = 0; i < toc.length; i++) {
+        const chapter = toc[i];
+        if (isNonStoryChapter(chapter.label)) continue;
+        if (chapter.subitems && chapter.subitems.length > 0) {
+          for (const subitem of chapter.subitems) {
+            chaptersToProcess.push(subitem);
+          }
+        } else {
+          chaptersToProcess.push(chapter);
+        }
+      }
+  
       console.log("Starting chapter processing...");
-      const processedBook = await processAllChapters(toc, epubReader, generatedBook.title, setLoadingInfo);
+      console.log(chaptersToProcess);
+      const processedBook = await processAllChapters(chaptersToProcess, epubReader, generatedBook.title, setLoadingInfo);
   
       await handleDownloadBook(processedBook, setLoadingInfo);
     } catch (error) {
