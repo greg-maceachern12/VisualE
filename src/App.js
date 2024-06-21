@@ -120,7 +120,7 @@ function App() {
                       <h1>Turn Words Into Worlds</h1>
                     </div>
                     <div id="headings">
-                      <h3>Illustrate each chapter of your book - Upload an ePub file to get started</h3>
+                      <h3>Illustrate each chapter of your book - Upload your ePub file to get started</h3>
                       <FileUpload 
                         handleFileChange={handleFileChangeWrapper}
                         fileError={fileError}
