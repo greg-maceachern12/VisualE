@@ -25,7 +25,6 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-*.epub
 temp_book.js
 exam.js
 working_azure_code.js
