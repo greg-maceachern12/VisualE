@@ -645,7 +645,7 @@ function App() {
                     <h1>Turn Words in Worlds</h1>
                     {isAccessGranted ? (
                       <div id="headings">
-                        <h4>Free users limited to 5 chapters</h4>
+                        {/*<h4>Free users limited to 5 chapters</h4>*/}
                         <div className="control-container">
                           <div className="input-container">
                             {/* <div className="file-input-wrapper"> */}
