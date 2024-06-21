@@ -1,5 +1,6 @@
 import React from 'react';
 import { Skeleton } from "@mui/material";
+import "../styles/ImageDisplay.scss";
 
 const ImageDisplay = ({ chapterTitle, isLoading, imageUrl, displayPrompt, handleNextChapter }) => {
   return (

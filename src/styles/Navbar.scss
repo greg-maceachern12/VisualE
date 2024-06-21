@@ -1,0 +1,61 @@
+@import 'variables';
+
+.navbar {
+  display: flex;
+  width: 100%;
+  height: 45px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  margin-bottom: 25px;
+  border-radius: 15px;
+  background-color: #ffffff6b;
+
+  .link-button {
+    text-decoration: none;
+  }
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  font-family: "Pacifico", cursive;
+  letter-spacing: 1.2px;
+  font-weight: 100;
+}
+
+.logo {
+  height: 30px;
+  margin-right: 10px;
+}
+
+.nav-links {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 5rem;
+
+  button {
+    text-decoration: none;
+    color: #333;
+    font-size: 16px;
+    background-color: transparent;
+    border: none;
+  }
+
+  #goPro {
+    color: #7135ff;
+  }
+}
+
+.nav-link {
+  text-decoration: none;
+  color: #333;
+  font-size: 16px;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

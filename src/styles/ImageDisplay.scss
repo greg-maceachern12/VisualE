@@ -1,0 +1,106 @@
+@import 'variables';
+
+.chapterContainer {
+  margin-top: 15px;
+  padding: 30px;
+  background-color: #f5f5f57d;
+  color: black;
+  border-radius: 10px;
+
+  border: 3px solid transparent;
+  border-left-color: var(--left-border-color);
+  border-top-color: var(--top-border-color);
+  border-right-color: var(--right-border-color);
+  border-bottom-color: var(--bottom-border-color);
+
+  transition: border-left-color 0.8s ease, border-top-color 0.8s ease,
+    border-right-color 0.8s ease, border-bottom-color 0.8s ease;
+
+  img {
+    max-width: 50%;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    height: auto;
+    width: 100%;
+    margin-bottom: 20px;
+  }
+}
+
+.container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 0 auto;
+
+  h2 {
+    margin-top: 0;
+  }
+}
+
+.chapterPrompt {
+  width: 100%;
+  padding: 5px;
+
+  p {
+    overflow-y: auto;
+    max-height: 430px;
+    margin-top: 0;
+    font-family: math;
+  }
+}
+
+.generatedImage {
+  margin-right: 40px;
+}
+
+.loadingContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: auto;
+
+  .skeletonWrapper {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+
+    .MuiSkeleton-rounded {
+      width: 300px;
+      height: 400px;
+      margin-right: 20px;
+    }
+
+    .textSkeletons {
+      display: flex;
+      flex-direction: column;
+      width: 300px;
+
+      .MuiSkeleton-text {
+        width: 100%;
+        max-width: 400px;
+        margin-bottom: 10px;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+}
+
+#nextbtn {
+  color: #333;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+  background-color: lightseagreen;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: rgb(12, 134, 128);
+  }
+}
