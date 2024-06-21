@@ -148,7 +148,7 @@ input[type="file"]:focus::file-selector-button {
 
 .button-container {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   margin-bottom: 20px;
   gap: 10px;
 
@@ -168,6 +168,9 @@ input[type="file"]:focus::file-selector-button {
   }
   #paynow:hover {
     background-color: #4d8cf5;
+  }
+  select {
+    max-width: 60%;
   }
 }
 
