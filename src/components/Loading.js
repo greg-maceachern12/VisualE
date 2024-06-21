@@ -1,5 +1,6 @@
 import React from 'react';
 import { mirage } from "ldrs";
+import "../styles/Loading.scss";
 
 mirage.register();
 

@@ -5,6 +5,8 @@ import { Link } from "react-router-dom";
 import { faGithub } from "@fortawesome/free-brands-svg-icons";
 import { faExternalLinkAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import "../styles/About.scss";
+
 function About() {
   useEffect(() => {
     // Track page views
