@@ -13,13 +13,13 @@
 
 @font-face {
   font-family: "Teresa-bold";
-  src: url("../public/fonts/Teresa-Bold.ttf") format("truetype");
+  src: url("../../public/fonts/Teresa-Bold.ttf") format("truetype");
   font-weight: bold;
   font-style: normal;
 }
 @font-face {
   font-family: "Teresa-semibold";
-  src: url("../public/fonts/Teresa-Semibold.ttf") format("truetype");
+  src: url("../../public/fonts/Teresa-Semibold.ttf") format("truetype");
   font-weight: bold;
   font-style: normal;
 }
@@ -297,6 +297,7 @@ select {
     overflow-y: auto;
     max-height: 430px;
     margin-top: 0;
+    font-family: math;
   }
 }
 .generatedImage {
