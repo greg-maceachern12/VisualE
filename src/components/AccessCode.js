@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./AccessCode.scss";
+import "../styles/AccessCode.scss";
 
 function AccessCode({ onAccessGranted }) {
   const [accessCode, setAccessCode] = useState("");
