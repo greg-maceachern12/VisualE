@@ -117,8 +117,12 @@ function App() {
               element={
                 <>
                   <div className="header-container">
-                    <p>**Now with Stable Diffusion**</p>
                     <h1>Turn Words in Worlds</h1>
+                    <h4>
+                      Add illustations to your full ePub - Free for a limited
+                      time
+                    </h4>
+                    <p>**Now with Stable Diffusion**</p>
                     {isAccessGranted ? (
                       <div id="headings">
                         <FileUpload
