@@ -29,9 +29,11 @@ function AccessCode({ onAccessGranted }) {
         <button type="submit">Submit</button>
       </form>
       <a
-              className="nav-link"
-              href={`mailto:greg@visuai.io?subject=Access%20Code%20For%20Pro&body=%20Please%20grant%20me%20access%20to%20Visuai%20Pro`}
-            >No Code? Request Access</a>
+        className="nav-link"
+        href={`mailto:greg@visuai.io?subject=Access%20Code%20For%20Pro&body=%20Please%20grant%20me%20access%20to%20Visuai%20Pro`}
+      >
+        No Code? Request Access
+      </a>
     </div>
   );
 }

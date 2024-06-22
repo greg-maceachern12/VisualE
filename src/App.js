@@ -116,6 +116,7 @@ function App() {
               path="/"
               element={
                 <>
+                <div className='home-content'></div>
                   <div className="header-container">
                     <h1>Turn Words in Worlds</h1>
                     <h4>

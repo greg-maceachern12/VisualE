@@ -10,7 +10,6 @@
   align-items: center;
   padding: 2rem;
   box-sizing: border-box;
-  background-color: #00000082;
 
   .gradient-bg {
     position: fixed;
@@ -38,6 +37,12 @@
   }
 
   .about-button {
+    float: left;
+    margin-top: 2rem;
+  }
+
+  .feedback {
+    float: right;
     margin-top: 2rem;
   }
 }
@@ -48,12 +53,59 @@
   border-radius: 10px;
 
   h1 {
-    font-size: 5rem;
-    font-family: "Teresa-bold", "Bebas Neue", "Lora", "Roboto", sans-serif;
+    font-size: 4rem;
+  }
+  span {
+    font-size: 1rem;
   }
 }
 
 #hiddenDiv {
   display: none;
   height: 0;
+}
+
+// Mobile optimizations
+@media (max-width: 768px) {
+  .App {
+    padding: 1rem;
+
+    .content-container {
+      max-width: 100%;
+    }
+
+    .header-container {
+      padding: 20px;
+
+      h1 {
+        font-size: 2.5rem;
+      }
+
+      h3 {
+        font-size: 1rem;
+        margin-bottom: 35px;
+        margin-top: 35px;
+      }
+
+      span {
+        font-size: 0.9rem;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .App {
+    .header-container {
+      padding: 15px;
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      span {
+        font-size: 0.8rem;
+      }
+    }
+  }
 }
