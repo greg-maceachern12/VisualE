@@ -4,9 +4,6 @@ import "../styles/Navbar.scss";
 
 const Navbar = ({
   user,
-  isDropdownOpen,
-  toggleDropdown,
-  handleSignOut,
   handleDownloadSampleBook,
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -58,7 +55,7 @@ const Navbar = ({
           Issues?
         </a>
         <div className="nav-link">
-          <Link className ='nav-link'to={linkTo} className="user-link">
+          <Link className="user-link" to={linkTo}>
             {linkText}
           </Link>
         </div>
