@@ -64,3 +64,48 @@
   display: none;
   height: 0;
 }
+
+// Mobile optimizations
+@media (max-width: 768px) {
+  .App {
+    padding: 1rem;
+
+    .content-container {
+      max-width: 100%;
+    }
+
+    .header-container {
+      padding: 20px;
+
+      h1 {
+        font-size: 2.5rem;
+      }
+
+      h3 {
+        font-size: 1rem;
+        margin-bottom: 35px;
+        margin-top: 35px;
+      }
+
+      span {
+        font-size: 0.9rem;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .App {
+    .header-container {
+      padding: 15px;
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      span {
+        font-size: 0.8rem;
+      }
+    }
+  }
+}

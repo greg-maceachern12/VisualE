@@ -58,17 +58,25 @@ export const generateImageFromPrompt = async (prompt, bookTitle) => {
 };
 
 export const processChapter = async (chapter, epubReader, bookName) => {
-  const chapterPrompt = await getChapterPrompt(chapter, epubReader);
-  const chapterSegment = await findChapterPrompt(chapterPrompt);
-
-  if (chapterSegment !== "False") {
-    const processedPrompt = await generatePromptFromText(chapterSegment, bookName);
-    const generatedImageUrl = await generateImageFromPrompt(processedPrompt, bookName);
-    return { displayPrompt: chapterSegment, imageUrl: generatedImageUrl };
-  } else {
-    return {
-      displayPrompt: "This chapter is not part of the plot, please click next chapter.",
-      imageUrl: "https://cdn2.iconfinder.com/data/icons/picons-basic-2/57/basic2-085_warning_attention-512.png"
-    };
-  }
-};
+    try {
+      const chapterPrompt = await getChapterPrompt(chapter, epubReader);
+      const chapterSegment = await findChapterPrompt(chapterPrompt);
+  
+      if (chapterSegment !== "False") {
+        const processedPrompt = await generatePromptFromText(chapterSegment, bookName);
+        const generatedImageUrl = await generateImageFromPrompt(processedPrompt, bookName);
+        return { displayPrompt: chapterSegment, imageUrl: generatedImageUrl };
+      } else {
+        return {
+          displayPrompt: "This chapter is not part of the plot, please click next chapter.",
+          imageUrl: "https://cdn2.iconfinder.com/data/icons/picons-basic-2/57/basic2-085_warning_attention-512.png"
+        };
+      }
+    } catch (error) {
+      console.error("Error processing chapter:", error);
+      return {
+        displayPrompt: `Error processing chapter: ${error.message}. Please try again or move to the next chapter.`,
+        imageUrl: "https://cdn2.iconfinder.com/data/icons/picons-basic-2/57/basic2-085_warning_attention-512.png"
+      };
+    }
+  };

@@ -1,4 +1,4 @@
-import epub from 'epubjs';
+import epub from "epubjs";
 
 export const parseEpubFile = (epubFile) => {
   return new Promise((resolve, reject) => {
@@ -16,12 +16,12 @@ export const parseEpubFile = (epubFile) => {
         resolve({ toc, metadata, epubReader });
       } catch (error) {
         console.error("Error parsing EPUB file:", error);
-        reject(error);
+        reject(new Error(`Failed to parse EPUB file: ${error.message}`));
       }
     };
     reader.onerror = (error) => {
       console.error("Error reading EPUB file:", error);
-      reject(error);
+      reject(new Error(`Failed to read EPUB file: ${error.message}`));
     };
     reader.readAsArrayBuffer(epubFile);
   });
@@ -49,12 +49,19 @@ export const populateChapterDropdown = (toc) => {
     }
   });
 };
-
 export const getChapterPrompt = async (chapter, epubReader) => {
-  const displayedChapter = await epubReader
-    .renderTo("hiddenDiv")
-    .display(chapter.href);
-  return displayedChapter.contents.innerText.slice(0, 16000);
+  try {
+    const displayedChapter = await epubReader
+      .renderTo("hiddenDiv")
+      .display(chapter.href);
+    if (!displayedChapter || !displayedChapter.contents) {
+      throw new Error("Failed to render chapter content");
+    }
+    return displayedChapter.contents.innerText.slice(0, 16000);
+  } catch (error) {
+    console.error("Error getting chapter prompt:", error);
+    throw new Error(`Failed to get chapter prompt: ${error.message}`);
+  }
 };
 
 export const isNonStoryChapter = (chapterLabel) => {
@@ -75,7 +82,11 @@ export const isNonStoryChapter = (chapterLabel) => {
   );
 };
 
-export const getNextChapter = (toc, currentChapterIndex, currentSubitemIndex) => {
+export const getNextChapter = (
+  toc,
+  currentChapterIndex,
+  currentSubitemIndex
+) => {
   let nextChapterIndex = currentChapterIndex;
   let nextSubitemIndex = currentSubitemIndex + 1;
 

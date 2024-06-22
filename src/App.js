@@ -114,20 +114,16 @@ function App() {
             <Route
               path="/"
               element={
-                <>
+                <div className="home-content">
                   <div className="header-container">
-                    <div className="title-container">
-                      <h1>Turn Words Into Worlds</h1>
-                    </div>
-                    <div id="headings">
-                      <h3>Illustrate each chapter of your book - Upload your ePub file to get started</h3>
-                      <FileUpload 
-                        handleFileChange={handleFileChangeWrapper}
-                        fileError={fileError}
-                        handleParseAndGenerateImage={handleParseAndGenerateImage}
-                        epubFile={epubFile}
-                      />
-                    </div>
+                    <h1>Turn Words Into Worlds</h1>
+                    <h3>Illustrate each chapter of your book - Upload your ePub file to get started</h3>
+                    <FileUpload 
+                      handleFileChange={handleFileChangeWrapper}
+                      fileError={fileError}
+                      handleParseAndGenerateImage={handleParseAndGenerateImage}
+                      epubFile={epubFile}
+                    />
                   </div>
                   {chapterTitle && (
                     <ImageDisplay 
@@ -138,8 +134,8 @@ function App() {
                       handleNextChapter={handleNextChapter}
                     />
                   )}
-                  <div id="hiddenDiv"></div>
-                </>
+                                    <div id="hiddenDiv"></div>
+                </div>
               }
             />
           </Routes>

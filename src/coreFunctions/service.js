@@ -58,39 +58,49 @@ export const handleFileChange = async (file, callbacks) => {
 };
 
 export const loadChapter = async (chapterIndex, subitemIndex, toc, epubReader, bookName, callbacks) => {
-  const { setChapterTitle, setDisplayPrompt, setImageUrl, setIsLoading } = callbacks;
-
-  if (!epubReader) {
-    console.error("No EPUB reader available.");
-    return;
-  }
-
-  setIsLoading(true);
-  try {
-    const currentChapter = toc[chapterIndex];
-    if (isNonStoryChapter(currentChapter.label)) {
-      const nextChapter = getNextChapter(toc, chapterIndex, subitemIndex);
-      if (nextChapter) {
-        await loadChapter(nextChapter.nextChapterIndex, nextChapter.nextSubitemIndex, toc, epubReader, bookName, callbacks);
-      } else {
-        setDisplayPrompt("You've reached the end of the book.");
-      }
+    const { setChapterTitle, setDisplayPrompt, setImageUrl, setIsLoading } = callbacks;
+  
+    if (!epubReader) {
+      console.error("No EPUB reader available.");
+      setDisplayPrompt("Error: EPUB reader not initialized. Please reload the page and try again.");
       return;
     }
-
-    const chapterToLoad = currentChapter.subitems && currentChapter.subitems.length > 0
-      ? currentChapter.subitems[subitemIndex]
-      : currentChapter;
-
-    setChapterTitle(chapterToLoad.label);
-
-    const { displayPrompt, imageUrl } = await processChapter(chapterToLoad, epubReader, bookName);
-    setDisplayPrompt(displayPrompt);
-    setImageUrl(imageUrl);
-  } catch (error) {
-    console.error("Error loading chapter:", error);
-    setDisplayPrompt("Error loading chapter. Please try again.");
-  } finally {
-    setIsLoading(false);
-  }
-};
+  
+    setIsLoading(true);
+    try {
+      const currentChapter = toc[chapterIndex];
+      if (!currentChapter) {
+        throw new Error("Invalid chapter index");
+      }
+  
+      if (isNonStoryChapter(currentChapter.label)) {
+        const nextChapter = getNextChapter(toc, chapterIndex, subitemIndex);
+        if (nextChapter) {
+          await loadChapter(nextChapter.nextChapterIndex, nextChapter.nextSubitemIndex, toc, epubReader, bookName, callbacks);
+        } else {
+          setDisplayPrompt("You've reached the end of the book.");
+        }
+        return;
+      }
+  
+      const chapterToLoad = currentChapter.subitems && currentChapter.subitems.length > 0
+        ? currentChapter.subitems[subitemIndex]
+        : currentChapter;
+  
+      if (!chapterToLoad) {
+        throw new Error("Invalid subitem index");
+      }
+  
+      setChapterTitle(chapterToLoad.label);
+  
+      const { displayPrompt, imageUrl } = await processChapter(chapterToLoad, epubReader, bookName);
+      setDisplayPrompt(displayPrompt);
+      setImageUrl(imageUrl);
+    } catch (error) {
+      console.error("Error loading chapter:", error);
+      setDisplayPrompt(`Error loading chapter: ${error.message}. Please try again or select a different chapter.`);
+      setImageUrl("https://cdn2.iconfinder.com/data/icons/picons-basic-2/57/basic2-085_warning_attention-512.png");
+    } finally {
+      setIsLoading(false);
+    }
+  };
