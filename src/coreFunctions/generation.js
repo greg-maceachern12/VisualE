@@ -8,9 +8,9 @@ export const findChapterSegment = async (prompt) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ prompt }),
     });
-    const data = await response.json();
-    console.log("Segment: " + data.response);
-    return data.response;
+    const data = await response.text();
+    console.log("Segment: " + data);
+    return data;
   } catch (error) {
     console.error("Error with ChatGPT API:", error);
     return "Chapter text invalid - try next chapter";
