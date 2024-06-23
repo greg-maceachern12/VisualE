@@ -8,9 +8,9 @@ export const findChapterPrompt = async (prompt) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ prompt }),
     });
-    const data = await response.json();
-    console.log("Segment of text: " + data.response);
-    return data.response;
+    const data = await response.text();
+    console.log("Segment of text: " + data);
+    return data;
   } catch (error) {
     console.error("Error with ChatGPT API:", error);
     return "Chapter text invalid - try next chapter";
@@ -30,6 +30,10 @@ export const generatePromptFromText = async (prompt, bookTitle) => {
     const data = await response.json();
     console.log("DALL-E Prompt: " + data.response);
     return data.response;
+
+    // const data = await response.text();
+    // console.log("DALL-E Prompt: " + data);
+    // return data;
   } catch (error) {
     console.error("Error with ChatGPT API:", error);
     return "Chapter text invalid - try next chapter";

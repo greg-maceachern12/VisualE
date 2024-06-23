@@ -57,7 +57,7 @@ export const getChapterPrompt = async (chapter, epubReader) => {
     if (!displayedChapter || !displayedChapter.contents) {
       throw new Error("Failed to render chapter content");
     }
-    return displayedChapter.contents.innerText.slice(0, 16000);
+    return displayedChapter.contents.innerText.slice(0, 25000);
   } catch (error) {
     console.error("Error getting chapter prompt:", error);
     throw new Error(`Failed to get chapter prompt: ${error.message}`);
