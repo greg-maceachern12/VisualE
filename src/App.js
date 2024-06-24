@@ -5,11 +5,12 @@ import "./gradBG/gradBG.scss";
 import AccessCode from "./components/AccessCode.js";
 import About from "./components/About.js";
 import AuthPage from "./components/AuthPage.js";
+import Account from "./components/Account.js";
 import Navbar from "./components/Navbar.js";
 import FileUpload from "./components/FileUpload.js";
 import Loading from "./components/Loading.js";
 import { initGradientBackground } from "./gradBG/gradBG.js";
-import { supabase } from "./supabaseClient";
+import { supabase } from "./utils/supabaseClient.js";
 import {
   initializeGoogleAnalytics,
   logPageView,
@@ -146,6 +147,7 @@ function App() {
               }
             />
             <Route path="/auth" element={<AuthPage />} />
+            <Route path="/account" element={<Account />} />
           </Routes>
         </div>
       </div>
