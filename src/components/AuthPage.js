@@ -16,7 +16,7 @@ function AuthPage() {
 
   const handleSignInWithMagicLink = async () => {
     try {
-      const { data, error } = await supabase.auth.signInWithOtp({
+      const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
           shouldCreateUser: true,
