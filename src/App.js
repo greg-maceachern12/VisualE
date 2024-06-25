@@ -84,6 +84,7 @@ function App() {
       handlePayNow(user.id);
     } else {
       console.error("User not logged in");
+      setFileError("Please log in to proceed.")
 
     }
   };
