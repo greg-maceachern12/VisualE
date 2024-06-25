@@ -110,6 +110,10 @@ export const handlePayNow = async (userId) => {
   const stripe = await loadStripe(
     "pk_live_51PMDZsHMeAmZ2ytpfyzeNN9ExgQBqQml8ROGTFF7pyztT4pue5iEyZW5brLeinKWeEg7ToU0XPrY4so6TPTs92vE0027R3L6B0"
   );
+  // const stripe = await loadStripe(
+  //   "pk_test_51PMDZsHMeAmZ2ytpSpivpSert86xt8kqmM6bWFbdOxem4vZVE74Lr2t4Frkbl5sfleouQjDvlsKdF4jEH37ii0in00xnLCRaB3"
+  // );
+
   try {
     const response = await fetch(payAPI, {
       method: "POST",
