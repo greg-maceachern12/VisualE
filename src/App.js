@@ -46,6 +46,7 @@ function App() {
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         const currentUser = session?.user;
+        console.log(currentUser)
         setUser(currentUser ?? null);
         if (currentUser) checkUserStatus(currentUser);
       }
