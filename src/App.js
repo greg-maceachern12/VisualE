@@ -136,7 +136,7 @@ function App() {
                 <>
                   <div className="home-content"></div>
                   <div className="header-container">
-                    <h1>Turn Words in Worlds</h1>
+                    <h1>Turn Words into Worlds</h1>
                     <h4>
                       Add illustations to your full ePub - Free for a limited
                       time
