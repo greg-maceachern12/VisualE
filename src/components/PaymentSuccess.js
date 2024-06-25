@@ -14,7 +14,7 @@ const PaymentSuccess = () => {
         if (error) throw error;
 
         if (user) {
-          const { data, error: updateError } = await supabase.auth.updateUser({
+          const { error: updateError } = await supabase.auth.updateUser({
             data: { is_premium: true, premium_since: new Date().toISOString() }
           });
 

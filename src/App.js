@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./styles/App.scss";
 import "./gradBG/gradBG.scss";
@@ -31,6 +31,16 @@ function App() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isPremiumUser, setIsPremiumUser] = useState(false);
 
+  const checkUserStatus = useCallback((user) => {
+    setIsPremiumUser(user.user_metadata.is_premium || false);
+  }, []);
+
+  const checkUser = useCallback(async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    setUser(user);
+    if (user) checkUserStatus(user);
+  }, [checkUserStatus]);
+
   useEffect(() => {
     checkUser();
     const { data: authListener } = supabase.auth.onAuthStateChange(
@@ -48,19 +58,8 @@ function App() {
       if (authListener?.subscription) authListener.subscription.unsubscribe();
       cleanupGradientBackground();
     };
-  }, []);
+  }, [checkUser, checkUserStatus]);
 
-  const checkUser = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    setUser(user);
-    if (user) checkUserStatus(user);
-  };
-
-  const checkUserStatus = (user) => {
-    setIsPremiumUser(user.user_metadata.is_premium || false);
-  };
 
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
 
