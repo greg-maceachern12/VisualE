@@ -7,6 +7,7 @@ import {
 } from "./bookLogic";
 import { loadStripe } from "@stripe/stripe-js";
 import { supabase } from "../utils/supabaseClient.js";
+import { fetchBlobAndConvertToBase64 } from '../utils/epubUtils.js'; 
 
 export const initializeGoogleAnalytics = () => {
   ReactGA.initialize("G-74BZMF8F67");
@@ -177,11 +178,28 @@ export const handleParseAndGenerateImage = async (
 
     const { epubReader, metadata, toc } = await parseEpubFile(epubFile);
 
+    let coverBase64 = null;
+    await epubReader.coverUrl()
+    .then(coverBlob => {
+      if (coverBlob) {
+        return fetchBlobAndConvertToBase64(coverBlob);
+      }
+      return null;
+    })
+    .then(base64 => {
+      if (base64) {
+        coverBase64 = `data:image/png;base64,${base64}`;
+      }
+    })
+    .catch(error => {
+      console.error("Error processing cover image:", error);
+    });
+    
     const generatedBook = {
       title: metadata.title,
+      cover: coverBase64 || "https://i.imgur.com/c4VGri2.jpeg",
       author: metadata.creator,
       publisher: "Your Publisher",
-      cover: "http://demo.com/url-to-cover-image.jpg",
       content: [],
     };
 
@@ -216,6 +234,7 @@ export const handleParseAndGenerateImage = async (
       chaptersToProcess,
       epubReader,
       generatedBook.title,
+      generatedBook.cover,
       setLoadingInfo
     );
 

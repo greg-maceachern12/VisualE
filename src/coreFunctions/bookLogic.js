@@ -61,12 +61,13 @@ export const processAllChapters = async (
   chapters,
   epubReader,
   bookTitle,
+  coverImg,
   setLoadingInfo
 ) => {
   console.log(`Total chapters to process: ${chapters.length}`);
 
   let completedChapters = 0;
-  const generatedBook = { title: bookTitle, content: [] };
+  const generatedBook = { title: bookTitle, cover: coverImg, content: [] };
 
   const updateProgress = () => {
     completedChapters++;

@@ -1,4 +1,4 @@
-import { segmentAPI, chatAPI, imageAPI } from "../utils/apiConfig";
+import { OpenAiSegmentAPI, OpenAiChatAPI, SDimageAPI } from "../utils/apiConfig";
 import ReactGA from "react-ga";
 
 const test = false;
@@ -8,16 +8,19 @@ export const findChapterSegment = async (prompt) => {
     return "sample text in text mode";
   } else {
     try {
-      const response = await fetch(segmentAPI, {
+      const response = await fetch(OpenAiSegmentAPI, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt }),
       });
-      const data = await response.text();
-      console.log("Segment: " + data);
-      return data;
+      // const data = await response.text();
+      // console.log("CSegment: " + data);
+      // return data;
+      const data = await response.json();
+      console.log("OSegment: " + data.response);
+      return data.response;
     } catch (error) {
-      console.error("Error with ChatGPT API:", error);
+      console.error("Error with segment API:", error);
       return "Chapter text invalid - try next chapter";
     }
   }
@@ -28,7 +31,7 @@ export const generatePromptFromSegment = async (prompt, bookTitle) => {
     return "sample prompt in test mode";
   } else {
     try {
-      const response = await fetch(chatAPI, {
+      const response = await fetch(OpenAiChatAPI, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt, bookTitle }),
@@ -49,7 +52,7 @@ export const generateImageFromPrompt = async (prompt, bookTitle) => {
   } else {
     try {
       console.log("generating image.. this can take up to 15s");
-      const response = await fetch(imageAPI, {
+      const response = await fetch(SDimageAPI, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
