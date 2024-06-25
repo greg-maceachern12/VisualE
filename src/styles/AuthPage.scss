@@ -36,6 +36,10 @@
       border-radius: 4px;
       cursor: pointer;
     }
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
 
     .oauth-buttons {
       margin-top: 20px;
