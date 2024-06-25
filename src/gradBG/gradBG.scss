@@ -1,17 +1,55 @@
 :root {
-  // --color-bg1: rgb(108, 0, 162);
-  // --color-bg2: rgb(0, 17, 82);
-  --color-bg1: rgb(0, 24, 162);
-  --color-bg2: rgb(0, 82, 48);
-  --color1: 18, 113, 255;
-  --color2: 221, 74, 255;
-  --color3: 100, 220, 255;
-  --color4: 200, 50, 50;
-  --color5: 180, 180, 50;
-  --color-interactive: 140, 100, 255;
+  --color-bg1: #090088;  /* Your primary deep blue */
+  --color-bg2: #050066;  /* A slightly darker blue for background gradient */
+  --color1: 176, 196, 222;  /* Light Steel Blue - a blue-grey */
+  --color2: 220, 220, 220;  /* Gainsboro - a light grey */
+  --color3: 230, 230, 250;  /* Lavender - very light purple-grey */
+  --color4: 119, 136, 153;  /* Light Slate Gray - darker grey */
+  --color5: 240, 248, 255;  /* Alice Blue - very light blue, almost white */
+  --color-interactive: 165, 182, 211;  /* A muted blue-grey */
   --circle-size: 80%;
-  --blending: hard-light;
+  --blending: screen;  /* Changed back to screen for better visibility */
 }
+
+.gradient-bg {
+  background: linear-gradient(40deg, var(--color-bg1), var(--color-bg2));
+}
+
+.g1 {
+  opacity: 0.35;
+  width: 120%;
+  height: 120%;
+}
+
+.g2 {
+  opacity: 0.3;
+  width: 100%;
+  height: 100%;
+}
+
+.g3 {
+  opacity: 0.25;
+  width: 90%;
+  height: 90%;
+}
+
+.g4 {
+  opacity: 0.3;
+  width: 110%;
+  height: 110%;
+}
+
+.g5 {
+  opacity: 0.2;
+  width: 130%;
+  height: 130%;
+}
+
+.interactive {
+  opacity: 0.2;
+}
+
+/* Rest of the CSS remains the same */
 
 @keyframes moveInCircle {
   0% {

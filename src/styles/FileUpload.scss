@@ -89,20 +89,23 @@ input[type="file"] {
     }
     #paynow {
     font-size: 16px;
-    background-color: #b596ff;
+    background-color: #090088;
     color: #fff;
+    }
+    #paynow:hover{
+      background-color: #06005a;
     }
 
   }
   
   #parse {
-    background: #ffa4e8;
+    background: #b3d4ff;
     color: #333;
     font-weight: 500;
     white-space: nowrap;
   
     &:hover {
-      background-color: #ff8be2;
+      background-color: #7cb5ff;
     }
   }
 
