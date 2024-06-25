@@ -24,7 +24,7 @@ import {
 function App() {
   const [epubFile, setEpubFile] = useState(null);
   const [fileError, setFileError] = useState("");
-  const [isAccessGranted, setIsAccessGranted] = useState(true);
+  const [isAccessGranted, setIsAccessGranted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingInfo, setLoadingInfo] = useState("");
   const [user, setUser] = useState(null);
