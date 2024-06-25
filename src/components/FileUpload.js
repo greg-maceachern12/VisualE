@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faWandMagicSparkles } from "@fortawesome/free-solid-svg-icons";
+import { faWandMagicSparkles, faCreditCard } from "@fortawesome/free-solid-svg-icons";
 import "../styles/FileUpload.scss";
 
 const FileUpload = ({
@@ -9,6 +9,7 @@ const FileUpload = ({
   handleParseAndGenerateImage,
   handlePayNow,
   epubFile,
+  isPremiumUser
 }) => {
   const [fileName, setFileName] = useState("No file chosen");
 
@@ -32,14 +33,17 @@ const FileUpload = ({
       </div>
       {epubFile && (
         <div className="button-container">
+          {isPremiumUser ? (
           <button id="parse" onClick={handleParseAndGenerateImage}>
             <FontAwesomeIcon icon={faWandMagicSparkles} />
             Visualize
           </button>
-          {/* <button id="paynow" onClick={handlePayNow} className="go-button">
-            <FontAwesomeIcon icon={faWandMagicSparkles} />
-            Full Book (Pay Now)
-          </button> */}
+          ) : (
+            <button id="paynow" onClick={handlePayNow} className="go-button">
+              <FontAwesomeIcon icon={faCreditCard} />
+              {" "}$5 to Generate
+            </button>
+          )}
         </div>
       )}
     </div>

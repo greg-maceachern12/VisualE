@@ -9,6 +9,7 @@ import Account from "./components/Account.js";
 import Navbar from "./components/Navbar.js";
 import FileUpload from "./components/FileUpload.js";
 import Loading from "./components/Loading.js";
+import PaymentSuccess from "./components/PaymentSuccess";
 import { initGradientBackground } from "./gradBG/gradBG.js";
 import { supabase } from "./utils/supabaseClient.js";
 import {
@@ -23,17 +24,20 @@ import {
 function App() {
   const [epubFile, setEpubFile] = useState(null);
   const [fileError, setFileError] = useState("");
-  const [isAccessGranted, setIsAccessGranted] = useState(false);
+  const [isAccessGranted, setIsAccessGranted] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingInfo, setLoadingInfo] = useState("");
   const [user, setUser] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isPremiumUser, setIsPremiumUser] = useState(false);
 
   useEffect(() => {
-    const { subscription } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+    checkUser();
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
         const currentUser = session?.user;
         setUser(currentUser ?? null);
+        if (currentUser) checkUserStatus(currentUser);
       }
     );
     initializeGoogleAnalytics();
@@ -41,10 +45,22 @@ function App() {
     const cleanupGradientBackground = initGradientBackground();
 
     return () => {
-      subscription?.unsubscribe();
+      if (authListener?.subscription) authListener.subscription.unsubscribe();
       cleanupGradientBackground();
     };
   }, []);
+
+  const checkUser = async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    setUser(user);
+    if (user) checkUserStatus(user);
+  };
+
+  const checkUserStatus = (user) => {
+    setIsPremiumUser(user.user_metadata.is_premium || false);
+  };
 
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
 
@@ -68,7 +84,7 @@ function App() {
       handlePayNow(user.id);
     } else {
       console.error("User not logged in");
-      // Handle the case when the user is not logged in
+
     }
   };
 
@@ -117,16 +133,22 @@ function App() {
               path="/"
               element={
                 <>
-                <div className='home-content'></div>
+                  <div className="home-content"></div>
                   <div className="header-container">
                     <h1>Turn Words in Worlds</h1>
                     <h4>
                       Add illustations to your full ePub - Free for a limited
                       time
                     </h4>
-                    <p>**Now with Stable Diffusion**</p>
                     {isAccessGranted ? (
                       <div id="headings">
+                        {isPremiumUser && (
+                          <i>
+                            You have access to one book generation. This access
+                            will be used up after you generate and download a
+                            book.
+                          </i>
+                        )}
                         <FileUpload
                           handleFileChange={handleFileChangeWrapper}
                           fileError={fileError}
@@ -134,6 +156,7 @@ function App() {
                             handleParseAndGenerateImageWrapper
                           }
                           handlePayNow={handlePayNowWrapper}
+                          isPremiumUser={isPremiumUser}
                           epubFile={epubFile}
                         />
                       </div>
@@ -148,6 +171,7 @@ function App() {
             />
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/account" element={<Account />} />
+            <Route path="/payment-success" element={<PaymentSuccess />} />
           </Routes>
         </div>
       </div>

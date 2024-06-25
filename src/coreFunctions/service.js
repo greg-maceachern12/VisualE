@@ -7,7 +7,7 @@ import {
 } from "./bookLogic";
 import { loadStripe } from "@stripe/stripe-js";
 import { supabase } from "../utils/supabaseClient.js";
-import { fetchBlobAndConvertToBase64 } from '../utils/epubUtils.js'; 
+import { fetchBlobAndConvertToBase64 } from "../utils/epubUtils.js";
 
 export const initializeGoogleAnalytics = () => {
   ReactGA.initialize("G-74BZMF8F67");
@@ -88,6 +88,17 @@ export const handleDownloadBook = async (generatedBook, setLoadingInfo) => {
       console.log("Book saved to database:", data);
     }
 
+    // Reset user's premium status
+    const { error: updateError } = await supabase.auth.updateUser({
+      data: { is_premium: false, premium_since: null },
+    });
+
+    if (updateError) {
+      console.error("Error resetting premium status:", updateError);
+    } else {
+      console.log("Premium status reset successfully");
+    }
+
     setLoadingInfo("Book downloaded and saved successfully!");
   } catch (error) {
     console.error("Error downloading the book:", error);
@@ -96,7 +107,9 @@ export const handleDownloadBook = async (generatedBook, setLoadingInfo) => {
 };
 
 export const handlePayNow = async (userId) => {
-  const stripe = await loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
+  const stripe = await loadStripe(
+    "pk_test_51PMDZsHMeAmZ2ytpSpivpSert86xt8kqmM6bWFbdOxem4vZVE74Lr2t4Frkbl5sfleouQjDvlsKdF4jEH37ii0in00xnLCRaB3"
+  );
   try {
     const response = await fetch(payAPI, {
       method: "POST",
@@ -108,6 +121,7 @@ export const handlePayNow = async (userId) => {
 
     if (response.ok) {
       const data = await response.json();
+      console.log(data);
       const result = await stripe.redirectToCheckout({
         sessionId: data.sessionId,
       });
@@ -120,6 +134,21 @@ export const handlePayNow = async (userId) => {
     }
   } catch (error) {
     console.error("Error:", error);
+  }
+};
+
+export const handlePaymentSuccess = async (userId) => {
+  try {
+    const { error } = await supabase
+      .from("user_meta")
+      .upsert({ user_id: userId, is_premium: true }, { onConflict: "user_id" });
+
+    if (error) throw error;
+    console.log("User premium status updated successfully");
+    return true;
+  } catch (error) {
+    console.error("Error updating user premium status:", error);
+    return false;
   }
 };
 
@@ -140,6 +169,17 @@ export const checkAndDownloadBook = async (bookTitle, setLoadingInfo) => {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+
+      // Reset user's premium status
+      const { error: updateError } = await supabase.auth.updateUser({
+        data: { is_premium: false, premium_since: null },
+      });
+
+      if (updateError) {
+        console.error("Error resetting premium status:", updateError);
+      } else {
+        console.log("Premium status reset successfully");
+      }
 
       console.log(`Book with title "${bookTitle}" downloaded successfully.`);
       setLoadingInfo(`"${bookTitle}" downloaded successfully.`);
@@ -179,22 +219,23 @@ export const handleParseAndGenerateImage = async (
     const { epubReader, metadata, toc } = await parseEpubFile(epubFile);
 
     let coverBase64 = null;
-    await epubReader.coverUrl()
-    .then(coverBlob => {
-      if (coverBlob) {
-        return fetchBlobAndConvertToBase64(coverBlob);
-      }
-      return null;
-    })
-    .then(base64 => {
-      if (base64) {
-        coverBase64 = `data:image/png;base64,${base64}`;
-      }
-    })
-    .catch(error => {
-      console.error("Error processing cover image:", error);
-    });
-    
+    await epubReader
+      .coverUrl()
+      .then((coverBlob) => {
+        if (coverBlob) {
+          return fetchBlobAndConvertToBase64(coverBlob);
+        }
+        return null;
+      })
+      .then((base64) => {
+        if (base64) {
+          coverBase64 = `data:image/png;base64,${base64}`;
+        }
+      })
+      .catch((error) => {
+        console.error("Error processing cover image:", error);
+      });
+
     const generatedBook = {
       title: metadata.title,
       cover: coverBase64 || "https://i.imgur.com/c4VGri2.jpeg",
@@ -251,14 +292,14 @@ export const handleParseAndGenerateImage = async (
 export const fetchUserBooks = async () => {
   try {
     const { data, error } = await supabase
-      .from('generated_books')
-      .select('*')
-      .order('created_at', { ascending: false });
+      .from("generated_books")
+      .select("*")
+      .order("created_at", { ascending: false });
 
     if (error) throw error;
     return data;
   } catch (error) {
-    console.error('Error fetching user books:', error);
+    console.error("Error fetching user books:", error);
     return [];
   }
 };
