@@ -72,8 +72,8 @@
     }
 
     button {
-      background-color: #4a90e2;
-      color: #ffffff;
+      background-color: #b3d4ff;
+      color: #333;
       border: none;
       cursor: pointer;
       font-weight: 600;
@@ -81,7 +81,7 @@
 
       &:hover {
         transform: scale(1.02);
-        background-color: #3a7bd5;
+        background-color: #7cb5ff;
       }
 
       &:disabled {

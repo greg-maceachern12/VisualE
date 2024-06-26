@@ -138,8 +138,7 @@ function App() {
                   <div className="header-container">
                     <h1>Turn Words Into Worlds</h1>
                     <h4>
-                      Add illustations to your full ePub - Free for a limited
-                      time
+                      Add illustations directly to your ebook - all for $5 per book.
                     </h4>
                     {isAccessGranted ? (
                       <div id="headings">
