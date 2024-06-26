@@ -29,14 +29,16 @@ function App() {
   const [loadingInfo, setLoadingInfo] = useState("");
   const [user, setUser] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isPremiumUser, setIsPremiumUser] = useState(false);
+  const [isPremiumUser, setIsPremiumUser] = useState(true);
 
   const checkUserStatus = useCallback((user) => {
     setIsPremiumUser(user.user_metadata.is_premium || false);
   }, []);
 
   const checkUser = useCallback(async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     setUser(user);
     if (user) checkUserStatus(user);
   }, [checkUserStatus]);
@@ -46,7 +48,7 @@ function App() {
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         const currentUser = session?.user;
-        console.log(currentUser)
+        console.log(currentUser);
         setUser(currentUser ?? null);
         if (currentUser) checkUserStatus(currentUser);
       }
@@ -60,7 +62,6 @@ function App() {
       cleanupGradientBackground();
     };
   }, [checkUser, checkUserStatus]);
-
 
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
 
@@ -84,8 +85,7 @@ function App() {
       handlePayNow(user.id);
     } else {
       console.error("User not logged in");
-      setFileError("Please log in to proceed.")
-
+      setFileError("Please log in to proceed.");
     }
   };
 
@@ -138,16 +138,13 @@ function App() {
                   <div className="header-container">
                     <h1>Turn Words Into Worlds</h1>
                     <h4>
-                      Add illustations directly to your ebook - all for $5 per book.
+                      Add illustations directly to your ebook - all for $5 per
+                      book.
                     </h4>
                     {isAccessGranted ? (
                       <div id="headings">
                         {isPremiumUser && (
-                          <i>
-                            You have access to one book generation. This access
-                            will be used up after you generate and download a
-                            book.
-                          </i>
+                          <p id="premium">Premium - 1 Visuai Generation</p>
                         )}
                         <FileUpload
                           handleFileChange={handleFileChangeWrapper}
