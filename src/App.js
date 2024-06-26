@@ -29,7 +29,7 @@ function App() {
   const [loadingInfo, setLoadingInfo] = useState("");
   const [user, setUser] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isPremiumUser, setIsPremiumUser] = useState(true);
+  const [isPremiumUser, setIsPremiumUser] = useState(false);
 
   const checkUserStatus = useCallback((user) => {
     setIsPremiumUser(user.user_metadata.is_premium || false);
