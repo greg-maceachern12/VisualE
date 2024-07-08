@@ -16,7 +16,7 @@ const PaymentStep = ({ handlePayNow, isPremiumUser, fileError }) => {
         <div>
           <p>Unlock the ability to visualize your ebook for just $5.</p>
           <button onClick={handlePayNow} className="pay-button">
-            <FontAwesomeIcon icon={faCreditCard} /> Pay $5 to Unlock
+            <FontAwesomeIcon icon={faCreditCard} /> $5 to Unlock
           </button>
         </div>
       )}
