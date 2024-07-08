@@ -1,4 +1,8 @@
-import { OpenAiSegmentAPI, OpenAiChatAPI, SDimageAPI } from "../utils/apiConfig";
+import {
+  OpenAiSegmentAPI,
+  OpenAiChatAPI,
+  SDimageAPI,
+} from "../utils/apiConfig";
 import ReactGA from "react-ga";
 
 const test = false;
@@ -13,15 +17,20 @@ export const findChapterSegment = async (prompt) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt }),
       });
-      // const data = await response.text();
-      // console.log("CSegment: " + data);
-      // return data;
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
       const data = await response.json();
       console.log("OSegment: " + data.response);
       return data.response;
     } catch (error) {
       console.error("Error with segment API:", error);
-      return "Chapter text invalid - try next chapter";
+      ReactGA.event({
+        category: "API",
+        action: "Error",
+        label: "Segment API failed",
+      });
+      return "Error: Unable to process chapter segment";
     }
   }
 };
@@ -36,19 +45,27 @@ export const generatePromptFromSegment = async (prompt, bookTitle) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt, bookTitle }),
       });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
       const data = await response.json();
       console.log("Stable-Diffusion Prompt: " + data.response);
       return data.response;
     } catch (error) {
       console.error("Error with ChatGPT API:", error);
-      return "Chapter text invalid - try next chapter";
+      ReactGA.event({
+        category: "API",
+        action: "Error",
+        label: "ChatGPT API failed",
+      });
+      return "Error: Unable to generate prompt";
     }
   }
 };
 
 export const generateImageFromPrompt = async (prompt, bookTitle) => {
   if (test === true) {
-    return "https://cdn.iconscout.com/icon/free/png-256/free-error-2653315-2202987.png"
+    return "https://cdn.iconscout.com/icon/free/png-256/free-error-2653315-2202987.png";
   } else {
     try {
       console.log("generating image.. this can take up to 15s");
@@ -62,16 +79,17 @@ export const generateImageFromPrompt = async (prompt, bookTitle) => {
           title: bookTitle,
         }),
       });
-      const data = await response.json();
-      if (data.error) {
-        console.error("Error generating image:", data.error);
-        ReactGA.event({
-          category: "User",
-          action: "Error",
-          label: "Image generation failed",
-        });
-        return `Error: ${data.error}`;
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+      
+      const data = await response.json();
+      
+      if (!data.imageUrl) {
+        throw new Error("No image URL returned from the API");
+      }
+      
       ReactGA.event({
         category: "User",
         action: "Action Complete",
@@ -79,13 +97,13 @@ export const generateImageFromPrompt = async (prompt, bookTitle) => {
       });
       return data.imageUrl;
     } catch (error) {
-      console.error("Error calling the API:", error);
+      console.error("Error generating image:", error);
       ReactGA.event({
         category: "User",
         action: "Error",
         label: "Image generation failed",
       });
-      return `Error: ${error.message}`;
+      return "https://cdn.iconscout.com/icon/free/png-256/free-error-2653315-2202987.png";
     }
   }
 };

@@ -48,7 +48,7 @@ export const getChapterText = async (chapter, epubReader) => {
     .display(chapter.href);
   return {
     html: displayedChapter.document.body.innerHTML,
-    text: displayedChapter.contents.innerText.slice(0, 16000),
+    text: displayedChapter.contents.innerText.slice(0, 12000),
   };
 };
 
@@ -112,21 +112,21 @@ const processChapter = async (
     const chapterPrompt = await getChapterText(chapter, epubReader);
     const chapterSegment = await findChapterSegment(chapterPrompt.text);
 
-    if (chapterSegment !== "False" && !isNonStoryChapter(chapter.label)) {
+    if (chapterSegment !== "False" && !isNonStoryChapter(chapter.label) && !chapterSegment.startsWith("Error:")) {
       const processedPrompt = await generatePromptFromSegment(
         chapterSegment,
         generatedBook.title
       );
-      let imageUrl = await generateImageFromPrompt(
-        processedPrompt,
-        generatedBook.title
-      );
-
-      if (imageUrl.startsWith("Error: ")) {
-        console.error(imageUrl);
-        imageUrl =
-          "https://cdn.iconscout.com/icon/free/png-256/free-error-2653315-2202987.png";
-        return false;
+      
+      let imageUrl;
+      if (processedPrompt.startsWith("Error:")) {
+        console.error(processedPrompt);
+        imageUrl = "https://cdn.iconscout.com/icon/free/png-256/free-error-2653315-2202987.png";
+      } else {
+        imageUrl = await generateImageFromPrompt(
+          processedPrompt,
+          generatedBook.title
+        );
       }
 
       const cleanedBook = removeImages(chapterPrompt.html);
@@ -139,7 +139,7 @@ const processChapter = async (
       );
       return true;
     } else {
-      console.log("Non-story: " + chapter.label);
+      console.log("Non-story or error: " + chapter.label);
       const cleanedBook = removeImages(chapterPrompt.html);
       const nonImageUrl =
         "https://cdn.iconscout.com/icon/free/png-256/free-error-2653315-2202987.png";
