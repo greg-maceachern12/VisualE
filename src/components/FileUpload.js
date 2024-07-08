@@ -1,16 +1,12 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faWandMagicSparkles,
-  faCreditCard,
-} from "@fortawesome/free-solid-svg-icons";
+import { faWandMagicSparkles } from "@fortawesome/free-solid-svg-icons";
 import "../styles/FileUpload.scss";
 
 const FileUpload = ({
   handleFileChange,
   fileError,
   handleParseAndGenerateImage,
-  handlePayNow,
   epubFile,
   isPremiumUser,
   isLoading,
@@ -18,13 +14,15 @@ const FileUpload = ({
   const [fileName, setFileName] = useState("No file chosen");
 
   const onFileChange = (event) => {
-    const file = event.target.files[0];
-    setFileName(file ? file.name : "No file chosen");
-    handleFileChange(event);
+    if (isPremiumUser) {
+      const file = event.target.files[0];
+      setFileName(file ? file.name : "No file chosen");
+      handleFileChange(event);
+    }
   };
 
   return (
-    <div className="control-container">
+    <div className={`control-container ${!isPremiumUser ? 'disabled' : ''}`}>
       <div className="input-container">
         <div className="file-input-wrapper">
           <label htmlFor="file-upload" className="file-input-label">
@@ -35,28 +33,24 @@ const FileUpload = ({
             type="file"
             accept=".epub"
             onChange={onFileChange}
+            disabled={!isPremiumUser}
           />
           <span className="file-name">{fileName}</span>
         </div>
         {fileError && <p className="error-message">{fileError}</p>}
       </div>
-      {epubFile && (
-        <div className="button-container">
-          {isPremiumUser ? (
-            <button
-              id="parse"
-              onClick={handleParseAndGenerateImage}
-              disabled={isLoading}
-            >
-              <FontAwesomeIcon icon={faWandMagicSparkles} />
-              {isLoading ? "Processing..." : "Visualize"}
-            </button>
-          ) : (
-            <button id="paynow" onClick={handlePayNow} className="go-button">
-              <FontAwesomeIcon icon={faCreditCard} /> $5 to Generate
-            </button>
-          )}
-        </div>
+      <div className="button-container">
+        <button
+          id="parse"
+          onClick={handleParseAndGenerateImage}
+          disabled={isLoading || !epubFile || !isPremiumUser}
+        >
+          <FontAwesomeIcon icon={faWandMagicSparkles} />
+          {isLoading ? "Processing..." : "Visualize"}
+        </button>
+      </div>
+      {!isPremiumUser && (
+        <div className="disabled-overlay">Complete Step 1 to unlock</div>
       )}
     </div>
   );

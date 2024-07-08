@@ -75,15 +75,14 @@ input[type="file"] {
   text-align: justify;
 }
 
+
 .button-container {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   width: 100%;
-  gap: 10px;
   padding-bottom: 15px;
 
   button {
-    flex: 1;
     padding: 12px 16px;
     font-size: 16px;
     border: none;
@@ -103,16 +102,6 @@ input[type="file"] {
       transform: scale(1);
     }
   }
-
-  #paynow {
-    font-size: 16px;
-    background-color: #090088;
-    color: #fff;
-
-    &:hover {
-      background-color: #06005a;
-    }
-  }
 }
 
 #parse {
@@ -124,6 +113,23 @@ input[type="file"] {
   &:hover {
     background-color: #509cff;
   }
+}
+
+.disabled-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 16px;
+  z-index: 10;
 }
 
 @media (max-width: 768px) {
@@ -147,5 +153,8 @@ input[type="file"] {
       width: 100%;
       max-width: 100%;
     }
+  }
+  .disabled-overlay {
+    font-size: 16px;
   }
 }

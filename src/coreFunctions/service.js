@@ -282,8 +282,11 @@ export const handleParseAndGenerateImage = async (
       generatedBook.cover,
       setLoadingInfo
     );
+    
+    console.log("Done processing book... ready for download");
+    return processedBook;
 
-    await handleDownloadBook(processedBook, setLoadingInfo);
+
   } catch (error) {
     console.error("Error while parsing EPUB:", error);
     setLoadingInfo("Error while parsing EPUB.");

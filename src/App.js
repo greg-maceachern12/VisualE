@@ -7,6 +7,7 @@ import About from "./components/About.js";
 import AuthPage from "./components/AuthPage.js";
 import Account from "./components/Account.js";
 import Navbar from "./components/Navbar.js";
+import PaymentStep from "./components/PaymentStep.js";
 import FileUpload from "./components/FileUpload.js";
 import Loading from "./components/Loading.js";
 import PaymentSuccess from "./components/PaymentSuccess";
@@ -19,6 +20,7 @@ import {
   handleFileChange,
   handleParseAndGenerateImage,
   handlePayNow,
+  handleDownloadBook,
 } from "./coreFunctions/service";
 
 function App() {
@@ -29,7 +31,8 @@ function App() {
   const [loadingInfo, setLoadingInfo] = useState("");
   const [user, setUser] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isPremiumUser, setIsPremiumUser] = useState(false);
+  const [isPremiumUser, setIsPremiumUser] = useState(true);
+  const [generatedBook, setGeneratedBook] = useState(null);
 
   const checkUserStatus = useCallback((user) => {
     setIsPremiumUser(user.user_metadata.is_premium || false);
@@ -76,8 +79,17 @@ function App() {
     handleFileChange(event.target.files[0], setEpubFile, setFileError);
   };
 
-  const handleParseAndGenerateImageWrapper = () => {
-    handleParseAndGenerateImage(epubFile, setIsLoading, setLoadingInfo);
+  const handleParseAndGenerateImageWrapper = async () => {
+    setIsLoading(true);
+    const result = await handleParseAndGenerateImage(
+      epubFile,
+      setIsLoading,
+      setLoadingInfo
+    );
+    if (result) {
+      setGeneratedBook(result);
+    }
+    setIsLoading(false);
   };
 
   const handlePayNowWrapper = () => {
@@ -86,6 +98,16 @@ function App() {
     } else {
       console.error("User not logged in");
       setFileError("Please log in to proceed.");
+    }
+  };
+
+  const handleDownloadNow = async () => {
+    console.log("waing");
+    if (generatedBook) {
+      setIsLoading(true);
+      await handleDownloadBook(generatedBook, setLoadingInfo);
+      setIsLoading(false);
+      setGeneratedBook(null);
     }
   };
 
@@ -138,28 +160,40 @@ function App() {
                   <div className="header-container">
                     <h1>Turn Words Into Worlds</h1>
                     <h4>
-                      Add illustations directly to your ebook - all for $5 per
+                      Add illustrations directly to your ebook - all for $5 per
                       book.
                     </h4>
                     {isAccessGranted ? (
-                      <div id="headings">
-                        {isPremiumUser && (
-                          <p id="premium">Premium - 1 Visuai Generation</p>
+                      <div id="headings" className="step-container">
+                        {!isPremiumUser ? (
+                          <PaymentStep
+                            handlePayNow={handlePayNowWrapper}
+                            fileError={fileError}
+                            isPremiumUser={isPremiumUser}
+                          />
+                        ) : (
+                          <FileUpload
+                            handleFileChange={handleFileChangeWrapper}
+                            fileError={fileError}
+                            handleParseAndGenerateImage={
+                              handleParseAndGenerateImageWrapper
+                            }
+                            isPremiumUser={isPremiumUser}
+                            epubFile={epubFile}
+                            isLoading={isLoading}
+                          />
                         )}
-                        <FileUpload
-                          handleFileChange={handleFileChangeWrapper}
-                          fileError={fileError}
-                          handleParseAndGenerateImage={
-                            handleParseAndGenerateImageWrapper
-                          }
-                          handlePayNow={handlePayNowWrapper}
-                          isPremiumUser={isPremiumUser}
-                          epubFile={epubFile}
-                          isLoading={isLoading}
-                        />
                       </div>
                     ) : (
                       <AccessCode onAccessGranted={handleAccessGranted} />
+                    )}
+                    {generatedBook && !isLoading && (
+                      <button
+                        onClick={handleDownloadNow}
+                        className="download-button"
+                      >
+                        Download Now
+                      </button>
                     )}
                     <Loading isLoading={isLoading} loadingInfo={loadingInfo} />
                   </div>
