@@ -75,7 +75,7 @@ export const generateImageFromPrompt = async (prompt, bookTitle) => {
         body: JSON.stringify({
           prompt: prompt,
           aspect_ratio: "16:9",
-          style_preset: "digital-art",
+          style_preset: "fantasy-art",
           title: bookTitle,
         }),
       });
