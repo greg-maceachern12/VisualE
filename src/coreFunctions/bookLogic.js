@@ -29,6 +29,10 @@ export const parseEpubFile = (epubFile) => {
 
 export const populateChapterDropdown = (toc) => {
   const chapterDropdown = document.getElementById("chapterDropdown");
+  if (!chapterDropdown) {
+    console.error("Chapter dropdown element not found");
+    return;
+  }
   chapterDropdown.innerHTML = "";
 
   const addChapterToDropdown = (chapter, index, isSubitem = false) => {
@@ -49,7 +53,16 @@ export const populateChapterDropdown = (toc) => {
     }
   });
 };
+
 export const getChapterPrompt = async (chapter, epubReader) => {
+  if (!chapter || !chapter.href) {
+    throw new Error("Invalid chapter data");
+  }
+
+  if (!epubReader) {
+    throw new Error("EPUB reader not initialized");
+  }
+
   try {
     const displayedChapter = await epubReader
       .renderTo("hiddenDiv")
@@ -87,10 +100,18 @@ export const getNextChapter = (
   currentChapterIndex,
   currentSubitemIndex
 ) => {
+  if (!Array.isArray(toc) || toc.length === 0) {
+    throw new Error("Invalid table of contents");
+  }
+
   let nextChapterIndex = currentChapterIndex;
   let nextSubitemIndex = currentSubitemIndex + 1;
 
   const currentChapter = toc[nextChapterIndex];
+  if (!currentChapter) {
+    throw new Error("Invalid current chapter index");
+  }
+
   if (currentChapter.subitems && currentChapter.subitems.length > 0) {
     if (nextSubitemIndex >= currentChapter.subitems.length) {
       nextChapterIndex++;

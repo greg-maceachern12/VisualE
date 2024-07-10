@@ -2,12 +2,17 @@ import React from 'react';
 import { Skeleton } from "@mui/material";
 import "../styles/ImageDisplay.scss";
 
-const ImageDisplay = ({ chapterTitle, isLoading, imageUrl, displayPrompt, handleNextChapter }) => {
+const ImageDisplay = ({ chapterTitle, isLoading, imageUrl, displayPrompt, handleNextChapter, error }) => {
   return (
     <div className="chapterContainer">
       <h2>{chapterTitle}</h2>
       <div className="container">
-        {!isLoading ? (
+        {error ? (
+          <div className="errorContainer">
+            <p className="errorMessage">Error: {error}</p>
+            <button onClick={handleNextChapter}>Try Next Chapter</button>
+          </div>
+        ) : !isLoading ? (
           <>
             {imageUrl && (
               <img

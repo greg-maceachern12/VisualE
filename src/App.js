@@ -7,7 +7,14 @@ import Navbar from "./components/Navbar";
 import FileUpload from "./components/FileUpload";
 import ImageDisplay from "./components/ImageDisplay";
 import { getNextChapter } from "./coreFunctions/bookLogic";
-import { initializeGoogleAnalytics, logPageView, logEvent, handleDownloadSampleBook, handleFileChange, loadChapter } from "./coreFunctions/service";
+import {
+  initializeGoogleAnalytics,
+  logPageView,
+  logEvent,
+  handleDownloadSampleBook,
+  handleFileChange,
+  loadChapter,
+} from "./coreFunctions/service";
 import About from "./pages/About";
 
 function App() {
@@ -22,6 +29,7 @@ function App() {
   const [epubReader, setEpubReader] = useState(null);
   const [fileError, setFileError] = useState("");
   const [toc, setToc] = useState([]);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     initializeGoogleAnalytics();
@@ -37,12 +45,14 @@ function App() {
       setFileError,
       setToc,
       setBookName,
-      setEpubReader
+      setEpubReader,
+      setError,
     });
   };
 
   const handleParseAndGenerateImage = async () => {
     logEvent("User", "Button Click", "Start Generation");
+    setError(null);
 
     const chapterDropdown = document.getElementById("chapterDropdown");
     const selectedValue = chapterDropdown.value;
@@ -52,25 +62,49 @@ function App() {
 
     setCurrentChapterIndex(chapterIndex);
     setCurrentSubitemIndex(subitemIndex);
-    await loadChapter(chapterIndex, subitemIndex, toc, epubReader, bookName, {
-      setChapterTitle,
-      setDisplayPrompt,
-      setImageUrl,
-      setIsLoading
-    });
-  };
-
-  const handleNextChapter = async () => {
-    const nextChapter = getNextChapter(toc, currentChapterIndex, currentSubitemIndex);
-    if (nextChapter) {
-      setCurrentChapterIndex(nextChapter.nextChapterIndex);
-      setCurrentSubitemIndex(nextChapter.nextSubitemIndex);
-      await loadChapter(nextChapter.nextChapterIndex, nextChapter.nextSubitemIndex, toc, epubReader, bookName, {
+    try {
+      await loadChapter(chapterIndex, subitemIndex, toc, epubReader, bookName, {
         setChapterTitle,
         setDisplayPrompt,
         setImageUrl,
-        setIsLoading
+        setIsLoading,
+        setError,
       });
+    } catch (err) {
+      setError(err.message);
+      setIsLoading(false);
+    }
+  };
+
+  const handleNextChapter = async () => {
+    setError(null); // Clear any previous errors
+    const nextChapter = getNextChapter(
+      toc,
+      currentChapterIndex,
+      currentSubitemIndex
+    );
+    if (nextChapter) {
+      setCurrentChapterIndex(nextChapter.nextChapterIndex);
+      setCurrentSubitemIndex(nextChapter.nextSubitemIndex);
+      try {
+        await loadChapter(
+          nextChapter.nextChapterIndex,
+          nextChapter.nextSubitemIndex,
+          toc,
+          epubReader,
+          bookName,
+          {
+            setChapterTitle,
+            setDisplayPrompt,
+            setImageUrl,
+            setIsLoading,
+            setError, // Add this to pass the error setter
+          }
+        );
+      } catch (err) {
+        setError(err.message);
+        setIsLoading(false);
+      }
     } else {
       setDisplayPrompt("You've reached the end of the book.");
     }
@@ -107,7 +141,7 @@ function App() {
             <div className="g5"></div>
             <div className="interactive"></div>
           </div>
-          </div>
+        </div>
         <div className="content-container">
           <Routes>
             <Route path="/about" element={<About />} />
@@ -117,8 +151,11 @@ function App() {
                 <div className="home-content">
                   <div className="header-container">
                     <h1>Turn Words Into Worlds</h1>
-                    <h3>Illustrate each chapter of your book - Upload your ePub file to get started</h3>
-                    <FileUpload 
+                    <h3>
+                      Illustrate each chapter of your book - Upload your ePub
+                      file to get started
+                    </h3>
+                    <FileUpload
                       handleFileChange={handleFileChangeWrapper}
                       fileError={fileError}
                       handleParseAndGenerateImage={handleParseAndGenerateImage}
@@ -126,15 +163,16 @@ function App() {
                     />
                   </div>
                   {chapterTitle && (
-                    <ImageDisplay 
+                    <ImageDisplay
                       chapterTitle={chapterTitle}
                       isLoading={isLoading}
                       imageUrl={imageUrl}
                       displayPrompt={displayPrompt}
                       handleNextChapter={handleNextChapter}
+                      error={error}
                     />
                   )}
-                                    <div id="hiddenDiv"></div>
+                  <div id="hiddenDiv"></div>
                 </div>
               }
             />
