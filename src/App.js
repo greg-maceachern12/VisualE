@@ -102,7 +102,6 @@ function App() {
   };
 
   const handleDownloadNow = async () => {
-    console.log("waing");
     if (generatedBook) {
       setIsLoading(true);
       await handleDownloadBook(generatedBook, setLoadingInfo);
@@ -160,7 +159,7 @@ function App() {
                   <div className="header-container">
                     <h1>Turn Words Into Worlds</h1>
                     <h4>
-                      Add illustrations directly to your ebook - all for $5 per
+                      Add illustrations directly to your ebook - all for $1 per
                       book.
                     </h4>
                     {isAccessGranted ? (

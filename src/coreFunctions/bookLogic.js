@@ -26,7 +26,7 @@ export const parseEpubFile = (file) => {
 
 export const isNonStoryChapter = (chapterLabel) => {
   const nonStoryLabels = [
-    "Title Page",
+    "Title",
     "Cover",
     "Dedication",
     "Contents",
@@ -36,6 +36,7 @@ export const isNonStoryChapter = (chapterLabel) => {
     "Author",
     "About",
     "Map",
+    "Recommendations"
   ];
   return nonStoryLabels.some((label) =>
     chapterLabel.toLowerCase().includes(label.toLowerCase())
@@ -141,8 +142,7 @@ const processChapter = async (
     } else {
       console.log("Non-story or error: " + chapter.label);
       const cleanedBook = removeImages(chapterPrompt.html);
-      const nonImageUrl =
-        "https://cdn.iconscout.com/icon/free/png-256/free-error-2653315-2202987.png";
+      const nonImageUrl = null;
       addChapter(
         generatedBook,
         chapter.label,
@@ -165,8 +165,10 @@ const addChapter = (
   imageUrl,
   chapterIndex
 ) => {
+  const imageTag = imageUrl ? `<img src='${imageUrl}' />\n` : '';
+  
   generatedBook.content[chapterIndex] = {
     title: chapterTitle,
-    data: `<body id='master-body'> \n<img src='${imageUrl}' /> \n<p>${chapterText}</p> \n</body>`,
+    data: `<body id='master-body'>\n${imageTag}<p>${chapterText}</p>\n</body>`,
   };
 };

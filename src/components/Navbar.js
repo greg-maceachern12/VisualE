@@ -12,7 +12,6 @@ const Navbar = ({
     setIsMenuOpen(!isMenuOpen);
   };
   const linkText = user ? "Account" : "Sign In";
-  // console.log(user)
   const linkTo = user ? "/account" : "/auth";
 
   return (

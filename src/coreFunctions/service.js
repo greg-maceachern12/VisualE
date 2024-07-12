@@ -3,7 +3,7 @@ import { checkAPI, downloadAPI, payAPI } from "../utils/apiConfig";
 import {
   parseEpubFile,
   processAllChapters,
-  isNonStoryChapter,
+  // isNonStoryChapter,
 } from "./bookLogic";
 import { loadStripe } from "@stripe/stripe-js";
 import { supabase } from "../utils/supabaseClient.js";
@@ -263,7 +263,7 @@ export const handleParseAndGenerateImage = async (
     const chaptersToProcess = [];
     for (let i = 0; i < toc.length; i++) {
       const chapter = toc[i];
-      if (isNonStoryChapter(chapter.label)) continue;
+      // if (isNonStoryChapter(chapter.label)) continue;
       if (chapter.subitems && chapter.subitems.length > 0) {
         for (const subitem of chapter.subitems) {
           chaptersToProcess.push(subitem);
@@ -272,7 +272,7 @@ export const handleParseAndGenerateImage = async (
         chaptersToProcess.push(chapter);
       }
     }
-
+    console.log(chaptersToProcess)
     console.log("Starting chapter processing...");
     console.log(chaptersToProcess);
     const processedBook = await processAllChapters(
