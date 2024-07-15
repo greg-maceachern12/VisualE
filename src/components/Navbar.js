@@ -49,7 +49,7 @@ const Navbar = ({
         </button>
         <a
           className="nav-link"
-          href={`mailto:greg@visuai.io?subject=Issues%20Generating%20Book&body=-%20This%20was%20broken%3A%0A-%20This%20is%20how%20it%20should%20have%20worked%3A%0A-%20Images%20or%20console%20errors%20(optional)%3A`}
+          href={`mailto:gregmaceachern98@gmail.com?subject=Issues%20Generating%20Book&body=-%20This%20was%20broken%3A%0A-%20This%20is%20how%20it%20should%20have%20worked%3A%0A-%20Images%20or%20console%20errors%20(optional)%3A`}
           onClick={toggleMenu}
         >
           Issues?
