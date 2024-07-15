@@ -26,7 +26,7 @@ const Navbar = ({ handleDownloadSampleBook }) => {
         <Link to="/" className="nav-link" onClick={toggleMenu}>Home</Link>
         <Link to="/about" className="nav-link" onClick={toggleMenu}>About</Link>
         <button onClick={() => { handleDownloadSampleBook(); toggleMenu(); }} className="nav-link">Download an ePub</button>
-        <a className="nav-link" href={`mailto:greg@visuai.io?subject=Issues%20Generating%20Book&body=-%20This%20was%20broken%3A%0A-%20This%20is%20how%20it%20should%20have%20worked%3A%0A-%20Images%20or%20console%20errors%20(optional)%3A`} onClick={toggleMenu}>
+        <a className="nav-link" href={`gregmaceachern98@gmail.com?subject=Issues%20Generating%20Book&body=-%20This%20was%20broken%3A%0A-%20This%20is%20how%20it%20should%20have%20worked%3A%0A-%20Images%20or%20console%20errors%20(optional)%3A`} onClick={toggleMenu}>
           Issues?
         </a>
         <a className="nav-link" href="https://pro.visuai.io" target="_blank" rel="noreferrer" id='goPro' onClick={toggleMenu}>
