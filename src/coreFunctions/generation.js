@@ -70,6 +70,17 @@ export const generateImageFromPrompt = async (prompt, bookTitle) => {
   }
 };
 
+const changeBorderWidth = (side) => {
+  const chapterDisplay = document.querySelector('.chapterContainer');
+  if (chapterDisplay) {
+    if (side === "all") {
+      chapterDisplay.style[`border-width`] = '0px';
+    } else {
+    chapterDisplay.style[`border-${side}-width`] = '3px';
+    }
+  }
+};
+
 export const processChapter = async (chapter, epubReader, bookName) => {
   try {
     if (!chapter || !epubReader || !bookName) {
@@ -79,24 +90,32 @@ export const processChapter = async (chapter, epubReader, bookName) => {
     const chapterPrompt = await getChapterPrompt(chapter, epubReader);
     if (!chapterPrompt) {
       throw new Error("Failed to get chapter prompt");
+    } else {
+      changeBorderWidth("bottom");
     }
 
     const chapterSegment = await findChapterPrompt(chapterPrompt);
     if (!chapterSegment) {
       throw new Error("Failed to find chapter segment");
+    } else {
+      changeBorderWidth("left");
     }
 
     if (chapterSegment !== "False") {
       const processedPrompt = await generatePromptFromText(chapterSegment, bookName);
       if (!processedPrompt) {
         throw new Error("Failed to generate prompt from text");
+      } else {
+        changeBorderWidth("top");
       }
 
       const generatedImageUrl = await generateImageFromPrompt(processedPrompt, bookName);
       if (!generatedImageUrl) {
         throw new Error("Failed to generate image URL");
-      }
-
+      } 
+    
+      changeBorderWidth("right");
+      changeBorderWidth("all");
       return { displayPrompt: chapterSegment, imageUrl: generatedImageUrl };
     } else {
       return {
