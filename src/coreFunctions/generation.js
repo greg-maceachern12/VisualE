@@ -73,10 +73,7 @@ export const generateImageFromPrompt = async (prompt, bookTitle) => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          prompt: prompt,
-          aspect_ratio: "16:9",
-          style_preset: "fantasy-art",
-          title: bookTitle,
+          prompt: prompt
         }),
       });
       
@@ -85,8 +82,7 @@ export const generateImageFromPrompt = async (prompt, bookTitle) => {
       }
       
       const data = await response.json();
-      
-      if (!data.imageUrl) {
+      if (!data.result[0]) {
         throw new Error("No image URL returned from the API");
       }
       
@@ -95,7 +91,7 @@ export const generateImageFromPrompt = async (prompt, bookTitle) => {
         action: "Action Complete",
         label: "Image successfully generated",
       });
-      return data.imageUrl;
+      return data.result[0];
     } catch (error) {
       console.error("Error generating image:", error);
       ReactGA.event({

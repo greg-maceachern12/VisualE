@@ -112,7 +112,7 @@ const processChapter = async (
   try {
     const chapterPrompt = await getChapterText(chapter, epubReader);
     const chapterSegment = await findChapterSegment(chapterPrompt.text);
-
+    
     if (chapterSegment !== "False" && !isNonStoryChapter(chapter.label) && !chapterSegment.startsWith("Error:")) {
       const processedPrompt = await generatePromptFromSegment(
         chapterSegment,

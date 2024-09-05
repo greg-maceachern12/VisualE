@@ -159,9 +159,9 @@ function App() {
                   <div className="header-container">
                     <h1>Turn Words Into Worlds</h1>
                     <h4>
-                      Add illustrations directly to your ebook - all for $1 per
-                      book.
+                      Add illustrations directly to your ebook - free for a limited time.
                     </h4>
+                    {/* When you want to charge users again, you need to set isPremiumUser to false by default */}
                     {isAccessGranted ? (
                       <div id="headings" className="step-container">
                         {!isPremiumUser ? (
