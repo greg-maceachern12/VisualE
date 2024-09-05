@@ -49,21 +49,18 @@ export const generateImageFromPrompt = async (prompt, bookTitle) => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        prompt: prompt,
-        aspect_ratio: "16:9",
-        style_preset: "fantasy-art",
-        title: bookTitle,
+        prompt: prompt
       }),
     });
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const data = await response.json();
-    if (!data.imageUrl) {
+    if (!data.result) {
       throw new Error("Image URL not received from API");
     }
-    console.log(data.imageUrl);
-    return data.imageUrl;
+    console.log(data.result[0]);
+    return data.result[0];
   } catch (error) {
     console.error("Error calling the Image API:", error);
     throw new Error("Failed to generate image. Please try again.");
