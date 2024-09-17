@@ -99,7 +99,7 @@ export const processChapter = async (chapter, epubReader, bookName) => {
     }
 
     if (chapterSegment !== "False") {
-      const processedPrompt = await generatePromptFromText(chapterSegment, bookName);
+      const processedPrompt = await generatePromptFromText(chapterPrompt, bookName);
       if (!processedPrompt) {
         throw new Error("Failed to generate prompt from text");
       } else {
