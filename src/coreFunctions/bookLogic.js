@@ -116,6 +116,7 @@ const processChapter = async (
     if (chapterSegment !== "False" && !isNonStoryChapter(chapter.label) && !chapterSegment.startsWith("Error:")) {
       const processedPrompt = await generatePromptFromSegment(
         chapterSegment,
+        // chapterPrompt,
         generatedBook.title
       );
       
