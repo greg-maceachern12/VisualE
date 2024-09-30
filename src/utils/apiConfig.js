@@ -1,6 +1,6 @@
 
 
-export const segmentAPI = "https://visuaicalls.azurewebsites.net/api/claudeSegment?code=s9zNLYc7orDkeX4dRQGfz6cdSFmFEc54XxT_aHxaMOa9AzFuTfn1Uw%3D%3D";
+// export const segmentAPI = "https://visuaicalls.azurewebsites.net/api/claudeSegment?code=s9zNLYc7orDkeX4dRQGfz6cdSFmFEc54XxT_aHxaMOa9AzFuTfn1Uw%3D%3D";
 
 // export const chatAPI = "https://visuaicalls.azurewebsites.net/api/claudePrompt?code=3CoAbYgWCT4NbKeNhZeozLj524dxm2lxj88rMwUzzgAcAzFu9K7XOg%3D%3D";
 
@@ -9,8 +9,8 @@ export const imageAPI =
 
 
 
-// export const segmentAPI =
-// "https://visuaicalls.azurewebsites.net/api/segmentFinder?code=pNDxb_DAPifFYYNOr59_RjNuryY-49m3n9iscpdA3MewAzFu0bfNxg%3D%3D";
+export const segmentAPI =
+"https://visuaicalls.azurewebsites.net/api/segmentFinder?code=pNDxb_DAPifFYYNOr59_RjNuryY-49m3n9iscpdA3MewAzFu0bfNxg%3D%3D";
 
 export const chatAPI =
 "https://visuaicalls.azurewebsites.net/api/chatgpt?code=QDubsyOhk_c8jC1RAGPBHNydCCNgpgfcSscjsSqVRdw_AzFuxUgufQ%3D%3D";

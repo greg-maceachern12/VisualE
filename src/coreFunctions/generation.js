@@ -11,9 +11,10 @@ export const findChapterPrompt = async (prompt) => {
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    const data = await response.text();
-    console.log("Segment of text: " + data);
-    return data;
+    // const data = await response.text();
+    const data = await response.json();
+    console.log("Segment of text: " + data.response);
+    return data.response;
   } catch (error) {
     console.error("Error with Segment API:", error);
     throw new Error("Failed to process chapter text. Please try again.");
