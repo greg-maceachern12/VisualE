@@ -1,12 +1,15 @@
 import { chatAPI, imageAPI, segmentAPI } from '../utils/apiConfig';
 import { getChapterPrompt } from './bookLogic';
 
-export const findChapterPrompt = async (prompt) => {
+export const findChapterPrompt = async (prompt, bookName) => {
   try {
     const response = await fetch(segmentAPI, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt }),
+      body: JSON.stringify({ 
+        prompt: prompt,
+        bookName: bookName, 
+    }),
     });
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -92,7 +95,7 @@ export const processChapter = async (chapter, epubReader, bookName) => {
       changeBorderWidth("bottom");
     }
 
-    const chapterSegment = await findChapterPrompt(chapterPrompt);
+    const chapterSegment = await findChapterPrompt(chapterPrompt, bookName);
     if (!chapterSegment) {
       throw new Error("Failed to find chapter segment");
     } else {
@@ -100,6 +103,7 @@ export const processChapter = async (chapter, epubReader, bookName) => {
     }
 
     if (chapterSegment !== "False") {
+      //users the entire text from the chapter instead of the summary
       const processedPrompt = await generatePromptFromText(chapterPrompt, bookName);
       if (!processedPrompt) {
         throw new Error("Failed to generate prompt from text");
