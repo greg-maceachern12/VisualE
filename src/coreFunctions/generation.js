@@ -63,8 +63,9 @@ export const generateImageFromPrompt = async (prompt, bookTitle) => {
     if (!data.result) {
       throw new Error("Image URL not received from API");
     }
-    console.log(data.result[0]);
-    return data.result[0];
+    // console.log(data)
+    console.log(data.result);
+    return data.result;
   } catch (error) {
     console.error("Error calling the Image API:", error);
     throw new Error("Failed to generate image. Please try again.");
