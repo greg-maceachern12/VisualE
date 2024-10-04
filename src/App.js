@@ -159,7 +159,8 @@ function App() {
                   <div className="header-container">
                     <h1>Turn Words Into Worlds</h1>
                     <h4>
-                      Add illustrations directly to your ebook - free for a limited time.
+                      Add illustrations directly to your ebook - free for a
+                      limited time.
                     </h4>
                     {/* When you want to charge users again, you need to set isPremiumUser to false by default */}
                     {isAccessGranted ? (
@@ -195,6 +196,16 @@ function App() {
                       </button>
                     )}
                     <Loading isLoading={isLoading} loadingInfo={loadingInfo} />
+                  </div>
+                  <div class="button-container">
+                    <a
+                      href="https://buymeacoffee.com/gregmac"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="coffee-button"
+                    >
+                      ☕ Buy me a coffee
+                    </a>
                   </div>
                   <div id="hiddenDiv"></div>
                 </>
