@@ -1,5 +1,5 @@
-@import 'variables';
-@import 'base';
+@import "variables";
+@import "base";
 
 .App {
   text-align: center;
@@ -44,6 +44,34 @@
   .feedback {
     float: right;
     margin-top: 2rem;
+  }
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 25px;
+
+  .coffee-button {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: bold;
+    text-decoration: none;
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    margin: auto;
+  }
+
+  .coffee-button:hover {
+    background: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
   }
 }
 

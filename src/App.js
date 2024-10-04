@@ -172,6 +172,16 @@ function App() {
                       error={error}
                     />
                   )}
+                  <div class="button-container">
+                    <a
+                      href="https://buymeacoffee.com/gregmac"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="coffee-button"
+                    >
+                      ☕ Buy me a coffee
+                    </a>
+                  </div>
                   <div id="hiddenDiv"></div>
                 </div>
               }

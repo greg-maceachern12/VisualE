@@ -32,6 +32,7 @@ const Navbar = ({ handleDownloadSampleBook }) => {
         <a className="nav-link" href="https://pro.visuai.io" target="_blank" rel="noreferrer" id='goPro' onClick={toggleMenu}>
           Visuai Pro
         </a>
+        
       </div>
     </div>
   );
