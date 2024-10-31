@@ -1,139 +1,27 @@
-@import "variables";
-@import "base";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-.App {
-  text-align: center;
-  min-height: 100vh;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 2rem;
-  box-sizing: border-box;
-
-  .gradient-bg {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: -1;
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
   }
-
-  .content-container {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    max-width: 65%;
-    margin: 0 auto;
+  50% {
+    background-position: 100% 50%;
   }
-
-  #headings {
-    padding-bottom: 15px;
-  }
-
-  h1 {
-    color: #f7f7f7;
-  }
-
-  .about-button {
-    float: left;
-    margin-top: 2rem;
-  }
-
-  .feedback {
-    float: right;
-    margin-top: 2rem;
+  100% {
+    background-position: 0% 50%;
   }
 }
 
-.button-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 25px;
-
-  .coffee-button {
-    display: inline-block;
-    padding: 0.75rem 1.5rem;
-    color: rgba(255, 255, 255, 0.8);
-    font-weight: bold;
-    text-decoration: none;
-    border-radius: 1rem;
-    background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    margin: auto;
-  }
-
-  .coffee-button:hover {
-    background: rgba(255, 255, 255, 0.3);
-    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
-    transform: translateY(-2px);
-  }
-}
-
-.header-container {
-  background-color: #00000086;
-  padding: 40px;
-  border-radius: 10px;
-
-  h1 {
-    font-size: 4rem;
-  }
-  span {
-    font-size: 1rem;
-  }
-}
-
-#hiddenDiv {
-  display: none;
-  height: 0;
-}
-
-// Mobile optimizations
-@media (max-width: 768px) {
-  .App {
-    padding: 1rem;
-
-    .content-container {
-      max-width: 100%;
-    }
-
-    .header-container {
-      padding: 20px;
-
-      h1 {
-        font-size: 2.5rem;
-      }
-
-      h3 {
-        font-size: 1rem;
-        margin-bottom: 35px;
-        margin-top: 35px;
-      }
-
-      span {
-        font-size: 0.9rem;
-      }
-    }
-  }
-}
-
-@media (max-width: 480px) {
-  .App {
-    .header-container {
-      padding: 15px;
-
-      h1 {
-        font-size: 2rem;
-      }
-
-      span {
-        font-size: 0.8rem;
-      }
-    }
-  }
+.animate-gradient {
+  background: linear-gradient(
+    -45deg,
+    #f3f4f6,
+    #e5e7eb,
+    #ddd6fe,
+    #e5e7eb
+  );
+  background-size: 400% 400%;
+  animation: gradient 15s ease infinite;
 }

@@ -1,5 +1,24 @@
 import epub from "epubjs";
 
+const fetchBlobAndConvertToBase64 = async (blobUrl) => {
+  try {
+    const response = await fetch(blobUrl);
+    const blob = await response.blob();
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64data = reader.result.split(',')[1];
+        resolve(base64data);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  } catch (error) {
+    console.error("Error converting blob to base64:", error);
+    return null;
+  }
+};
+
 export const parseEpubFile = (epubFile) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -11,9 +30,30 @@ export const parseEpubFile = (epubFile) => {
         const epubReader = epub(epubBlob);
         const nav = await epubReader.loaded.navigation;
         const toc = nav.toc;
-
         const metadata = await epubReader.loaded.metadata;
-        resolve({ toc, metadata, epubReader });
+        
+        // Extract cover URL
+        let coverBase64 = null;
+        await epubReader
+          .coverUrl()
+          .then((coverBlob) => {
+            if (coverBlob) {
+              return fetchBlobAndConvertToBase64(coverBlob);
+            }
+            return null;
+          })
+          .then((base64) => {
+            if (base64) {
+              coverBase64 = `data:image/png;base64,${base64}`;
+            }
+          })
+          .catch((error) => {
+            console.error("Error processing cover image:", error);
+          });
+          // console.log(coverBase64)
+        coverBase64 = coverBase64 || "https://i.imgur.com/c4VGri2.jpeg";
+
+        resolve({ toc, metadata, epubReader, coverBase64 });
       } catch (error) {
         console.error("Error parsing EPUB file:", error);
         reject(new Error(`Failed to parse EPUB file: ${error.message}`));
@@ -26,7 +66,6 @@ export const parseEpubFile = (epubFile) => {
     reader.readAsArrayBuffer(epubFile);
   });
 };
-
 export const populateChapterDropdown = (toc) => {
   const chapterDropdown = document.getElementById("chapterDropdown");
   if (!chapterDropdown) {

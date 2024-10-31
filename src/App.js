@@ -1,21 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import "./styles/App.scss";
-import "./gradBG/gradBG.scss";
-import { initGradientBackground } from "./gradBG/gradBG.js";
 import Navbar from "./components/Navbar";
 import FileUpload from "./components/FileUpload";
 import ImageDisplay from "./components/ImageDisplay";
-import { getNextChapter } from "./coreFunctions/bookLogic";
-import {
-  initializeGoogleAnalytics,
-  logPageView,
+import About from "./pages/About";
+import { 
+  initializeGoogleAnalytics, 
+  logPageView, 
   logEvent,
   handleDownloadSampleBook,
   handleFileChange,
   loadChapter,
 } from "./coreFunctions/service";
-import About from "./pages/About";
+import { getNextChapter } from "./coreFunctions/bookLogic";
+import "./styles/App.scss";
 
 function App() {
   const [epubFile, setEpubFile] = useState(null);
@@ -30,13 +28,13 @@ function App() {
   const [fileError, setFileError] = useState("");
   const [toc, setToc] = useState([]);
   const [error, setError] = useState(null);
+  const [coverBase64, setCoverBase64] = useState(null);
 
   useEffect(() => {
     initializeGoogleAnalytics();
     logPageView();
-    const cleanupGradientBackground = initGradientBackground();
-    return () => cleanupGradientBackground();
   }, []);
+
 
   const handleFileChangeWrapper = (event) => {
     const file = event.target.files[0];
@@ -47,6 +45,7 @@ function App() {
       setBookName,
       setEpubReader,
       setError,
+      setCoverBase64  // Changed from setCoverUrl
     });
   };
 
@@ -77,7 +76,7 @@ function App() {
   };
 
   const handleNextChapter = async () => {
-    setError(null); // Clear any previous errors
+    setError(null);
     const nextChapter = getNextChapter(
       toc,
       currentChapterIndex,
@@ -98,7 +97,7 @@ function App() {
             setDisplayPrompt,
             setImageUrl,
             setIsLoading,
-            setError, // Add this to pass the error setter
+            setError,
           }
         );
       } catch (err) {
@@ -110,83 +109,70 @@ function App() {
     }
   };
 
+
   return (
     <Router>
-      <div className="App">
-        <Navbar handleDownloadSampleBook={handleDownloadSampleBook} />
-        <div className="gradient-bg">
-          <svg xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <filter id="goo">
-                <feGaussianBlur
-                  in="SourceGraphic"
-                  stdDeviation="10"
-                  result="blur"
-                />
-                <feColorMatrix
-                  in="blur"
-                  mode="matrix"
-                  values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8"
-                  result="goo"
-                />
-                <feBlend in="SourceGraphic" in2="goo" />
-              </filter>
-            </defs>
-          </svg>
-          <div className="gradients-container">
-            <div className="g1"></div>
-            <div className="g2"></div>
-            <div className="g3"></div>
-            <div className="g4"></div>
-            <div className="g5"></div>
-            <div className="interactive"></div>
-          </div>
-        </div>
-        <div className="content-container">
-          <Routes>
-            <Route path="/about" element={<About />} />
-            <Route
-              path="/"
-              element={
-                <div className="home-content">
-                  <div className="header-container">
-                    <h1>Turn Words Into Worlds</h1>
-                    <h3>
-                      Illustrate each chapter of your book - Upload your ePub
-                      file to get started
-                    </h3>
+      <div className="animate-gradient min-h-screen">
+        <div className="min-h-screen backdrop-blur-[100px] bg-white/30">
+          <Navbar handleDownloadSampleBook={handleDownloadSampleBook} />
+          
+          <main className="container mx-auto py-8">
+            <Routes>
+              <Route path="/about" element={<About />} />
+              <Route
+                path="/"
+                element={
+                  <div className="space-y-8">
+                    <div className="text-center">
+                      <h1 className="text-4xl font-bold text-gray-900 mb-4">
+                        Visuai
+                      </h1>
+                      <p className="text-lg text-gray-600 mb-8">
+                        Turn your books into visual stories
+                      </p>
+                    </div>
+
                     <FileUpload
                       handleFileChange={handleFileChangeWrapper}
                       fileError={fileError}
                       handleParseAndGenerateImage={handleParseAndGenerateImage}
                       epubFile={epubFile}
+                      coverBase64={coverBase64}  // Pass down as prop if needed
                     />
+
+                    {chapterTitle && (
+                      <ImageDisplay
+                        chapterTitle={chapterTitle}
+                        isLoading={isLoading}
+                        imageUrl={imageUrl}
+                        displayPrompt={displayPrompt}
+                        handleNextChapter={handleNextChapter}
+                        error={error}
+                      />
+                    )}
+
+                    <div className="mt-8 text-center">
+                      <a
+                        href="https://buymeacoffee.com/gregmac"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 py-2 px-4 text-sm font-medium text-gray-700 bg-white rounded-lg border border-gray-300 hover:bg-gray-50"
+                      >
+                        ☕ Buy me a coffee
+                      </a>
+                    </div>
+
+                    {/* Important: This div is needed for EPUB.js rendering */}
+                    <div 
+                      id="hiddenDiv" 
+                      className="hidden"
+                      style={{ position: 'absolute', visibility: 'hidden', overflow: 'hidden', height: 0 }}
+                    ></div>
                   </div>
-                  {chapterTitle && (
-                    <ImageDisplay
-                      chapterTitle={chapterTitle}
-                      isLoading={isLoading}
-                      imageUrl={imageUrl}
-                      displayPrompt={displayPrompt}
-                      handleNextChapter={handleNextChapter}
-                      error={error}
-                    />
-                  )}
-                  <div class="button-container">
-                    <a
-                      href="https://buymeacoffee.com/gregmac"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="coffee-button"
-                    >
-                      ☕ Buy me a coffee
-                    </a>
-                  </div>
-                  <div id="hiddenDiv"></div>
-                </div>
-              }
-            />
-          </Routes>
+                }
+              />
+            </Routes>
+          </main>
         </div>
       </div>
     </Router>

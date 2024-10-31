@@ -31,20 +31,28 @@ export const handleDownloadSampleBook = () => {
 };
 
 export const handleFileChange = async (file, callbacks) => {
-  const { setEpubFile, setFileError, setToc, setBookName, setEpubReader } = callbacks;
+  const { 
+    setEpubFile, 
+    setFileError, 
+    setToc, 
+    setBookName, 
+    setEpubReader, 
+    setCoverBase64  // Changed from having both setCoverUrl and setCoverBase64
+  } = callbacks;
   
   if (file) {
     if (file.type === "application/epub+zip") {
       setEpubFile(file);
       setFileError("");
       try {
-        const { toc, metadata, epubReader } = await parseEpubFile(file);
+        const { toc, metadata, epubReader, coverBase64 } = await parseEpubFile(file);
         setToc(toc);
         setBookName(metadata.title);
         setEpubReader(epubReader);
+        setCoverBase64(coverBase64);  // Single callback
         populateChapterDropdown(toc);
       } catch (error) {
-        console.error("Error parsing EPUB file, could not retrieve TOC.");
+        console.error("Error parsing EPUB file:", error);
         setFileError("Error parsing EPUB file. Please try again.");
       }
     } else {
@@ -56,6 +64,7 @@ export const handleFileChange = async (file, callbacks) => {
     setFileError("No file selected.");
   }
 };
+
 
 export const loadChapter = async (chapterIndex, subitemIndex, toc, epubReader, bookName, callbacks) => {
     const { setChapterTitle, setDisplayPrompt, setImageUrl, setIsLoading } = callbacks;
