@@ -111,10 +111,19 @@ function App() {
     <Router>
       <div className="min-h-screen relative overflow-hidden">
         {/* Background gradient circles */}
-        <div className="absolute top-0 left-0 w-full h-full bg-white">
-          <div className="absolute top-[-10%] left-[-20%] w-3/4 h-3/4 rounded-full bg-gradient-to-r from-purple-200/40 to-pink-200/40 blur-3xl animate-pulse" style={{ animationDuration: '8s' }}></div>
-          <div className="absolute bottom-[-20%] right-[-10%] w-3/4 h-3/4 rounded-full bg-gradient-to-l from-indigo-200/40 to-blue-200/40 blur-3xl animate-pulse" style={{ animationDuration: '10s' }}></div>
-          <div className="absolute top-[30%] right-[-20%] w-2/3 h-2/3 rounded-full bg-gradient-to-l from-rose-200/30 to-cyan-200/30 blur-3xl animate-pulse" style={{ animationDuration: '12s' }}></div>
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white to-gray-50">
+          <div 
+            className="absolute top-[-10%] left-[-20%] w-3/4 h-3/4 rounded-full bg-gradient-to-r from-blue-100/60 to-cyan-100/60 blur-3xl animate-pulse" 
+            style={{ animationDuration: '8s' }}
+          />
+          <div 
+            className="absolute bottom-[-20%] right-[-10%] w-3/4 h-3/4 rounded-full bg-gradient-to-l from-indigo-100/60 to-sky-100/60 blur-3xl animate-pulse" 
+            style={{ animationDuration: '10s' }}
+          />
+          <div 
+            className="absolute top-[30%] right-[-20%] w-2/3 h-2/3 rounded-full bg-gradient-to-l from-cyan-100/50 to-blue-100/50 blur-3xl animate-pulse" 
+            style={{ animationDuration: '12s' }}
+          />
         </div>
         
         {/* Content container with glass effect */}
@@ -129,17 +138,17 @@ function App() {
                 element={
                   <div className="space-y-8">
                     <div className="text-center">
-                      <h1 className="text-4xl font-bold text-gray-900 mb-4">
+                      <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent mb-4">
                         Visuai
                       </h1>
-                      <p className="text-lg text-gray-600 mb-8">
+                      <p className="text-xl text-gray-600 mb-8">
                         Turn your books into visual stories
                       </p>
                       <p>Try the <a 
                         href='https://pro.visuai.io' 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="text-indigo-600 font-bold hover:text-indigo-700 transition-colors"
+                        className="text-blue-600 font-bold hover:text-blue-700 transition-colors"
                       >
                         Pro Version
                       </a> to add illustrations to the entire book!</p>
@@ -169,19 +178,19 @@ function App() {
                         href="https://buymeacoffee.com/gregmac"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center px-6 py-3 text-sm font-medium text-gray-700 bg-white rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors shadow-sm space-x-2"
+                        className="inline-flex items-center px-6 py-3 text-sm font-medium text-gray-600 bg-white/80 rounded-lg border border-gray-200 hover:bg-white hover:border-blue-200 transition-all duration-200 shadow-sm space-x-2 backdrop-blur-sm"
                       >
                         <span>☕</span>
                         <span>Buy me a coffee</span>
                       </a>
                     </div>
 
-                    {/* Important: This div is needed for EPUB.js rendering */}
+                    {/* Hidden div for EPUB.js rendering */}
                     <div 
                       id="hiddenDiv" 
                       className="hidden"
                       style={{ position: 'absolute', visibility: 'hidden', overflow: 'hidden', height: 0 }}
-                    ></div>
+                    />
                   </div>
                 }
               />
