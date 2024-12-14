@@ -1,0 +1,135 @@
+@import 'variables';
+
+.chapterContainer {
+  margin-top: 15px;
+  padding: 30px;
+  background-color: #f5f5f57d;
+  color: black;
+  border-radius: 10px;
+  border: 3px solid #0f7dd8;
+  border-image: var(--border-gradient);
+  border-image-slice: 1;
+  transition: border-image 0.8s ease;
+  border-left-width: 0px;
+  border-top-width: 0px;
+  border-right-width: 0px;
+  border-bottom-width: 0px;
+  transition: border-width 0.3s ease;
+}
+
+.container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 0 auto;
+
+  h2 {
+    margin-top: 0;
+  }
+}
+
+.chapterPrompt {
+  width: 100%;
+  padding: 5px;
+
+  p {
+    overflow-y: auto;
+    max-height: 430px;
+    margin-top: 0;
+    font-family: math;
+  }
+}
+
+.generatedImage {
+  margin-right: 40px;
+  max-width: 50%;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#nextbtn {
+  color: #333;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+  background-color: lightseagreen;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: rgb(12, 134, 128);
+  }
+}
+
+.loadingContainer {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.skeletonWrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  width: 100%;  // Ensure the wrapper takes full width
+
+  .MuiSkeleton-rounded {
+    flex-shrink: 0;
+    width: 300px;  // Set a fixed width for the image skeleton
+  }
+
+  .textSkeletons {
+    flex-grow: 1;
+    width: calc(100% - 320px);  // Subtract image width and gap from total width
+    margin: auto;
+  }
+}
+
+@media (max-width: 1340px) {
+  .chapterContainer {
+    padding: 15px;
+  }
+
+  .container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .generatedImage {
+    margin-right: 0;
+    margin-bottom: 20px;
+    max-width: 100%;
+  }
+
+  .chapterPrompt {
+    width: 100%;
+    
+    p {
+      max-height: 300px;
+      overflow-y: scroll;
+    }
+  }
+
+  #nextbtn {
+    margin-top: 20px;
+    width: 100%;
+  }
+
+  .skeletonWrapper {
+    flex-direction: column;
+    align-items: center;
+
+    .MuiSkeleton-rounded {
+      width: 100%;
+      max-width: 300px;
+      margin-bottom: 20px;
+    }
+
+    .textSkeletons {
+      width: 100%;
+    }
+  }
+}

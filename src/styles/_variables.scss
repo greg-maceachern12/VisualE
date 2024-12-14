@@ -1,0 +1,48 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&family=Outfit:wght@100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Pacifico&display=swap");
+
+$primary-color: #007bff;
+$secondary-color: #6c757d;
+$text-color: #333;
+$background-color: #f5f5f5;
+
+// Typography
+$font-family-base: "Teresa-semibold", "Bebas Neue", "Lora", "Roboto", sans-serif;
+$font-size-base: 16px;
+$line-height-base: 1.5;
+
+// Spacing
+$spacing-small: 8px;
+$spacing-medium: 16px;
+$spacing-large: 24px;
+
+// Breakpoints
+$breakpoint-sm: 576px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 992px;
+$breakpoint-xl: 1200px;
+
+:root {
+    --text-color: #eaeaea;
+    --link-color: #191919;
+    --left-border-color: transparent;
+    --top-border-color: transparent;
+    --right-border-color: transparent;
+    --bottom-border-color: transparent;
+}
+
+@font-face {
+  font-family: "Teresa-bold";
+  src: url("../../public/fonts/Teresa-Bold.ttf") format("truetype");
+  font-weight: bold;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Teresa-semibold";
+  src: url("../../public/fonts/Teresa-Semibold.ttf") format("truetype");
+  font-weight: bold;
+  font-style: normal;
+}

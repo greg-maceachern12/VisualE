@@ -1,17 +1,55 @@
 :root {
-  // --color-bg1: rgb(108, 0, 162);
-  // --color-bg2: rgb(0, 17, 82);
-  --color-bg1: rgb(0, 24, 162);
-  --color-bg2: rgb(0, 82, 48);
-  --color1: 18, 113, 255;
-  --color2: 221, 74, 255;
-  --color3: 100, 220, 255;
-  --color4: 200, 50, 50;
-  --color5: 180, 180, 50;
-  --color-interactive: 140, 100, 255;
+  --color-bg1: #e0eeff;  /* Light blue background */
+  --color-bg2: #b3d4ff;  /* Slightly darker blue background */
+  --color1: 70, 130, 180;   /* Steel Blue */
+  --color2: 30, 144, 255;   /* Dodger Blue */
+  --color3: 0, 119, 190;    /* A darker blue */
+  --color4: 25, 25, 112;    /* Midnight Blue */
+  --color5: 9, 0, 136;      /* Your primary blue (#090088) */
+  --color-interactive: 65, 105, 225;  /* Royal Blue */
   --circle-size: 80%;
-  --blending: hard-light;
+  --blending: screen;  /* Changed to screen for better visibility */
 }
+
+.gradient-bg {
+  background: linear-gradient(40deg, var(--color-bg1), var(--color-bg2));
+}
+
+.g1 {
+  opacity: 0.6;
+  width: 120%;
+  height: 120%;
+}
+
+.g2 {
+  opacity: 0.5;
+  width: 100%;
+  height: 100%;
+}
+
+.g3 {
+  opacity: 0.55;
+  width: 90%;
+  height: 90%;
+}
+
+.g4 {
+  opacity: 0.5;
+  width: 110%;
+  height: 110%;
+}
+
+.g5 {
+  opacity: 0.45;
+  width: 130%;
+  height: 130%;
+}
+
+.interactive {
+  opacity: 0.4;
+}
+
+/* Rest of the CSS remains the same */
 
 @keyframes moveInCircle {
   0% {
