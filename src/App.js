@@ -1,7 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import "./styles/App.scss";
-import "./gradBG/gradBG.scss";
 import AccessCode from "./components/AccessCode.js";
 import About from "./components/About.js";
 import AuthPage from "./components/AuthPage.js";
@@ -11,7 +9,6 @@ import PaymentStep from "./components/PaymentStep.js";
 import FileUpload from "./components/FileUpload.js";
 import Loading from "./components/Loading.js";
 import PaymentSuccess from "./components/PaymentSuccess";
-import { initGradientBackground } from "./gradBG/gradBG.js";
 import { supabase } from "./utils/supabaseClient.js";
 import {
   initializeGoogleAnalytics,
@@ -58,11 +55,9 @@ function App() {
     );
     initializeGoogleAnalytics();
     logPageView();
-    const cleanupGradientBackground = initGradientBackground();
 
     return () => {
       if (authListener?.subscription) authListener.subscription.unsubscribe();
-      cleanupGradientBackground();
     };
   }, [checkUser, checkUserStatus]);
 
@@ -112,59 +107,54 @@ function App() {
 
   return (
     <Router>
-      <div className="App">
-        <Navbar
-          user={user}
-          isDropdownOpen={isDropdownOpen}
-          toggleDropdown={toggleDropdown}
-          handleSignOut={handleSignOut}
-          handleDownloadSampleBook={handleDownloadSampleBook}
-        />
-        <div className="gradient-bg">
-          <svg xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <filter id="goo">
-                <feGaussianBlur
-                  in="SourceGraphic"
-                  stdDeviation="10"
-                  result="blur"
-                />
-                <feColorMatrix
-                  in="blur"
-                  mode="matrix"
-                  values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8"
-                  result="goo"
-                />
-                <feBlend in="SourceGraphic" in2="goo" />
-              </filter>
-            </defs>
-          </svg>
-          <div className="gradients-container">
-            <div className="g1"></div>
-            <div className="g2"></div>
-            <div className="g3"></div>
-            <div className="g4"></div>
-            <div className="g5"></div>
-            <div className="interactive"></div>
-          </div>
+      <div className="min-h-screen relative overflow-hidden bg-[#0A0C14]">
+        {/* Animated background gradients */}
+        <div className="absolute inset-0">
+          <div 
+            className="absolute top-[-10%] left-[-20%] w-3/4 h-3/4 rounded-full bg-gradient-to-r from-blue-900/20 to-indigo-900/20 blur-3xl animate-pulse" 
+            style={{ animationDuration: '8s' }}
+          />
+          <div 
+            className="absolute bottom-[-20%] right-[-10%] w-3/4 h-3/4 rounded-full bg-gradient-to-l from-teal-900/20 to-cyan-900/20 blur-3xl animate-pulse" 
+            style={{ animationDuration: '10s' }}
+          />
+          <div 
+            className="absolute top-[30%] right-[-20%] w-2/3 h-2/3 rounded-full bg-gradient-to-l from-slate-900/20 to-zinc-900/20 blur-3xl animate-pulse" 
+            style={{ animationDuration: '12s' }}
+          />
         </div>
-        <div className="content-container">
-          <Routes>
-            <Route path="/about" element={<About />} />
-            <Route
-              path="/"
-              element={
-                <>
-                  <div className="home-content"></div>
-                  <div className="header-container">
-                    <h1>Turn Words Into Worlds</h1>
-                    <h4>
-                      Add illustrations directly to your ebook - free for a
-                      limited time.
-                    </h4>
-                    {/* When you want to charge users again, you need to set isPremiumUser to false by default */}
+
+        {/* Content container with glass effect */}
+        <div className="relative min-h-screen backdrop-blur-xl bg-[#0A0C14]/50">
+          <Navbar
+            user={user}
+            isDropdownOpen={isDropdownOpen}
+            toggleDropdown={toggleDropdown}
+            handleSignOut={handleSignOut}
+            handleDownloadSampleBook={handleDownloadSampleBook}
+          />
+
+          <main className="container mx-auto px-4 py-8">
+            <Routes>
+              <Route path="/about" element={<About />} />
+              <Route path="/auth" element={<AuthPage />} />
+              <Route path="/account" element={<Account />} />
+              <Route path="/payment-success" element={<PaymentSuccess />} />
+              <Route
+                path="/"
+                element={
+                  <div className="max-w-4xl mx-auto space-y-8">
+                    <div className="text-center space-y-6">
+                      <h1 className="text-5xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+                        Turn Words Into Worlds
+                      </h1>
+                      <p className="text-xl text-slate-300">
+                        Add illustrations directly to your ebook - free for a limited time.
+                      </p>
+                    </div>
+
                     {isAccessGranted ? (
-                      <div id="headings" className="step-container">
+                      <div className="space-y-8">
                         {!isPremiumUser ? (
                           <PaymentStep
                             handlePayNow={handlePayNowWrapper}
@@ -175,9 +165,7 @@ function App() {
                           <FileUpload
                             handleFileChange={handleFileChangeWrapper}
                             fileError={fileError}
-                            handleParseAndGenerateImage={
-                              handleParseAndGenerateImageWrapper
-                            }
+                            handleParseAndGenerateImage={handleParseAndGenerateImageWrapper}
                             isPremiumUser={isPremiumUser}
                             epubFile={epubFile}
                             isLoading={isLoading}
@@ -187,34 +175,45 @@ function App() {
                     ) : (
                       <AccessCode onAccessGranted={handleAccessGranted} />
                     )}
+
                     {generatedBook && !isLoading && (
                       <button
                         onClick={handleDownloadNow}
-                        className="download-button"
+                        className="w-full py-3 px-6 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-lg hover:from-cyan-700 hover:to-blue-700 transition-all duration-200 font-medium shadow-lg"
                       >
                         Download Now
                       </button>
                     )}
+
                     <Loading isLoading={isLoading} loadingInfo={loadingInfo} />
+
+                    <div className="text-center pt-8">
+                      <a
+                        href="https://buymeacoffee.com/gregmac"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center px-6 py-3 text-sm font-medium text-slate-300 bg-slate-800/50 rounded-lg border border-slate-700 hover:bg-slate-800 transition-colors shadow-lg space-x-2 backdrop-blur-sm"
+                      >
+                        <span>☕</span>
+                        <span>Buy me a coffee</span>
+                      </a>
+                    </div>
                   </div>
-                  <div class="button-container">
-                    <a
-                      href="https://buymeacoffee.com/gregmac"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="coffee-button"
-                    >
-                      ☕ Buy me a coffee
-                    </a>
-                  </div>
-                  <div id="hiddenDiv"></div>
-                </>
-              }
-            />
-            <Route path="/auth" element={<AuthPage />} />
-            <Route path="/account" element={<Account />} />
-            <Route path="/payment-success" element={<PaymentSuccess />} />
-          </Routes>
+                }
+              />
+            </Routes>
+          </main>
+
+          {/* Hidden div for EPUB.js */}
+          <div
+            id="hiddenDiv"
+            style={{
+              position: "absolute",
+              visibility: "hidden",
+              overflow: "hidden",
+              height: 0,
+            }}
+          />
         </div>
       </div>
     </Router>
