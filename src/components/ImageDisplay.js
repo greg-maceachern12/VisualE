@@ -1,5 +1,4 @@
 import React from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const ImageDisplay = ({ chapterTitle, isLoading, imageUrl, displayPrompt, handleNextChapter, error }) => {
   return (
@@ -32,20 +31,6 @@ const ImageDisplay = ({ chapterTitle, isLoading, imageUrl, displayPrompt, handle
                 No content selected
               </div>
             )}
-            
-            {/* Navigation buttons */}
-            <button 
-              className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 hover:bg-white shadow-lg"
-              onClick={() => console.log('Previous')}
-            >
-              <ChevronLeft className="w-6 h-6 text-gray-600" />
-            </button>
-            <button 
-              className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 hover:bg-white shadow-lg"
-              onClick={handleNextChapter}
-            >
-              <ChevronRight className="w-6 h-6 text-gray-600" />
-            </button>
           </div>
         ) : (
           <div className="flex items-center justify-center min-h-[400px]">
@@ -62,12 +47,14 @@ const ImageDisplay = ({ chapterTitle, isLoading, imageUrl, displayPrompt, handle
         {displayPrompt && !isLoading && !error && (
           <div className="p-4 text-center">
             <p className="italic text-gray-600">{displayPrompt}</p>
-            <button
-              className="mt-4 py-2.5 px-4 text-sm font-semibold rounded-lg bg-green-600 text-white hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-              onClick={handleNextChapter}
-            >
-              Next Chapter
-            </button>
+            {displayPrompt !== "No content selected" && (
+              <button
+                className="mt-4 py-2.5 px-4 text-sm font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-colors"
+                onClick={handleNextChapter}
+              >
+                Next Chapter
+              </button>
+            )}
           </div>
         )}
       </div>

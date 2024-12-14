@@ -21,8 +21,8 @@ const FileUpload = ({
   if (!epubFile) {
     return (
       <div className="w-full max-w-2xl mx-auto px-4">
-        <div className="mt-8 p-8 border-2 border-dashed border-gray-300 rounded-lg bg-white/50 backdrop-blur-sm hover:border-indigo-500 transition-colors duration-200">
-          <div className="flex flex-col items-center justify-center gap-4">
+        <div className="mt-8 p-8 border-2 border-dashed border-gray-300 rounded-xl bg-white/50 backdrop-blur-sm hover:border-indigo-500 transition-colors">
+          <div className="flex flex-col items-center justify-center space-y-4">
             <UploadCloud className="w-12 h-12 text-gray-400" />
             <p className="text-lg text-gray-600">
               Upload an EPUB file to get started
@@ -31,7 +31,7 @@ const FileUpload = ({
             <div className="w-full max-w-sm">
               <label
                 htmlFor="file-upload"
-                className="w-full flex justify-center py-2.5 px-4 text-sm font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 cursor-pointer transition-colors duration-200"
+                className="w-full flex justify-center py-2.5 px-4 text-sm font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 cursor-pointer transition-colors"
               >
                 Select EPUB
               </label>
@@ -53,15 +53,15 @@ const FileUpload = ({
 
   return (
     <div className="w-full max-w-3xl mx-auto px-4">
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
         {/* Book Preview Section - Clickable to change file */}
         <label
           htmlFor="file-upload-change"
-          className="block p-6 cursor-pointer hover:bg-gray-50 transition-colors duration-200"
+          className="block p-6 cursor-pointer hover:bg-gray-50 transition-colors"
         >
-          <div className="flex items-center gap-6">
+          <div className="flex items-center space-x-6">
             <div className="flex-shrink-0">
-              <div className="w-20 h-28 bg-gray-100 rounded-lg shadow-sm overflow-hidden">
+              <div className="w-20 h-28 bg-gray-100 rounded-lg shadow overflow-hidden">
                 {parentCoverBase64 ? (
                   <img
                     src={parentCoverBase64}
@@ -95,21 +95,24 @@ const FileUpload = ({
         {/* Chapter Selection and Generate Button */}
         <div className="border-t border-gray-100 p-6 space-y-4">
           <div className="space-y-2">
-            <label htmlFor="chapterDropdown" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="chapterDropdown"
+              className="block text-sm font-medium text-gray-700"
+            >
               Choose a chapter to illustrate
             </label>
             <select
               id="chapterDropdown"
-              className="block w-full rounded-md border-gray-300 py-2 px-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm bg-white"
+              className="block w-full rounded-lg border-gray-300 py-2 px-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm bg-white"
             />
           </div>
 
           <button
             onClick={handleParseAndGenerateImage}
-            className="w-full flex items-center justify-center gap-2 py-3 px-4 text-sm font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-colors duration-200"
+            className="w-full flex items-center justify-center space-x-2 py-3 px-4 text-sm font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-colors"
           >
             <Wand2 className="w-4 h-4" />
-            Generate Image
+            <span>Generate Image</span>
           </button>
         </div>
       </div>
