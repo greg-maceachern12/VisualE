@@ -13,7 +13,6 @@ import {
   loadChapter,
 } from "./coreFunctions/service";
 import { getNextChapter } from "./coreFunctions/bookLogic";
-import "./styles/App.scss";
 
 function App() {
   const [epubFile, setEpubFile] = useState(null);
@@ -35,7 +34,6 @@ function App() {
     logPageView();
   }, []);
 
-
   const handleFileChangeWrapper = (event) => {
     const file = event.target.files[0];
     handleFileChange(file, {
@@ -45,7 +43,7 @@ function App() {
       setBookName,
       setEpubReader,
       setError,
-      setCoverBase64  // Changed from setCoverUrl
+      setCoverBase64
     });
   };
 
@@ -109,14 +107,21 @@ function App() {
     }
   };
 
-
   return (
     <Router>
-      <div className="animate-gradient min-h-screen">
-        <div className="min-h-screen backdrop-blur-[100px] bg-white/30">
+      <div className="min-h-screen relative overflow-hidden">
+        {/* Background gradient circles */}
+        <div className="absolute top-0 left-0 w-full h-full bg-white">
+          <div className="absolute top-[-10%] left-[-20%] w-3/4 h-3/4 rounded-full bg-gradient-to-r from-purple-200/40 to-pink-200/40 blur-3xl animate-pulse" style={{ animationDuration: '8s' }}></div>
+          <div className="absolute bottom-[-20%] right-[-10%] w-3/4 h-3/4 rounded-full bg-gradient-to-l from-indigo-200/40 to-blue-200/40 blur-3xl animate-pulse" style={{ animationDuration: '10s' }}></div>
+          <div className="absolute top-[30%] right-[-20%] w-2/3 h-2/3 rounded-full bg-gradient-to-l from-rose-200/30 to-cyan-200/30 blur-3xl animate-pulse" style={{ animationDuration: '12s' }}></div>
+        </div>
+        
+        {/* Content container with glass effect */}
+        <div className="min-h-screen relative backdrop-blur-xl bg-white/30">
           <Navbar handleDownloadSampleBook={handleDownloadSampleBook} />
           
-          <main className="container mx-auto py-8">
+          <main className="container mx-auto py-8 px-4">
             <Routes>
               <Route path="/about" element={<About />} />
               <Route
@@ -130,6 +135,14 @@ function App() {
                       <p className="text-lg text-gray-600 mb-8">
                         Turn your books into visual stories
                       </p>
+                      <p>Try the <a 
+                        href='https://pro.visuai.io' 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-indigo-600 font-bold hover:text-indigo-700 transition-colors"
+                      >
+                        Pro Version
+                      </a> to add illustrations to the entire book!</p>
                     </div>
 
                     <FileUpload
@@ -137,7 +150,7 @@ function App() {
                       fileError={fileError}
                       handleParseAndGenerateImage={handleParseAndGenerateImage}
                       epubFile={epubFile}
-                      coverBase64={coverBase64}  // Pass down as prop if needed
+                      coverBase64={coverBase64}
                     />
 
                     {chapterTitle && (
@@ -156,9 +169,10 @@ function App() {
                         href="https://buymeacoffee.com/gregmac"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 py-2 px-4 text-sm font-medium text-gray-700 bg-white rounded-lg border border-gray-300 hover:bg-gray-50"
+                        className="inline-flex items-center px-6 py-3 text-sm font-medium text-gray-700 bg-white rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors shadow-sm space-x-2"
                       >
-                        ☕ Buy me a coffee
+                        <span>☕</span>
+                        <span>Buy me a coffee</span>
                       </a>
                     </div>
 
