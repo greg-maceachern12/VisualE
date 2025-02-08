@@ -72,55 +72,66 @@ export const generateImageFromPrompt = async (prompt, bookTitle) => {
   }
 };
 
-export const processChapter = async (chapter, epubReader, bookName) => {
+export const processChapter = async (
+  chapter,
+  epubReader,
+  bookName,
+  onAudioReady // optional callback for audio updates
+) => {
   try {
     if (!chapter || !epubReader || !bookName) {
       throw new Error("Invalid input parameters for chapter processing");
     }
 
-    // Get the chapter prompt
+    // Obtain the chapter prompt.
     const chapterPrompt = await getChapterPrompt(chapter, epubReader);
     if (!chapterPrompt) throw new Error("Failed to get chapter prompt");
 
-    // Start generating audio concurrently.
-    console.log("generating audio.. this can take up to 15s");
+    // Kick off audio generation without awaiting it.
     const audioPromise = generateAudioFromText(chapterPrompt);
+    console.log("Audio generation started...");
 
-    // Process the image generation chain.
+    // Process the non‑audio tasks.
     const chapterSegment = await findChapterPrompt(chapterPrompt, bookName);
     if (!chapterSegment) throw new Error("Failed to find chapter segment");
 
+    let result;
     if (chapterSegment !== "False") {
       const processedPrompt = await generatePromptFromText(chapterSegment, bookName);
       const generatedImageUrl = await generateImageFromPrompt(processedPrompt, bookName);
-
-      // Await the audio promise now.
-      if (generatedImageUrl) {
-        alert("This is taking longer than expected, please wait 15s (server in cold state)")
-      }
-      const audioResponse = await audioPromise;
-      console.log("audio generated");
-      return {
+      result = {
         displayPrompt: chapterSegment,
         imageUrl: generatedImageUrl,
-        audioStream: audioResponse,
+        audioStream: null, // Audio not ready yet.
+      };
+    } else {
+      result = {
+        displayPrompt:
+          "This chapter is not part of the plot, please click next chapter.",
+        imageUrl:
+          "https://cdn2.iconfinder.com/data/icons/picons-basic-2/57/basic2-085_warning_attention-512.png",
+        audioStream: null,
       };
     }
 
-    // If chapterSegment indicates we shouldn't process this chapter,
-    // you might still want to await the audio if needed (or ignore it).
-    await audioPromise; // Optional depending on your needs.
-    return {
-      displayPrompt:
-        "This chapter is not part of the plot, please click next chapter.",
-      imageUrl:
-        "https://cdn2.iconfinder.com/data/icons/picons-basic-2/57/basic2-085_warning_attention-512.png",
-      audioStream: null,
-    };
+    // Once the audio is ready, call the callback to update it.
+    audioPromise
+      .then((audioResponse) => {
+        if (typeof onAudioReady === "function") {
+          onAudioReady(audioResponse);
+        }
+      })
+      .catch((err) => {
+        console.error("Audio generation error:", err);
+      });
+
+    // Return the initial result (without audio)
+    return result;
   } catch (error) {
     throw new Error(`Error processing chapter: ${error.message}`);
   }
 };
+
 
 
 // In generation.js

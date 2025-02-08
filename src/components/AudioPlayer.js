@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Play, Pause } from 'lucide-react';
 
-const AudioPlayer = ({ audioURL, isLoading }) => {
+const AudioPlayer = ({ audioURL }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
@@ -36,8 +36,10 @@ const AudioPlayer = ({ audioURL, isLoading }) => {
     audioRef.current.currentTime = newTime;
     setCurrentTime(newTime);
   };
-  
-  if (isLoading) {
+
+  // Instead of checking for both isLoading and audioURL,
+  // we simply show a placeholder while audioURL is not available.
+  if (!audioURL) {
     return (
       <div className="w-full max-w-md mx-auto mt-4 pb-6">
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6">
@@ -45,12 +47,11 @@ const AudioPlayer = ({ audioURL, isLoading }) => {
             <div className="h-8 bg-gray-100 rounded-full w-8" />
             <div className="h-1 bg-gray-100 rounded-full" />
           </div>
+          <p className="text-center text-gray-500 mt-2">Audio is generating...</p>
         </div>
       </div>
     );
   }
-
-  if (!audioURL) return null;
 
   const progress = (currentTime / duration) * 100 || 0;
 

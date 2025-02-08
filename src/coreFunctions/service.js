@@ -66,52 +66,69 @@ export const handleFileChange = async (file, callbacks) => {
 };
 
 
-export const loadChapter = async (chapterIndex, subitemIndex, toc, epubReader, bookName, callbacks) => {
-    const { setChapterTitle, setDisplayPrompt, setImageUrl, setIsLoading, setAudioUrl } = callbacks;
-  
-    if (!epubReader) {
-      console.error("No EPUB reader available.");
-      setDisplayPrompt("Error: EPUB reader not initialized. Please reload the page and try again.");
+export const loadChapter = async (
+  chapterIndex,
+  subitemIndex,
+  toc,
+  epubReader,
+  bookName,
+  callbacks
+) => {
+  const { setChapterTitle, setDisplayPrompt, setImageUrl, setIsLoading, setAudioUrl } = callbacks;
+
+  if (!epubReader) {
+    console.error("No EPUB reader available.");
+    setDisplayPrompt("Error: EPUB reader not initialized. Please reload the page and try again.");
+    return;
+  }
+
+  setIsLoading(true);
+  try {
+    const currentChapter = toc[chapterIndex];
+    if (!currentChapter) {
+      throw new Error("Invalid chapter index");
+    }
+
+    if (isNonStoryChapter(currentChapter.label)) {
+      const nextChapter = getNextChapter(toc, chapterIndex, subitemIndex);
+      if (nextChapter) {
+        await loadChapter(nextChapter.nextChapterIndex, nextChapter.nextSubitemIndex, toc, epubReader, bookName, callbacks);
+      } else {
+        setDisplayPrompt("You've reached the end of the book.");
+      }
       return;
     }
-  
-    setIsLoading(true);
-    try {
-      const currentChapter = toc[chapterIndex];
-      if (!currentChapter) {
-        throw new Error("Invalid chapter index");
-      }
-  
-      if (isNonStoryChapter(currentChapter.label)) {
-        const nextChapter = getNextChapter(toc, chapterIndex, subitemIndex);
-        if (nextChapter) {
-          await loadChapter(nextChapter.nextChapterIndex, nextChapter.nextSubitemIndex, toc, epubReader, bookName, callbacks);
-        } else {
-          setDisplayPrompt("You've reached the end of the book.");
-        }
-        return;
-      }
-  
-      const chapterToLoad = currentChapter.subitems && currentChapter.subitems.length > 0
-        ? currentChapter.subitems[subitemIndex]
-        : currentChapter;
-  
-      if (!chapterToLoad) {
-        throw new Error("Invalid subitem index");
-      }
-  
-      setChapterTitle(chapterToLoad.label);
-  
-      const { displayPrompt, imageUrl, audioStream } = await processChapter(chapterToLoad, epubReader, bookName);
-      setDisplayPrompt(displayPrompt);
-      setImageUrl(imageUrl);
-      setAudioUrl(audioStream);
-    } catch (error) {
-      console.error("Error loading chapter:", error);
-      setDisplayPrompt(`Error loading chapter: ${error.message}. Please try again or select a different chapter.`);
-      setImageUrl("https://cdn2.iconfinder.com/data/icons/picons-basic-2/57/basic2-085_warning_attention-512.png");
-      setAudioUrl(null);
-    } finally {
-      setIsLoading(false);
+
+    const chapterToLoad = currentChapter.subitems && currentChapter.subitems.length > 0
+      ? currentChapter.subitems[subitemIndex]
+      : currentChapter;
+
+    if (!chapterToLoad) {
+      throw new Error("Invalid subitem index");
     }
-  };
+
+    setChapterTitle(chapterToLoad.label);
+
+    // Call processChapter with an onAudioReady callback that updates the UI.
+    const { displayPrompt, imageUrl, audioStream } = await processChapter(
+      chapterToLoad,
+      epubReader,
+      bookName,
+      (audioResponse) => {
+        // This callback runs when the audio is ready.
+        setAudioUrl(audioResponse);
+      }
+    );
+    // Update the UI with the non‑audio results immediately.
+    setDisplayPrompt(displayPrompt);
+    setImageUrl(imageUrl);
+    setAudioUrl(audioStream); // Likely null; will be updated when audio is ready.
+  } catch (error) {
+    console.error("Error loading chapter:", error);
+    setDisplayPrompt(`Error loading chapter: ${error.message}. Please try again or select a different chapter.`);
+    setImageUrl("https://cdn2.iconfinder.com/data/icons/picons-basic-2/57/basic2-085_warning_attention-512.png");
+    setAudioUrl(null);
+  } finally {
+    setIsLoading(false);
+  }
+};
