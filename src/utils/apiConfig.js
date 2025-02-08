@@ -7,7 +7,7 @@
 export const imageAPI =
 "https://visuaicalls.azurewebsites.net/api/stableDiffusion?code=yc1zQswCux8bBw5EMCIfPudqmMtSEi9qrdcGpNgvADdJAzFuFvfvyQ%3D%3D";
 
-
+export const audioAPI ='https://visuaicalls.azurewebsites.net/api/audioGen?code=lOIQvJpJKi0j7t5jkAyWHVb87YyQchpEc00ltF6j1WH2AzFu25Zqhg%3D%3D';
 
 export const segmentAPI =
 "https://visuaicalls.azurewebsites.net/api/segmentFinder?code=pNDxb_DAPifFYYNOr59_RjNuryY-49m3n9iscpdA3MewAzFu0bfNxg%3D%3D";

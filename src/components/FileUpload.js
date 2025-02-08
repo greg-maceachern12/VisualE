@@ -6,7 +6,7 @@ const FileUpload = ({
   fileError,
   epubFile,
   coverBase64: parentCoverBase64,
-  handleParseAndGenerateImage
+  handleParseAndGenerateImage,
 }) => {
   const [fileName, setFileName] = useState("No file chosen");
 
@@ -112,8 +112,9 @@ const FileUpload = ({
             className="w-full flex items-center justify-center space-x-2 py-3 px-4 text-sm font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-colors"
           >
             <Wand2 className="w-4 h-4" />
-            <span>Generate Image</span>
+            <span>Generate</span>
           </button>
+
         </div>
       </div>
     </div>

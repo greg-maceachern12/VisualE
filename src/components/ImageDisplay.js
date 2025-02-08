@@ -1,17 +1,30 @@
-import React from 'react';
+import React from "react";
+import AudioPlayer from "./AudioPlayer";
 
-const ImageDisplay = ({ chapterTitle, isLoading, imageUrl, displayPrompt, handleNextChapter, error }) => {
+const ImageDisplay = ({
+  chapterTitle,
+  isLoading,
+  imageUrl,
+  displayPrompt,
+  handleNextChapter,
+  audioURL,
+  error,
+}) => {
   return (
     <div className="w-full max-w-4xl mx-auto px-4">
       {chapterTitle && (
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">{chapterTitle}</h2>
+        <h2 className="text-xl font-semibold text-gray-900 mb-4">
+          {chapterTitle}
+        </h2>
       )}
       
+      <AudioPlayer className="px-4" audioURL={audioURL} isLoading={isLoading} />
+
       <div className="relative min-h-[400px] bg-white/50 backdrop-blur-sm rounded-lg shadow-sm">
         {error ? (
           <div className="p-8 flex flex-col items-center gap-4">
             <p className="text-red-600">Error: {error}</p>
-            <button 
+            <button
               onClick={handleNextChapter}
               className="py-2 px-4 text-sm font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
@@ -43,7 +56,7 @@ const ImageDisplay = ({ chapterTitle, isLoading, imageUrl, displayPrompt, handle
             </div>
           </div>
         )}
-        
+
         {displayPrompt && !isLoading && !error && (
           <div className="p-4 text-center">
             <p className="italic text-gray-600">{displayPrompt}</p>

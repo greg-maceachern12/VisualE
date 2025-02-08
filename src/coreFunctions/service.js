@@ -67,7 +67,7 @@ export const handleFileChange = async (file, callbacks) => {
 
 
 export const loadChapter = async (chapterIndex, subitemIndex, toc, epubReader, bookName, callbacks) => {
-    const { setChapterTitle, setDisplayPrompt, setImageUrl, setIsLoading } = callbacks;
+    const { setChapterTitle, setDisplayPrompt, setImageUrl, setIsLoading, setAudioUrl } = callbacks;
   
     if (!epubReader) {
       console.error("No EPUB reader available.");
@@ -102,13 +102,15 @@ export const loadChapter = async (chapterIndex, subitemIndex, toc, epubReader, b
   
       setChapterTitle(chapterToLoad.label);
   
-      const { displayPrompt, imageUrl } = await processChapter(chapterToLoad, epubReader, bookName);
+      const { displayPrompt, imageUrl, audioStream } = await processChapter(chapterToLoad, epubReader, bookName);
       setDisplayPrompt(displayPrompt);
       setImageUrl(imageUrl);
+      setAudioUrl(audioStream);
     } catch (error) {
       console.error("Error loading chapter:", error);
       setDisplayPrompt(`Error loading chapter: ${error.message}. Please try again or select a different chapter.`);
       setImageUrl("https://cdn2.iconfinder.com/data/icons/picons-basic-2/57/basic2-085_warning_attention-512.png");
+      setAudioUrl(null);
     } finally {
       setIsLoading(false);
     }

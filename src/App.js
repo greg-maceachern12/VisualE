@@ -20,6 +20,7 @@ function App() {
   const [bookName, setBookName] = useState("");
   const [displayPrompt, setDisplayPrompt] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [audioUrl, setAudioUrl] = useState(null); // State to store the Blob URL for audio
   const [currentChapterIndex, setCurrentChapterIndex] = useState(0);
   const [currentSubitemIndex, setCurrentSubitemIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -29,10 +30,12 @@ function App() {
   const [error, setError] = useState(null);
   const [coverBase64, setCoverBase64] = useState(null);
 
+  // Initialize Google Analytics (or any other global services)
   useEffect(() => {
     initializeGoogleAnalytics();
     logPageView();
   }, []);
+  
 
   const handleFileChangeWrapper = (event) => {
     const file = event.target.files[0];
@@ -43,7 +46,7 @@ function App() {
       setBookName,
       setEpubReader,
       setError,
-      setCoverBase64
+      setCoverBase64,
     });
   };
 
@@ -60,10 +63,13 @@ function App() {
     setCurrentChapterIndex(chapterIndex);
     setCurrentSubitemIndex(subitemIndex);
     try {
+      // loadChapter is assumed to set state variables including displayPrompt.
+      // Once displayPrompt is updated, our useEffect above will call generateAudioFromText.
       await loadChapter(chapterIndex, subitemIndex, toc, epubReader, bookName, {
         setChapterTitle,
         setDisplayPrompt,
         setImageUrl,
+        setAudioUrl,
         setIsLoading,
         setError,
       });
@@ -94,10 +100,12 @@ function App() {
             setChapterTitle,
             setDisplayPrompt,
             setImageUrl,
+            setAudioUrl,
             setIsLoading,
             setError,
           }
         );
+        console.log(audioUrl);
       } catch (err) {
         setError(err.message);
         setIsLoading(false);
@@ -112,24 +120,24 @@ function App() {
       <div className="min-h-screen relative overflow-hidden">
         {/* Background gradient circles */}
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white to-gray-50">
-          <div 
-            className="absolute top-[-10%] left-[-20%] w-3/4 h-3/4 rounded-full bg-gradient-to-r from-blue-100/60 to-cyan-100/60 blur-3xl animate-pulse" 
-            style={{ animationDuration: '8s' }}
+          <div
+            className="absolute top-[-10%] left-[-20%] w-3/4 h-3/4 rounded-full bg-gradient-to-r from-blue-100/60 to-cyan-100/60 blur-3xl animate-pulse"
+            style={{ animationDuration: "8s" }}
           />
-          <div 
-            className="absolute bottom-[-20%] right-[-10%] w-3/4 h-3/4 rounded-full bg-gradient-to-l from-indigo-100/60 to-sky-100/60 blur-3xl animate-pulse" 
-            style={{ animationDuration: '10s' }}
+          <div
+            className="absolute bottom-[-20%] right-[-10%] w-3/4 h-3/4 rounded-full bg-gradient-to-l from-indigo-100/60 to-sky-100/60 blur-3xl animate-pulse"
+            style={{ animationDuration: "10s" }}
           />
-          <div 
-            className="absolute top-[30%] right-[-20%] w-2/3 h-2/3 rounded-full bg-gradient-to-l from-cyan-100/50 to-blue-100/50 blur-3xl animate-pulse" 
-            style={{ animationDuration: '12s' }}
+          <div
+            className="absolute top-[30%] right-[-20%] w-2/3 h-2/3 rounded-full bg-gradient-to-l from-cyan-100/50 to-blue-100/50 blur-3xl animate-pulse"
+            style={{ animationDuration: "12s" }}
           />
         </div>
-        
+
         {/* Content container with glass effect */}
         <div className="min-h-screen relative backdrop-blur-xl bg-white/30">
           <Navbar handleDownloadSampleBook={handleDownloadSampleBook} />
-          
+
           <main className="container mx-auto py-8 px-4">
             <Routes>
               <Route path="/about" element={<About />} />
@@ -138,20 +146,27 @@ function App() {
                 element={
                   <div className="space-y-8">
                     <div className="text-center">
+                    <p className="text-l text-gray-600 mb-8 bg-green-100 px-4 py-3 rounded-lg">
+                        New! Generate audio for each chapter!
+                      </p>
                       <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent mb-4">
                         Visuai
                       </h1>
                       <p className="text-xl text-gray-600 mb-8">
                         Turn your books into visual stories
                       </p>
-                      <p>Try the <a 
-                        href='https://pro.visuai.io' 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-blue-600 font-bold hover:text-blue-700 transition-colors"
-                      >
-                        Pro Version
-                      </a> to add illustrations to the entire book!</p>
+                      <p>
+                        Try the{" "}
+                        <a
+                          href="https://pro.visuai.io"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 font-bold hover:text-blue-700 transition-colors"
+                        >
+                          Pro Version
+                        </a>{" "}
+                        to add illustrations to the entire book!
+                      </p>
                     </div>
 
                     <FileUpload
@@ -169,6 +184,7 @@ function App() {
                         imageUrl={imageUrl}
                         displayPrompt={displayPrompt}
                         handleNextChapter={handleNextChapter}
+                        audioURL={audioUrl}
                         error={error}
                       />
                     )}
@@ -186,10 +202,15 @@ function App() {
                     </div>
 
                     {/* Hidden div for EPUB.js rendering */}
-                    <div 
-                      id="hiddenDiv" 
+                    <div
+                      id="hiddenDiv"
                       className="hidden"
-                      style={{ position: 'absolute', visibility: 'hidden', overflow: 'hidden', height: 0 }}
+                      style={{
+                        position: "absolute",
+                        visibility: "hidden",
+                        overflow: "hidden",
+                        height: 0,
+                      }}
                     />
                   </div>
                 }
