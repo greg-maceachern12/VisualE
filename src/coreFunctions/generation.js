@@ -74,7 +74,7 @@ export const generateImageFromPrompt = async (prompt, bookTitle) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           prompt: prompt,
-          cheapModel: true,
+          cheapModel: false,
         }),
       });
       
